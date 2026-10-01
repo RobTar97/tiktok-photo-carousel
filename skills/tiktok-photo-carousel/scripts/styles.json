@@ -1,0 +1,75 @@
+{
+  "dreamcore": {
+    "font": "Fredoka.ttf", "variation": "SemiBold",
+    "size_max": 130, "size_min": 60,
+    "color": "#FFFFFF", "highlight": "#FFE9A8", "secondary": "#F4F1EA",
+    "stroke": 0, "stroke_color": "#000000",
+    "shadow": [0, 4, 14, 140],
+    "line_spacing": 1.05,
+    "filter": "dreamcore"
+  },
+  "dreamcore-quiet": {
+    "font": "Lora.ttf", "variation": "Regular",
+    "size_max": 92, "size_min": 54,
+    "color": "#FFFFFF", "highlight": "#FFE9C2", "secondary": "#F4F1EA",
+    "stroke": 0, "stroke_color": "#000000",
+    "shadow": [0, 3, 16, 170],
+    "line_spacing": 1.18,
+    "filter": "bloom"
+  },
+  "editorial": {
+    "font": "Inter.ttf", "variation": "Bold",
+    "size_max": 74, "size_min": 50,
+    "color": "#FFFFFF", "highlight": "#F4D9A0", "secondary": "#F4F1EA",
+    "stroke": 0, "stroke_color": "#000000",
+    "shadow": [0, 2, 8, 90],
+    "line_spacing": 1.08,
+    "align": "left", "gradient": 0.34,
+    "filter": "golden"
+  },
+  "clean-bold": {
+    "font": "Inter.ttf", "variation": "Black",
+    "size_max": 120, "size_min": 56,
+    "color": "#FFFFFF", "highlight": "#FFD84D", "secondary": "#FFFFFF",
+    "stroke": 8, "stroke_color": "#000000",
+    "shadow": null,
+    "line_spacing": 1.08,
+    "filter": "none"
+  },
+  "impact-meme": {
+    "font": "Anton-Regular.ttf",
+    "size_max": 150, "size_min": 64,
+    "color": "#FFFFFF", "highlight": "#FFE600", "secondary": "#FFFFFF",
+    "stroke": 9, "stroke_color": "#000000",
+    "shadow": null,
+    "line_spacing": 1.0,
+    "filter": "none"
+  },
+  "handwritten": {
+    "font": "Caveat.ttf", "variation": "Bold",
+    "size_max": 150, "size_min": 70,
+    "color": "#FFFFFF", "highlight": "#FFC2E2", "secondary": "#FFFFFF",
+    "stroke": 4, "stroke_color": "#222222",
+    "shadow": [0, 3, 10, 120],
+    "line_spacing": 1.0,
+    "filter": "warm"
+  },
+  "vhs-mono": {
+    "font": "SpaceMono-Bold.ttf",
+    "size_max": 104, "size_min": 54,
+    "color": "#F2F2F2", "highlight": "#7CFFB2", "secondary": "#F2F2F2",
+    "stroke": 3, "stroke_color": "#000000",
+    "shadow": [4, 4, 0, 200],
+    "line_spacing": 1.1,
+    "filter": "vhs"
+  },
+  "serif-soft": {
+    "font": "Lora.ttf", "variation": "Bold",
+    "size_max": 118, "size_min": 56,
+    "color": "#FFFFFF", "highlight": "#F7D9A8", "secondary": "#F4F1EA",
+    "stroke": 0, "stroke_color": "#000000",
+    "shadow": [0, 4, 18, 170],
+    "line_spacing": 1.1,
+    "filter": "golden"
+  }
+}

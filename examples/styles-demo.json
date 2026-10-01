@@ -1,0 +1,51 @@
+[
+ {
+  "photo": "sunset.jpg",
+  "style": "dreamcore",
+  "text": "This is *dreamcore*",
+  "pos": "top"
+ },
+ {
+  "photo": "hallway.jpg",
+  "style": "dreamcore-quiet",
+  "text": "This is *dreamcore-quiet*",
+  "pos": "top"
+ },
+ {
+  "photo": "sunset.jpg",
+  "style": "editorial",
+  "text": "This is *editorial*",
+  "pos": "top",
+  "kicker": "01"
+ },
+ {
+  "photo": "hallway.jpg",
+  "style": "clean-bold",
+  "text": "This is *clean-bold*",
+  "pos": "top"
+ },
+ {
+  "photo": "sunset.jpg",
+  "style": "impact-meme",
+  "text": "This is *impact-meme*",
+  "pos": "top"
+ },
+ {
+  "photo": "hallway.jpg",
+  "style": "handwritten",
+  "text": "This is *handwritten*",
+  "pos": "top"
+ },
+ {
+  "photo": "sunset.jpg",
+  "style": "vhs-mono",
+  "text": "This is *vhs-mono*",
+  "pos": "top"
+ },
+ {
+  "photo": "hallway.jpg",
+  "style": "serif-soft",
+  "text": "This is *serif-soft*",
+  "pos": "top"
+ }
+]

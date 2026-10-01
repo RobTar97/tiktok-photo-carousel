@@ -1,0 +1,23 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  selftest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -r skills/tiktok-photo-carousel/requirements.txt
+      - run: python skills/tiktok-photo-carousel/scripts/selftest.py
+      - name: Render the example
+        run: python skills/tiktok-photo-carousel/scripts/carousel.py --photos examples/photos --script examples/demo-script.json --out out --style editorial

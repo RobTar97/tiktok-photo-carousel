@@ -1,0 +1,6 @@
+[
+  {"photo": "sunset.jpg", "text": "Best sunset spots // in *your city*", "sub": "(nobody tells you these)", "pos": "top", "size": 104},
+  {"photo": "sea.jpg", "kicker": "01", "text": "A seaside promenade // with room to breathe", "pos": "top"},
+  {"photo": "hallway.jpg", "kicker": "02", "text": "A hallway that feels // like a *dream*", "pos": "top"},
+  {"photo": "sunset.jpg", "text": "Save this for // your next *trip*", "sub": "your place, your city", "pos": "top", "focus": [0.5, 0.6]}
+]
