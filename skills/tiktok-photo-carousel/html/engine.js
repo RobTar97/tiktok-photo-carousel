@@ -139,6 +139,56 @@
     }
   };
 
+  /* --- templates 13-18 -------------------------------------------------
+     Declared after the literal so each one stays a readable unit.        */
+
+  ART["cover"] = function (slide, s) {
+    // Only the feed ever sees this band; the profile grid crops it away.
+    var sw = el("div", "swipe");
+    sw.innerHTML = esc(s.swipe || "swipe") + "<i></i>";
+    slide.querySelector(".layer-art").appendChild(sw);
+  };
+
+  ART["index-card"] = function (slide, s) {
+    var art = slide.querySelector(".layer-art");
+    art.appendChild(el("div", "edge-rule"));
+    if (s.edgeLabel) art.appendChild(el("div", "edge-label", esc(s.edgeLabel)));
+  };
+
+  ART["quote-pull"] = function (slide, s) {
+    slide.querySelector(".layer-art")
+      .appendChild(el("div", "quote-mark", s.quoteMark || "“"));
+  };
+
+  ART["diagonal-split"] = function (slide) {
+    slide.querySelector(".layer-art").appendChild(el("div", "cut"));
+  };
+
+  ART["caption-bar"] = function (slide, s, deck) {
+    var art = slide.querySelector(".layer-art");
+    art.appendChild(el("div", "bar"));
+    if (s.counter !== false) {
+      var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+      art.appendChild(el("div", "counter",
+        pad(deck.slides.indexOf(s) + 1) + " / " + pad(deck.slides.length)));
+    }
+  };
+
+  ART["compare"] = function (slide, s, deck) {
+    var photos = s.photos || [s.photo];
+    var labels = s.labels || [];
+    var pair = el("div", "pair");
+    photos.slice(0, 2).forEach(function (p, i) {
+      var fig = el("figure");
+      var img = el("img");
+      img.src = src(deck, p);
+      fig.appendChild(img);
+      if (labels[i]) fig.appendChild(el("figcaption", null, esc(labels[i])));
+      pair.appendChild(fig);
+    });
+    slide.querySelector(".layer-art").appendChild(pair);
+  };
+
   /* Templates whose copy sits inside a card element. */
   var CARDED = { "frosted-card": 1, "notes-card": 1 };
 
@@ -249,6 +299,7 @@
     /* --- overlays (studio only, stripped on export) --- */
     var safe = el("div", "layer-safe");
     safe.appendChild(el("div", "rail"));
+    safe.appendChild(el("div", "gridcrop"));
     slide.appendChild(safe);
 
     var chrome = el("div", "layer-chrome");
@@ -283,7 +334,7 @@
     var availH = type.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
     var availW = type.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
 
-    var min = s.sizeMin || t.sizeMin || 48;
+    var min = s.sizeMin || t.sizeMin || 48;   // TikTok headline floor
     var max = s.size || t.sizeMax || 132;
 
     function fits(px) {
@@ -340,7 +391,12 @@
      contact sheet after the fact.                                         */
   function verify(deck) {
     var out = [];
-    var zones = deck.safe || { top: 0.12, bottom: 0.25, side: 0.08, rail: 0.16, railTop: 0.42 };
+    // Defaults follow TikTok's published media specs on a 1080x1920 canvas:
+    // ~150px username row, ~250-270px caption and buttons, icon column right.
+    var zones = Object.assign(
+      { top: 0.085, bottom: 0.15, side: 0.07, rail: 0.16, railTop: 0.42 },
+      deck.safe || {}
+    );
     window.CAROUSEL.slides.forEach(function (slide, i) {
       var sr = slide.getBoundingClientRect();
       var scale = sr.width / W || 1;
@@ -392,12 +448,77 @@
     return out;
   }
 
+  /* === MEASURE =========================================================
+     Hands scripts/audit.py the one thing it cannot work out from a PNG:
+     where each piece of copy is, what colour it was asked to be, and how
+     big it actually rendered. The audit then samples the exported pixels
+     underneath and computes real contrast.                                */
+  function measure() {
+    var out = [];
+    window.CAROUSEL.slides.forEach(function (slide, i) {
+      var sr = slide.getBoundingClientRect();
+      var scale = sr.width / W || 1;
+      var box = function (r) {
+        return [
+          Math.round((r.left - sr.left) / scale),
+          Math.round((r.top - sr.top) / scale),
+          Math.round((r.right - sr.left) / scale),
+          Math.round((r.bottom - sr.top) / scale)
+        ];
+      };
+      slide.querySelectorAll(
+        ".headline, .headline mark, .sub, .kicker, .cta, .counter, .edge-label, figcaption"
+      ).forEach(function (node) {
+          var r = node.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          var cs = getComputedStyle(node);
+          // A highlighted word has its own colour and its own band, so it is
+          // measured in its own right and cut out of its parent's sample -
+          // otherwise the parent's white is compared against the band.
+          var holes = [];
+          if (node.tagName !== "MARK") {
+            node.querySelectorAll("mark").forEach(function (m) {
+              var mr = m.getBoundingClientRect();
+              if (mr.width && mr.height) holes.push(box(mr));
+            });
+          }
+          out.push({
+            holes: holes,
+            slide: i + 1,
+            el: node.tagName === "MARK"
+              ? "highlight"
+              : (node.className.split(" ")[0] || node.tagName.toLowerCase()),
+            role: slide.dataset.role,
+            template: slide.dataset.template,
+            // canvas pixels, so the audit can index straight into the PNG
+            box: box(r),
+            color: cs.color,
+            // Whether the element paints its own ground (a label chip, a
+            // CTA pill). The audit samples inside those instead of around.
+            ownBg: cs.backgroundColor,
+            // a marker band is a gradient, not a background-color
+            ownBgImage: cs.backgroundImage && cs.backgroundImage !== "none",
+            fontSize: Math.round(parseFloat(cs.fontSize) / scale),
+            weight: cs.fontWeight,
+            text: plain(node.textContent).slice(0, 60)
+          });
+        });
+    });
+    return out;
+  }
+
   /* === THEME =========================================================== */
   function applyTheme(root, deck) {
     var t = deck.theme || {};
     var p = t.palette || [];
     var set = function (k, v) { if (v != null) root.style.setProperty(k, v); };
     set("--W", W + "px"); set("--H", H + "px");
+
+    // deck.safe drives both the CSS clearances and the verifier, so the
+    // layout and the check can never disagree about where the zones are.
+    var z = deck.safe || {};
+    set("--f-top", z.top); set("--f-bottom", z.bottom); set("--f-side", z.side);
+    set("--f-rail", z.rail); set("--f-railtop", z.railTop);
     // p is sorted dark-to-light, so the page background is p[0]. Taking a
     // middle swatch here once produced grey type on the end card.
     set("--bg", t.bg || p[0] || "#0e0e10");
@@ -581,6 +702,7 @@
     exportMode: /[?&]export=1/.test(location.search),
     slides: [],
     verify: function () { return verify(window.CAROUSEL.deck); },
+    measure: measure,
     render: render
   };
 

@@ -53,6 +53,12 @@ const SLIDES = [
   { template: "sticker-chaos", photo: "c.png", text: "sticker chaos", stickers: [{ text: "here", x: 0.6, y: 0.5, rot: -8 }] },
   { template: "dreamcore-glow", photo: "a.png", text: "Dreamcore glow", sub: "bloom and haze" },
   { template: "end-card", text: "Save this", sub: "no photo at all", cta: "part 2?" },
+  { template: "cover", role: "cover", photo: "a.png", kicker: "osaka", text: "The cover slide", sub: "survives the 1:1 grid crop" },
+  { template: "index-card", photo: "b.png", edgeLabel: "nanko bay", text: "Index card", sub: "a rule and a vertical label" },
+  { template: "quote-pull", photo: "c.png", text: "The line is the subject and the photograph is only a ground", sub: "slide four" },
+  { template: "diagonal-split", photo: "a.png", text: "Diagonal split", sub: "the copy sits in the wedge" },
+  { template: "caption-bar", photo: "b.png", text: "A lower third, the way a subtitle sits on film", sub: "with a position counter" },
+  { template: "compare", photos: ["a.png", "c.png"], labels: ["before", "after"], text: "Two frames, one split" },
   // Japanese, including vertical type - the path most likely to regress.
   { template: "full-bleed-hook", photo: "b.png", text: "大阪に // こんな場所", sub: "誰も教えてくれない" },
   { template: "arch-window", photo: "c.png", text: "海の駅", vertical: true },

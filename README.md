@@ -4,11 +4,11 @@
 [![test](https://github.com/RobTar97/tiktok-photo-carousel/actions/workflows/test.yml/badge.svg)](https://github.com/RobTar97/tiktok-photo-carousel/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-An agent skill that turns a folder of your own photos into a **TikTok photo-mode carousel**. It picks and orders the photos, writes the hook, slide text and caption, lays each slide out in HTML from a set of composition templates, lets you review and edit the whole deck in your browser, then exports pixel-exact 1080x1920 slides and checks that nothing landed under TikTok's interface.
+An agent skill that turns a folder of your own photos into a **TikTok photo-mode carousel**. It picks and orders the photos, writes the hook, slide text and caption, lays each slide out in HTML from eighteen composition templates, lets you review and edit the whole deck in your browser, then exports pixel-exact 1080x1920 slides, checks that nothing landed under TikTok's interface, and audits the shipped pixels for real contrast and legible type.
 
 No video, no AI image generation, no API keys.
 
-![Twelve templates rendered on the same three demo photos](examples/output-templates/_gallery.png)
+![Eighteen templates rendered on the same three demo photos](examples/output-templates/_gallery.png)
 
 ## Install
 
@@ -43,8 +43,10 @@ The agent asks what the carousel is for, analyses and views the photos, writes t
 ```text
 out/
   01.png ... 08.png     1080x1920 slides
+  cover.png             the thumbnail, built to survive the 1:1 grid crop
+  _cover_grid.png       what the profile grid will actually show
   _contact_sheet.png    every slide, labelled
-  _report.json          safe-zone verification
+  _report.json          safe-zone verification + measurements
   caption.md            caption + hashtags
 ```
 
@@ -60,8 +62,11 @@ node scripts/build.js --deck work/deck.json --out work/carousel.html
 
 # 3. open carousel.html, review, edit, Ctrl+S -> edits.json
 
-# 4. slides + contact sheet + verification report
+# 4. slides + cover + contact sheet + verification report
 node scripts/export.js --html work/carousel.html --out ./out
+
+# 5. is it actually readable? real contrast against the shipped pixels
+python3 scripts/audit.py --out ./out
 ```
 
 `deck.json` is the only state. Copy and layout live in separate fields, so a round of text edits can never break the geometry.
@@ -83,11 +88,13 @@ Full schema: [deck-format.md](skills/tiktok-photo-carousel/references/deck-forma
 
 ## What you get
 
-- **12 composition templates** — full-bleed hook, duotone poster, torn reveal, editorial split, arch window, frosted card, film strip, notes card, polaroid stack, sticker chaos, dreamcore glow, end card. A template sets the layout; the theme sets type and colour, so a deck still reads as one deck. [Catalogue](skills/tiktok-photo-carousel/references/templates.md)
+- **18 composition templates** — cover, full-bleed hook, duotone poster, torn reveal, editorial split, index card, caption bar, quote pull, diagonal split, arch window, frosted card, film strip, notes card, polaroid stack, sticker chaos, dreamcore glow, compare, end card. A template sets the layout; the theme sets type and colour, so a deck still reads as one deck. [Catalogue](skills/tiktok-photo-carousel/references/templates.md)
+- **A grid-safe cover** — on a photo post the first image *is* the cover, and the profile grid centre-crops it to 1:1. The `cover` template puts the title inside the square that survives and the swipe cue in the band that does not. You get `cover.png` and a preview of the cropped version.
+- **A readability audit** — `audit.py` measures real WCAG contrast for every line against the pixels actually behind it, using background plates rendered with the glyphs made transparent, and enforces TikTok's 48px headline / 32px body floors. [How it reads](skills/tiktok-photo-carousel/references/review-loop.md)
 - **Colour from the photographs** — a five-colour palette per photo seeds the theme, so the accent belongs to the images instead of to a default.
 - **Measured contrast** — scrim strength comes from the real luminance and busyness of the strip the text sits on, and the gradient ends just past the last line, whatever size the type settled at.
 - **A browser review studio** — safe-zone x-ray, a mock of TikTok's actual interface over your slide, and in-place text editing that exports back as `edits.json`. [How the loop works](skills/tiktok-photo-carousel/references/review-loop.md)
-- **Safe-zone verification** — every copy element is measured against the zones TikTok covers, and overlaps are reported in pixels. [Details](skills/tiktok-photo-carousel/references/safe-zones.md)
+- **Safe zones from the published specs** — ~150px top, ~250-270px bottom, the icon column on the lower right. One set of fractions drives both the CSS and the verifier, so the layout and the check cannot disagree. [Details](skills/tiktok-photo-carousel/references/safe-zones.md)
 - **Autofit that measures** — binary search against the real rendered box, so type runs as large as it actually can.
 - **Japanese as a first-class path** — JP display and text faces, looser leading, manual line breaking, and vertical type. [Design system](skills/tiktok-photo-carousel/references/design-system.md)
 - **Brand kits** — a reusable theme plus copy rules, merged under the deck's own choices. [Brand kits](skills/tiktok-photo-carousel/references/brand-kit.md)
@@ -99,11 +106,12 @@ Full schema: [deck-format.md](skills/tiktok-photo-carousel/references/deck-forma
 skills/tiktok-photo-carousel/
   SKILL.md                 workflow + commands (the only file always read)
   html/
-    templates.css          the 12 templates and the layer system
+    templates.css          the 18 templates and the layer system
     engine.js              rendering, autofit, scrim fitting, verifier, studio
     shell.html             page shell the build fills in
   scripts/
     analyze.py             photos -> palette, focus, contrast, resized copies
+    audit.py               exported slides -> contrast, size floors, cover crop
     build.js               deck.json -> carousel.html
     export.js              carousel.html -> slides + contact sheet + report
     selftest.js            renders every template and asserts the output
@@ -147,6 +155,8 @@ All demo images are generated by `examples/make_demo_photos.py`, so nothing is c
 | Fonts fall back to system faces | the Google Fonts request was blocked; check the network or set `fontSource: "local"` |
 | The studio is slow | you skipped `--resize`; re-run `analyze.py` with it |
 | `copy hit the minimum size` | the slide carries two ideas — split it |
+| audit says a line "drops to 2.1:1" | raise that slide's `scrim`, move the copy with `pos`, or change the photo |
+| audit says the cover "leaves the 1:1 grid crop" | slide 1 is not using the `cover` template |
 | Colours look different on the phone | TikTok recompresses; avoid thin fonts and very low contrast |
 | `python3: command not found` on Windows | use `python` |
 

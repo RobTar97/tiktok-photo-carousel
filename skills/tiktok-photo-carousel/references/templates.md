@@ -1,6 +1,6 @@
 # Templates
 
-Twelve composition archetypes. A template decides the **layout** of a slide,
+Eighteen composition archetypes. A template decides the **layout** of a slide,
 not its font. Fonts and colour come from the theme, so every template in a
 deck still looks like one deck.
 
@@ -12,16 +12,22 @@ people by slide 3.
 
 | Slide | Job | Reach for |
 |---|---|---|
-| 1 | Stop the thumb | `full-bleed-hook`, `duotone-poster`, `torn-reveal` |
-| 2..n-1 | Carry one idea each | `editorial-split`, `arch-window`, `frosted-card`, `film-strip`, `notes-card` |
+| 1 | Stop the thumb, and survive the grid crop | **`cover`**, `full-bleed-hook`, `duotone-poster`, `torn-reveal` |
+| 2..n-1 | Carry one idea each | `editorial-split`, `index-card`, `caption-bar`, `arch-window`, `frosted-card`, `diagonal-split`, `notes-card`, `film-strip` |
+| any | A line worth hearing | `quote-pull` |
+| any | A real pairing | `compare` |
 | n-1 | The payoff | `polaroid-stack`, `full-bleed-hook`, `sticker-chaos` |
 | n | One call to action | `end-card` |
+
+**Slide 1 should normally be `cover`.** On a photo post the first image is the
+cover, and the profile grid crops it to 1:1 - every other template puts the
+headline where that crop cuts.
 
 A good default shape for 8 slides:
 
 ```
-full-bleed-hook -> editorial-split -> editorial-split -> arch-window
--> frosted-card -> notes-card -> polaroid-stack -> end-card
+cover -> editorial-split -> caption-bar -> arch-window
+-> frosted-card -> index-card -> polaroid-stack -> end-card
 ```
 
 Vary, but keep two rules: **never two of the same template back to back**, and
@@ -160,6 +166,72 @@ automatically. Keep the CTA to one action — save, send, follow, or "part 2?".
 
 ---
 
+## 13. `cover`
+
+The thumbnail, and on a photo post the first slide as well. Centred lockup
+inside the 1080x1080 band the profile grid keeps, with the swipe cue in the
+band below that only the feed ever shows.
+
+Fields: `photo`, `text`, `sub?`, `kicker?`, `swipe?` (default `swipe`)
+This is the one template where centring is right: the crop is centred, so the
+title has to be. Its scrim has a floor, because the cover is read in a
+fraction of a second in a crowded feed.
+
+---
+
+## 14. `index-card`
+
+Asymmetric editorial. A rule runs the height of the safe area with the section
+label set vertically along it; the headline hangs to its right.
+
+Fields: `photo`, `edgeLabel`, `text`, `sub?`
+The edge label should name something real - a place, a floor, a section. If it
+would only be decoration, use `full-bleed-hook` instead.
+
+---
+
+## 15. `quote-pull`
+
+The line is the subject and the photograph is only a ground, so the photo is
+desaturated and pushed back behind an oversized quotation mark.
+
+Fields: `photo`, `text`, `sub?` (set in mono as an attribution), `quoteMark?`
+Best for POV and storytime, or one line of someone else's words. The headline
+is set in the text face, not the display face - this is a quote, not a shout.
+
+---
+
+## 16. `diagonal-split`
+
+The photo is cut on a rising diagonal with the copy in the solid wedge below.
+Signature: a hairline accent stroke along the cut.
+
+Fields: `photo`, `text`, `sub?`
+The cut rises left to right, so put the subject low-left in the frame.
+
+---
+
+## 17. `caption-bar`
+
+A lower third over a full-bleed photo, the way a subtitle sits on film, with a
+position counter at its right edge.
+
+Fields: `photo`, `text`, `sub?`, `counter?` (`false` to drop it)
+The counter tells the viewer how much is left, which is the single best lever
+there is on swipe-through. Keep it unless you have a reason.
+
+---
+
+## 18. `compare`
+
+Two frames, hard split, one label each.
+
+Fields: `photos` (2), `labels` (2), `text`, `sub?`
+Only reach for it when the pairing is real - a before and an after, two sides
+of the same place. A split with nothing to compare is just a smaller photo.
+
+---
+
 ## Adding a template
 
 1. Add a block to `html/templates.css` keyed on
@@ -167,8 +239,9 @@ automatically. Keep the CTA to one action — save, send, follow, or "part 2?".
 2. Set padding on `.layer-type`, never on `.type-box` — the autofit pass
    measures the box against the layer's padding box, so padding is how you
    tell it where the copy may live.
-3. Keep the copy out of the top 12% and the bottom 25%, and leave the
-   lower-right clear of the icon rail.
+3. Express clearances as `var(--safe-t)` / `var(--safe-b)` so the template
+   follows `deck.safe` instead of a hard-coded fraction, and leave the
+   lower right clear of the icon rail.
 4. If it needs extra DOM, add an entry to `ART` in `html/engine.js`.
 5. Rebuild and run the export — the verifier will tell you if the geometry
    collides with TikTok's interface.

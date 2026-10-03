@@ -1,10 +1,10 @@
 ---
 name: tiktok-photo-carousel
-description: Designs and renders TikTok photo-mode carousels from the user's own photos. Composes each slide in HTML from twelve layout templates (editorial split, duotone poster, polaroid, notes card, arch window, film strip and more), derives colour and crop from the photographs themselves, lets the user review and edit the deck in their browser before anything is final, then exports pixel-exact 1080x1920 slides with Playwright and verifies nothing lands under TikTok's interface. Writes the hooks, slide copy and caption when the user has none. Use when the user asks for a TikTok carousel, a photo-mode post, a photo slideshow, text over photos, slide captions, "dreamcore slides", a travel or list carousel, or burning text onto a folder of images.
+description: Designs and renders TikTok photo-mode carousels from the user's own photos. Composes each slide in HTML from eighteen layout templates (cover, editorial split, index card, caption bar, quote pull, diagonal split, duotone poster, polaroid, notes card, arch window, film strip and more), derives colour and crop from the photographs themselves, lets the user review and edit the deck in their browser before anything is final, then exports pixel-exact 1080x1920 slides with Playwright, verifies nothing lands under TikTok's interface, and audits the shipped pixels for real contrast and legible type sizes. Produces a grid-safe cover for the thumbnail. Writes the hooks, slide copy and caption when the user has none. Use when the user asks for a TikTok carousel, a photo-mode post, a photo slideshow, text over photos, slide captions, "dreamcore slides", a travel or list carousel, or burning text onto a folder of images.
 license: MIT
 compatibility: Node 18+ and Playwright for the HTML engine (npm install, then npx playwright install chromium). Python 3.9+ and Pillow for photo analysis and the legacy renderer. Works on Windows, macOS and Linux.
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # TikTok Photo Carousel
@@ -29,7 +29,7 @@ node scripts/selftest.js            # prints: OK
 
 | | `html` (default) | `pil` (legacy) |
 |---|---|---|
-| Layout | 12 composition templates | text over the photo, nothing else |
+| Layout | 18 composition templates | text over the photo, nothing else |
 | Review | browser studio, inline editing | contact sheet after the fact |
 | Needs | Node + Playwright | Pillow only, fully offline |
 | Use when | almost always | no Node available, or re-running a v1 script |
@@ -104,7 +104,9 @@ twenty questions will not.
 
 Write `deck.json` ([references/deck-format.md](references/deck-format.md)),
 choosing a template per slide by the job that slide does
-([references/templates.md](references/templates.md)). Read
+([references/templates.md](references/templates.md)). **Slide 1 should
+normally be `cover`** - on a photo post the first image is the cover, and the
+profile grid crops it to 1:1, which cuts the headline of every other template. Read
 [references/design-system.md](references/design-system.md) before settling the
 theme.
 
@@ -127,11 +129,21 @@ break the geometry.
 node scripts/export.js --html work/<name>/carousel.html --out ./out
 ```
 
-Produces `01.png`…`NN.png` at exactly 1080x1920, a labelled
-`_contact_sheet.png`, and `_report.json`. The safe-zone verifier runs as part
-of the export and prints what it found.
+Produces `01.png`…`NN.png` at exactly 1080x1920, `cover.png`, a labelled
+`_contact_sheet.png`, `_report.json`, and `_bg/` plates for the audit. The
+safe-zone verifier runs as part of the export and prints what it found.
 
-**Fix everything it reports, then re-export.** What each message means and how
+Then audit what you actually shipped:
+
+```bash
+python3 scripts/audit.py --out ./out
+```
+
+It measures real contrast for every line against the pixels behind it, checks
+the 48px / 32px size floors, and writes `_cover_grid.png` - the cover as the
+profile grid will crop it.
+
+**Fix everything both of them report, then re-export.** What each message means and how
 to fix it is in [references/review-loop.md](references/review-loop.md).
 
 Then look at the contact sheet yourself, and at any slide the verifier was
@@ -157,11 +169,12 @@ Do not post anything for the user.
 | Path | What it is |
 |---|---|
 | `scripts/analyze.py` | photos -> palette, focus, contrast; optional resize |
+| `scripts/audit.py` | exported slides -> contrast, size floors, cover crop |
 | `scripts/build.js` | deck.json -> one self-contained carousel.html |
 | `scripts/export.js` | carousel.html -> slides + contact sheet + report |
 | `scripts/selftest.js` | end-to-end check on generated demo photos |
 | `scripts/carousel.py` | legacy Pillow renderer (v1, unchanged) |
-| `html/templates.css` | the twelve templates and the layer system |
+| `html/templates.css` | the eighteen templates and the layer system |
 | `html/engine.js` | rendering, autofit, scrim fitting, verifier, studio |
 | `html/shell.html` | page shell the build fills in |
 | `brand/` | brand kits |

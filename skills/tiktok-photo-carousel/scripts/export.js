@@ -74,6 +74,12 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
   await page.waitForSelector('body[data-ready="1"]', { timeout: 30000 });
 
   const report = await page.evaluate(() => window.CAROUSEL.verify());
+  const boxes = await page.evaluate(() => window.CAROUSEL.measure());
+  const isCover = await page.evaluate(() =>
+    window.CAROUSEL.slides.map(
+      (s) => s.dataset.template === "cover" || s.dataset.role === "cover"
+    )
+  );
   const slides = await page.$$(".slide");
 
   const names = [];
@@ -85,6 +91,38 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
     names.push(name);
     process.stdout.write("  " + name + "\n");
   }
+
+  /* The cover is what people meet first, in the feed and again on the
+     profile grid, so it gets its own file rather than being "the first
+     one you happen to upload". */
+  let coverIdx = isCover.indexOf(true);
+  if (coverIdx === -1) coverIdx = 0;
+  const coverName = "cover." + (format === "jpeg" ? "jpg" : "png");
+  fs.copyFileSync(path.join(outDir, names[coverIdx]), path.join(outDir, coverName));
+  process.stdout.write("  " + coverName + "  (from slide " + (coverIdx + 1) + ")\n");
+
+  /* --- pass 1b: background plates --------------------------------------
+     The same slides with the glyphs made transparent - every card, chip,
+     bar and scrim still painted. scripts/audit.py
+     measures contrast against these instead of trying to separate glyphs
+     from their background inside a finished PNG, where antialiasing makes
+     the two indistinguishable at the edges. */
+  const bgDir = path.join(outDir, "_bg");
+  fs.mkdirSync(bgDir, { recursive: true });
+  await page.addStyleTag({
+    content:
+      ".headline,.headline mark,.sub,.kicker,.cta,.counter,.edge-label," +
+      ".swipe,.note-bar,.pair figcaption{" +
+      "color:transparent!important;text-shadow:none!important;" +
+      "-webkit-text-stroke-color:transparent!important}",
+  });
+  for (let i = 0; i < slides.length; i++) {
+    await slides[i].screenshot({
+      path: path.join(bgDir, String(i + 1).padStart(2, "0") + ".png"),
+      type: "png",
+    });
+  }
+  process.stdout.write("  _bg/  (background plates for the audit)\n");
 
   /* --- pass 2: labelled contact sheet ---------------------------------- */
   if (wantContact) {
@@ -102,7 +140,11 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
   /* --- report ---------------------------------------------------------- */
   fs.writeFileSync(
     path.join(outDir, "_report.json"),
-    JSON.stringify({ slides: names, issues: report, pageErrors: errors }, null, 2)
+    JSON.stringify(
+      { slides: names, cover: coverName, coverSlide: coverIdx + 1,
+        issues: report, boxes, pageErrors: errors },
+      null, 2
+    )
   );
 
   console.log("\n" + names.length + " slide(s) -> " + outDir);

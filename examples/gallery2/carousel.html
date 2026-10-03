@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800;900&family=Instrument+Sans:wght@300;400;500;600&family=Caveat:wght@400;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* ===================== TEMPLATE STYLESHEET (inlined) ===================== */
+/* ============================================================================
+   TikTok Photo Carousel - template stylesheet
+   Canvas is a fixed 1080x1920 box. Everything inside is absolute or grid.
+   Never use viewport units here: the slide is a fixed-size element, not a page.
+   ========================================================================= */
+
+/* === RESET ============================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* === CANVAS ============================================================= */
+.slide {
+  position: relative;
+  width: var(--W, 1080px);
+  height: var(--H, 1920px);
+  overflow: hidden;
+  background: var(--bg, #0e0e10);
+  color: var(--ink, #ffffff);
+  font-family: var(--font-text, serif);
+  isolation: isolate;          /* keeps blend modes from leaking out */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Safe-zone geometry, from TikTok's own media specs on a 1080x1920 canvas:
+     ~150px of username row at the top, ~250-270px of caption and buttons at
+     the bottom, and the like/comment/share column down the right. Stated as
+     unitless fractions so every template derives its padding from one place.
+     Override per deck with deck.safe. */
+  --f-top: 0.085;              /* 163px */
+  --f-bottom: 0.15;            /* 288px */
+  --f-side: 0.07;              /* 76px  */
+  --f-rail: 0.16;              /* icon column width */
+  --f-railtop: 0.42;           /* where that column starts */
+
+  --safe-x: calc(var(--W, 1080px) * var(--f-side));
+  --safe-t: calc(var(--H, 1920px) * var(--f-top));
+  --safe-b: calc(var(--H, 1920px) * var(--f-bottom));
+
+  /* percentage forms, for the x-ray overlay */
+  --safe-top: calc(var(--f-top) * 100%);
+  --safe-bottom: calc(var(--f-bottom) * 100%);
+  --rail: calc(var(--f-rail) * 100%);
+}
+
+/* === LAYER STACK ======================================================== */
+.layer-photo, .layer-scrim, .layer-texture, .layer-art,
+.layer-type, .layer-safe, .layer-chrome {
+  position: absolute; inset: 0;
+}
+.layer-photo  { z-index: 1; }
+.layer-scrim  { z-index: 2; pointer-events: none; }
+.layer-texture{ z-index: 3; pointer-events: none; }
+.layer-art    { z-index: 4; pointer-events: none; }
+.layer-type   { z-index: 5; }
+.layer-safe   { z-index: 8; pointer-events: none; display: none; }
+.layer-chrome { z-index: 9; pointer-events: none; display: none; }
+
+.slide[data-xray="1"] .layer-safe     { display: block; }
+.slide[data-chrome="1"] .layer-chrome { display: block; }
+
+/* === PHOTO ============================================================== */
+.layer-photo .photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: var(--focus, 50% 50%);
+  display: block;
+}
+/* Blur-pad fit: photo letterboxed over a blown-up blurred copy of itself. */
+.slide[data-fit="blur"] .layer-photo { display: grid; place-items: center; }
+.slide[data-fit="blur"] .photo { object-fit: contain; position: relative; z-index: 1; }
+.slide[data-fit="blur"] .photo-pad {
+  position: absolute; inset: -5%;
+  width: 110%; height: 110%;
+  object-fit: cover;
+  filter: blur(48px) saturate(1.2) brightness(0.7);
+}
+
+/* === SCRIM =============================================================
+   Opacity is computed per slide from the real luminance under the type box
+   (see scripts/analyze.py). --scrim is 0..1, data-dir picks the ramp.      */
+.layer-scrim { opacity: var(--scrim, 0.45); }
+.layer-scrim[data-dir="top"] {
+  /* --scrim-mid / --scrim-end are written per slide by fitScrim() so the
+     ramp ends just past the last line, whatever size the copy settled at. */
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,0.96) calc(var(--scrim-mid, 42%) * 0.55),
+    rgba(0,0,0,0.88) var(--scrim-mid, 42%),
+    rgba(0,0,0,0) var(--scrim-end, 62%));
+}
+.layer-scrim[data-dir="bottom"] {
+  background: linear-gradient(to top,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,0.96) calc(var(--scrim-mid, 42%) * 0.55),
+    rgba(0,0,0,0.88) var(--scrim-mid, 42%),
+    rgba(0,0,0,0) var(--scrim-end, 62%));
+}
+.layer-scrim[data-dir="full"]  { background: rgba(0,0,0,0.55); }
+.layer-scrim[data-dir="radial"] {
+  background: radial-gradient(60% 42% at 50% 34%,
+    rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0) 100%);
+}
+.layer-scrim[data-dir="none"] { background: none; }
+
+/* === TEXTURE ===========================================================
+   Grain, vignette and a hairline chromatic fringe. All three are optional
+   and all three are what stop a flat render from reading as "generated".   */
+.layer-texture::before {              /* grain */
+  content: ""; position: absolute; inset: -50%;
+  opacity: var(--grain, 0.06);
+  background-image: var(--grain-url);
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+.layer-texture::after {               /* vignette */
+  content: ""; position: absolute; inset: 0;
+  opacity: var(--vignette, 0.35);
+  background: radial-gradient(118% 78% at 50% 44%,
+    rgba(0,0,0,0) 48%, rgba(0,0,0,0.85) 100%);
+}
+.slide[data-aberration="1"] .layer-photo .photo {
+  filter: drop-shadow(2px 0 0 rgba(255,0,64,0.22))
+          drop-shadow(-2px 0 0 rgba(0,210,255,0.22));
+}
+.slide[data-scanlines="1"] .layer-texture {
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 1px, transparent 1px, transparent 4px);
+}
+
+/* === TYPE ==============================================================
+   The type block lives inside the safe box. Position variants decide where
+   vertically. Font size comes from --fs, written by the autofit pass.      */
+.layer-type {
+  display: flex; flex-direction: column;
+  padding: var(--safe-t) var(--safe-x) var(--safe-b) var(--safe-x);
+}
+/* Every template's copy lives in exactly one .type-box. The autofit pass
+   measures this box against the padding box of .layer-type, so adding a
+   template means setting padding on .layer-type - never on the box. */
+.layer-type > .type-box {
+  display: flex; flex-direction: column;
+  width: 100%;
+  gap: calc(var(--fs, 96px) * 0.22);
+}
+.slide[data-align="center"] .type-box { align-items: center; }
+.slide[data-align="right"]  .type-box { align-items: flex-end; }
+/* Icon-rail clearance lives on the box, not on .layer-type: templates
+   rewrite .layer-type padding wholesale and would otherwise drop it. */
+.slide[data-rail="1"] .type-box { padding-right: calc(var(--W) * (var(--f-rail) - var(--f-side) + 0.04)); }
+
+.slide[data-pos="top"]    .layer-type { justify-content: flex-start; padding-top: calc(var(--safe-t) + var(--H) * 0.02); }
+.slide[data-pos="upper"]  .layer-type { justify-content: flex-start; padding-top: calc(var(--H) * 0.20); }
+.slide[data-pos="middle"] .layer-type { justify-content: center; padding-bottom: calc(var(--safe-b) + var(--H) * 0.09); }
+.slide[data-pos="lower"]  .layer-type { justify-content: flex-end; padding-bottom: calc(var(--safe-b) + var(--H) * 0.03); }
+
+.slide[data-align="center"] .layer-type { align-items: center; text-align: center; }
+.slide[data-align="right"]  .layer-type { align-items: flex-end; text-align: right; }
+
+.headline {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--fs, 96px);
+  font-weight: var(--display-weight, 800);
+  line-height: var(--leading, 1.06);
+  letter-spacing: var(--tracking, -0.02em);
+  text-wrap: balance;
+  max-width: 100%;
+}
+.sub {
+  font-family: var(--font-text, sans-serif);
+  /* 32px is the smallest body text that stays readable on a phone, so the
+     floor is absolute - it does not scale down with the headline. */
+  font-size: max(32px, calc(var(--fs, 96px) * var(--sub-ratio, 0.38)));
+  line-height: 1.32;
+  font-weight: 500;
+  color: var(--muted, rgba(255,255,255,0.93));
+  letter-spacing: 0.005em;
+  max-width: 86%;
+}
+.kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: max(32px, calc(var(--fs, 96px) * 0.20));
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--accent, #f2b705);
+}
+.headline mark {
+  background: none;
+  color: var(--accent, #f2b705);
+  font-style: inherit;
+}
+/* Highlight variants: set theme.highlight to swap the treatment. */
+.slide[data-hl="box"] .headline mark {
+  color: var(--bg, #0e0e10);
+  background: var(--accent, #f2b705);
+  padding: 0.02em 0.16em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.slide[data-hl="underline"] .headline mark {
+  color: inherit;
+  box-shadow: inset 0 -0.14em 0 var(--accent, #f2b705);
+}
+.slide[data-hl="marker"] .headline mark {
+  color: inherit;
+  background: linear-gradient(to bottom, transparent 56%, var(--accent, #f2b705) 56%,
+                              var(--accent, #f2b705) 94%, transparent 94%);
+  padding: 0 0.1em;
+}
+
+/* Readability armour: a soft shadow under type on busy photos. */
+.slide[data-shadow="1"] .headline { text-shadow: 0 4px 22px rgba(0,0,0,0.55); }
+/* The secondary line is smaller and thinner, so it needs a tighter, denser
+   shadow than the headline rather than the same one. */
+.slide[data-shadow="1"] .sub {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.85), 0 0 26px rgba(0,0,0,0.5);
+}
+.slide[data-stroke="1"] .headline {
+  -webkit-text-stroke: calc(var(--fs) * 0.018) var(--stroke-color, #000);
+  paint-order: stroke fill;
+}
+
+/* ============================================================================
+   TEMPLATES
+   Each sets layout, colour behaviour and which art the engine should inject.
+   ========================================================================= */
+
+/* --- 1. full-bleed-hook -------------------------------------------------
+   Photo edge to edge, display type as large as the safe box allows.        */
+.slide[data-template="full-bleed-hook"] {
+  --leading: 1.02; --tracking: -0.035em;
+}
+
+/* --- 2. duotone-poster --------------------------------------------------
+   Photo crushed to two brand colours, halftone dots, condensed caps.       */
+.slide[data-template="duotone-poster"] { background: var(--duo-dark, #101b3a); }
+.slide[data-template="duotone-poster"] .photo {
+  filter: grayscale(1) contrast(1.22) brightness(1.04);
+  mix-blend-mode: luminosity;
+}
+.slide[data-template="duotone-poster"] .layer-photo {
+  background: linear-gradient(140deg, var(--duo-dark, #101b3a), var(--duo-light, #c8102e));
+}
+.slide[data-template="duotone-poster"] .halftone {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at center, var(--duo-light, #c8102e) 28%, transparent 29%);
+  background-size: 14px 14px;
+  opacity: 0.30; mix-blend-mode: screen;
+}
+.slide[data-template="duotone-poster"] .headline {
+  text-transform: uppercase;
+  font-stretch: condensed;
+  letter-spacing: -0.015em;
+  line-height: 0.94;
+}
+
+/* --- 3. torn-reveal -----------------------------------------------------
+   Photo visible through a torn-paper tear; headline on the paper above.    */
+.slide[data-template="torn-reveal"] { background: var(--paper, #efe9dd); color: #141414; }
+/* The copy sits on paper, not on the photo, so the photo scrim would only
+   dirty the paper. Same reasoning as arch-window and polaroid-stack. */
+.slide[data-template="torn-reveal"] .layer-scrim { display: none; }
+.slide[data-template="torn-reveal"] .layer-texture::after { opacity: 0; }
+.slide[data-template="torn-reveal"] .layer-photo { clip-path: url(#tearClip); }
+.slide[data-template="torn-reveal"] .paper-top {
+  position: absolute; inset: 0 0 auto 0; height: 46%;
+  background: var(--paper, #efe9dd);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+}
+.slide[data-template="torn-reveal"] .layer-type {
+  justify-content: flex-start;
+  padding-top: calc(var(--H) * 0.13);
+  color: #141414;
+}
+.slide[data-template="torn-reveal"] .sub { color: rgba(20,20,20,0.66); }
+
+/* --- 4. editorial-split -------------------------------------------------
+   Photo 62%, flat colour block 38% carrying kicker + headline + rules.     */
+.slide[data-template="editorial-split"] { background: var(--block, #141414); }
+.slide[data-template="editorial-split"] .layer-photo,
+.slide[data-template="editorial-split"] .layer-scrim,
+.slide[data-template="editorial-split"] .layer-texture,
+.slide[data-template="editorial-split"] .layer-art { inset: 0 0 42% 0; }
+.slide[data-template="editorial-split"] .layer-type {
+  inset: 58% 0 var(--safe-b) 0;    /* stops at the bottom safe zone */
+  justify-content: center;
+  padding: calc(var(--H) * 0.03) var(--safe-x);
+  gap: calc(var(--fs) * 0.30);
+  border-top: 3px solid var(--accent, #f2b705);
+}
+.slide[data-template="editorial-split"] .headline { letter-spacing: -0.015em; }
+.slide[data-template="editorial-split"] .kicker {
+  display: flex; align-items: center; gap: 0.9em; align-self: stretch;
+}
+.slide[data-template="editorial-split"] .kicker::after {
+  content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.4;
+}
+
+/* --- 5. arch-window -----------------------------------------------------
+   Photo masked into an arch with a hairline border. Calm, premium.         */
+.slide[data-template="arch-window"] { background: var(--paper, #e8e2d6); color: #1b1b1b; }
+.slide[data-template="arch-window"] .layer-photo {
+  inset: calc(var(--H) * 0.075) calc(var(--W) * 0.10) calc(var(--H) * 0.41);
+  border-radius: 50% 50% 8px 8px / 32% 32% 2% 2%;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+}
+.slide[data-template="arch-window"] .layer-photo::after {
+  content: ""; position: absolute; inset: 0;
+  border: 2px solid rgba(255,255,255,0.55);
+  border-radius: inherit;
+}
+.slide[data-template="arch-window"] .layer-scrim,
+.slide[data-template="arch-window"] .layer-texture { display: none; }
+.slide[data-template="arch-window"] .layer-type {
+  justify-content: flex-end;
+  padding-top: calc(var(--H) * 0.615);     /* starts below the arch */
+  padding-bottom: var(--safe-b);
+  color: #1b1b1b;
+}
+.slide[data-template="arch-window"] .sub { color: rgba(27,27,27,0.62); }
+.slide[data-template="arch-window"] .headline {
+  font-family: var(--font-text); font-weight: 500; --tracking: 0.005em;
+}
+
+/* --- 6. frosted-card ----------------------------------------------------
+   Glass card over the blurred photo. The list / tips slide.                */
+.slide[data-template="frosted-card"] .photo { filter: blur(3px) saturate(1.1); transform: scale(1.06); }
+.slide[data-template="frosted-card"] .layer-type {
+  justify-content: center;
+  padding-bottom: calc(var(--safe-b) + var(--H) * 0.04);
+}
+.slide[data-template="frosted-card"] .card {
+  background: rgba(14,14,18,0.34);
+  border: 1px solid rgba(255,255,255,0.26);
+  border-radius: 34px;
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.35);
+  padding: calc(var(--fs) * 0.70) calc(var(--fs) * 0.62);
+  display: flex; flex-direction: column; gap: calc(var(--fs) * 0.26);
+}
+
+/* --- 7. film-strip ------------------------------------------------------
+   Two or three frames stacked with sprocket holes and a date stamp.        */
+.slide[data-template="film-strip"] { background: #0b0b0b; }
+.slide[data-template="film-strip"] .layer-photo,
+.slide[data-template="film-strip"] .layer-scrim { display: none; }
+.slide[data-template="film-strip"] .strip {
+  position: absolute; inset: calc(var(--H) * 0.09) calc(var(--W) * 0.07) calc(var(--H) * 0.38);
+  display: grid; gap: 14px;
+  background: #121212;
+  padding: 26px 46px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.slide[data-template="film-strip"] .strip img {
+  width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block;
+}
+.slide[data-template="film-strip"] .sprockets {
+  position: absolute; top: 0; bottom: 0; width: 30px;
+  background-image: radial-gradient(circle, #0b0b0b 38%, transparent 39%);
+  background-size: 30px 46px;
+}
+.slide[data-template="film-strip"] .sprockets.left  { left: 8px; }
+.slide[data-template="film-strip"] .sprockets.right { right: 8px; }
+.slide[data-template="film-strip"] .layer-type {
+  justify-content: flex-end;
+  padding-top: calc(var(--H) * 0.64);      /* the copy sits below the strip */
+  padding-bottom: var(--safe-b);
+}
+
+/* --- 8. notes-card ------------------------------------------------------
+   Photo on top, an iOS-notes style card underneath holding the line.
+   The most native-feeling format on the app.                               */
+.slide[data-template="notes-card"] { background: #0e0e10; }
+.slide[data-template="notes-card"] .layer-photo,
+.slide[data-template="notes-card"] .layer-scrim,
+.slide[data-template="notes-card"] .layer-texture { inset: 0 0 34% 0; }
+.slide[data-template="notes-card"] .layer-type {
+  justify-content: flex-end;
+  padding: calc(var(--H) * 0.40) calc(var(--W) * 0.055) var(--safe-b);
+}
+.slide[data-template="notes-card"] .card {
+  background: var(--note-bg, #fbf7ec);
+  color: var(--note-ink, #1a1a1a);
+  border-radius: 26px;
+  padding: calc(var(--fs) * 0.58);
+  display: flex; flex-direction: column; gap: calc(var(--fs) * 0.22);
+  box-shadow: 0 -10px 50px rgba(0,0,0,0.45);
+}
+.slide[data-template="notes-card"] .card .sub { color: rgba(26,26,26,0.60); }
+.slide[data-template="notes-card"] .note-bar {
+  display: flex; gap: 10px; align-items: center;
+  font-family: var(--font-mono); font-size: max(32px, calc(var(--fs) * 0.17));
+  letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.55;
+}
+
+/* --- 9. polaroid-stack --------------------------------------------------
+   Tilted print on linen, tape corners, handwritten caption.                */
+.slide[data-template="polaroid-stack"] {
+  background: var(--paper, #ded7c8);
+  background-image: var(--linen-url);
+  color: #1d1d1d;
+}
+.slide[data-template="polaroid-stack"] .layer-photo,
+.slide[data-template="polaroid-stack"] .layer-scrim,
+.slide[data-template="polaroid-stack"] .layer-texture { display: none; }
+.slide[data-template="polaroid-stack"] .polaroid {
+  position: absolute; left: 11%; right: 11%;
+  top: calc(var(--H) * 0.11); height: calc(var(--H) * 0.52);
+  background: #fff; padding: 26px 26px 112px;
+  transform: rotate(var(--tilt, -3deg));
+  box-shadow: 0 26px 54px rgba(0,0,0,0.30);
+}
+.slide[data-template="polaroid-stack"] .polaroid.behind {
+  transform: rotate(calc(var(--tilt, -3deg) * -1.7)) translateY(10px);
+  filter: brightness(0.94);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.22);
+}
+.slide[data-template="polaroid-stack"] .polaroid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slide[data-template="polaroid-stack"] .tape {
+  position: absolute; width: 180px; height: 52px;
+  background: rgba(255,250,224,0.80);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.slide[data-template="polaroid-stack"] .layer-type {
+  justify-content: flex-end; padding-bottom: var(--safe-b); color: #1d1d1d;
+}
+.slide[data-template="polaroid-stack"] .headline {
+  font-family: var(--font-hand, cursive); font-weight: 700; --tracking: 0; --leading: 1.0;
+}
+.slide[data-template="polaroid-stack"] .sub { color: rgba(29,29,29,0.58); }
+
+/* --- 10. sticker-chaos --------------------------------------------------
+   Rough SVG arrows, circles and highlighter over the photo.                */
+.slide[data-template="sticker-chaos"] .headline {
+  font-family: var(--font-hand, cursive); --tracking: 0;
+}
+.slide[data-template="sticker-chaos"] .layer-art svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.slide[data-template="sticker-chaos"] .sticker {
+  position: absolute;
+  font-family: var(--font-hand, cursive);
+  background: var(--accent, #f2b705);
+  color: #111;
+  padding: 0.22em 0.6em;
+  border-radius: 10px;
+  font-size: calc(var(--fs) * 0.30);
+  transform: rotate(var(--rot, -6deg));
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* --- 11. dreamcore-glow -------------------------------------------------
+   The v1 dreamcore look, rebuilt: bloom, haze, sparkles, soft rounded type.*/
+.slide[data-template="dreamcore-glow"] .photo {
+  filter: saturate(0.82) contrast(0.94) brightness(1.08) blur(0.4px);
+}
+.slide[data-template="dreamcore-glow"] .layer-photo::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(70% 46% at 50% 38%, rgba(255,241,200,0.40), transparent 70%),
+              linear-gradient(180deg, rgba(126,186,255,0.18), rgba(255,170,220,0.14));
+  mix-blend-mode: screen;
+}
+.slide[data-template="dreamcore-glow"] .headline {
+  text-shadow: 0 0 36px rgba(255,255,255,0.55), 0 4px 18px rgba(0,0,0,0.35);
+  --tracking: -0.01em;
+}
+.slide[data-template="dreamcore-glow"] .sparkle { position: absolute; opacity: 0.85; }
+
+/* --- 12. end-card -------------------------------------------------------
+   Flat colour, oversized type, one call to action.                         */
+.slide[data-template="end-card"] {
+  /* Defaults to the accent, but a brand that caps accent at 10% of a slide
+     wants to set its own ground here - hence the per-slide "bg". */
+  background: var(--slide-bg, var(--accent, #f2b705));
+  color: var(--on-slide-bg, var(--on-accent, #0e0e10));  /* contrast-checked */
+}
+.slide[data-template="end-card"] .layer-photo,
+.slide[data-template="end-card"] .layer-scrim,
+.slide[data-template="end-card"] .layer-texture { display: none; }
+.slide[data-template="end-card"] .layer-type {
+  justify-content: center; padding-bottom: calc(var(--safe-b) + var(--H) * 0.09);
+}
+.slide[data-template="end-card"] .headline { --leading: 0.98; --tracking: -0.04em; }
+.slide[data-template="end-card"] .sub { color: currentColor; opacity: 0.62; }
+.slide[data-template="end-card"] .cta {
+  margin-top: calc(var(--fs) * 0.4);
+  font-family: var(--font-mono);
+  font-size: max(32px, calc(var(--fs) * 0.22));
+  letter-spacing: 0.22em; text-transform: uppercase;
+  border: 3px solid currentColor; border-radius: 999px;
+  padding: 0.6em 1.2em; align-self: flex-start;
+}
+.slide[data-align="center"][data-template="end-card"] .cta { align-self: center; }
+
+
+/* ============================================================================
+   TEMPLATES 13-18
+   Added after reading TikTok's published media specs. Each spends its boldness
+   on a single signature element and keeps everything around it quiet, and each
+   structural device carries real information - a place, a position in the
+   deck, a pairing - rather than decorating the frame.
+   ========================================================================= */
+
+/* --- 13. cover ----------------------------------------------------------
+   The thumbnail. The profile grid centre-crops a 9:16 cover to 1:1, cutting
+   the top and bottom ~420px, so this is the one template where centring is
+   right: the crop is centred, so the title has to be. The lower band carries
+   the swipe cue, which only the feed ever shows - the grid never sees it.   */
+/* The cover is read in a fraction of a second in a crowded feed, so it gets
+   a floor on its scrim rather than whatever the photo's luminance suggested. */
+.slide[data-template="cover"] .layer-scrim { opacity: max(var(--scrim, 0.45), 0.62); }
+.slide[data-template="cover"] .layer-type {
+  justify-content: center;
+  align-items: center; text-align: center;
+  /* the 1080x1080 band that survives the crop is y 420..1500 */
+  padding: calc(var(--H) * 0.26) calc(var(--W) * 0.17) calc(var(--H) * 0.26);
+}
+.slide[data-template="cover"] .type-box { align-items: center; padding-right: 0; }
+.slide[data-template="cover"] .headline { --leading: 1.0; --tracking: -0.035em; }
+.slide[data-template="cover"] .kicker {
+  align-self: center;
+  border: 2px solid currentColor; border-radius: 999px;
+  padding: 0.5em 1.1em; letter-spacing: 0.26em;
+}
+.slide[data-template="cover"] .swipe {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-b) + var(--H) * 0.015);
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: #fff; opacity: 0.82; text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+}
+.slide[data-template="cover"] .swipe i {
+  display: block; width: 46px; height: 2px; background: currentColor;
+  position: relative;
+}
+.slide[data-template="cover"] .swipe i::after {
+  content: ""; position: absolute; right: 0; top: -5px;
+  width: 12px; height: 12px;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* --- 14. index-card -----------------------------------------------------
+   Asymmetric editorial. A rule runs the height of the safe area with the
+   section label set vertically along it; the headline hangs to its right.
+   Signature: the vertical edge label, naming a real place or section.       */
+.slide[data-template="index-card"] .layer-type {
+  justify-content: flex-end;
+  padding: var(--safe-t) var(--safe-x) calc(var(--safe-b) + var(--H) * 0.03) calc(var(--W) * 0.19);
+}
+.slide[data-template="index-card"] .edge-rule {
+  position: absolute; left: calc(var(--W) * 0.075);
+  top: var(--safe-t); bottom: var(--safe-b);
+  width: 3px; background: var(--accent, #f2b705);
+}
+.slide[data-template="index-card"] .edge-label {
+  position: absolute; left: calc(var(--W) * 0.075 + 22px);
+  bottom: calc(var(--safe-b) + var(--H) * 0.03);
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-family: var(--font-mono); font-size: max(32px, calc(var(--fs) * 0.19));
+  letter-spacing: 0.34em; text-transform: uppercase;
+  color: var(--accent, #f2b705);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+.slide[data-template="index-card"] .headline { --tracking: -0.03em; }
+
+/* --- 15. quote-pull -----------------------------------------------------
+   The line is the subject and the photograph is only a ground, so the photo
+   is desaturated and pushed back. Signature: an oversized quotation glyph
+   bleeding off the left edge with the quote set across it.                  */
+.slide[data-template="quote-pull"] .photo {
+  filter: grayscale(0.78) contrast(1.06) brightness(0.72);
+}
+.slide[data-template="quote-pull"] .quote-mark {
+  position: absolute; left: calc(var(--W) * -0.02); top: calc(var(--H) * 0.085);
+  font-family: Georgia, "Times New Roman", var(--font-display), serif;
+  font-weight: 700;
+  /* A display face renders this glyph small inside a large em box; a serif
+     fills it, which is what makes it read as a graphic rather than a tick. */
+  font-size: 820px; line-height: 0.62;
+  color: var(--accent, #f2b705); opacity: 0.28;
+}
+.slide[data-template="quote-pull"] .layer-type {
+  justify-content: center;
+  padding: calc(var(--H) * 0.26) var(--safe-x) calc(var(--safe-b) + var(--H) * 0.05);
+}
+.slide[data-template="quote-pull"] .headline {
+  font-family: var(--font-text, serif);
+  font-weight: 500; --leading: 1.24; --tracking: -0.005em;
+}
+.slide[data-template="quote-pull"] .sub {
+  font-family: var(--font-mono);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* --- 16. diagonal-split -------------------------------------------------
+   The photo is cut on a rising diagonal and the copy sits in the solid wedge
+   beneath it. Signature: a hairline accent stroke along the cut.            */
+.slide[data-template="diagonal-split"] { background: var(--block, #141414); }
+.slide[data-template="diagonal-split"] .layer-photo,
+.slide[data-template="diagonal-split"] .layer-scrim,
+.slide[data-template="diagonal-split"] .layer-texture {
+  clip-path: polygon(0 0, 100% 0, 100% 44%, 0 62%);
+}
+.slide[data-template="diagonal-split"] .cut {
+  position: absolute; inset: 0;
+  background: var(--accent, #f2b705);
+  clip-path: polygon(0 62%, 100% 44%, 100% 44.6%, 0 62.6%);
+}
+.slide[data-template="diagonal-split"] .layer-type {
+  justify-content: flex-start;
+  padding: calc(var(--H) * 0.665) var(--safe-x) var(--safe-b);
+}
+
+/* --- 17. caption-bar ----------------------------------------------------
+   A lower-third over a full-bleed photo, the way a subtitle sits on film.
+   Signature: the position counter - real information, and the single best
+   lever there is on swipe-through.                                          */
+.slide[data-template="caption-bar"] .bar {
+  position: absolute; left: 0; right: 0;
+  top: 60%; bottom: calc(var(--f-bottom) * 100%);
+  background: var(--block, #141414);
+  border-top: 3px solid var(--accent, #f2b705);
+}
+.slide[data-template="caption-bar"] .counter {
+  position: absolute; right: var(--safe-x); top: calc(60% + 28px);
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.22em; color: var(--accent, #f2b705);
+}
+.slide[data-template="caption-bar"] .layer-type {
+  inset: 60% 0 calc(var(--f-bottom) * 100%) 0;
+  justify-content: center;
+  padding: calc(var(--H) * 0.04) var(--safe-x);
+}
+.slide[data-template="caption-bar"] .type-box { padding-right: calc(var(--W) * 0.12); }
+
+/* --- 18. compare --------------------------------------------------------
+   Two frames, hard split, one label each. Only reach for it when the pairing
+   is real - a before and an after, two sides of the same place.             */
+.slide[data-template="compare"] .layer-photo,
+.slide[data-template="compare"] .layer-scrim { display: none; }
+.slide[data-template="compare"] .pair {
+  position: absolute; left: 0; right: 0;
+  top: calc(var(--H) * 0.30); bottom: var(--safe-b);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  background: var(--bg, #0e0e10);
+}
+.slide[data-template="compare"] .pair figure { position: relative; overflow: hidden; }
+.slide[data-template="compare"] .pair img {
+  width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block;
+}
+.slide[data-template="compare"] .pair figcaption {
+  position: absolute; left: 0; bottom: 0;
+  background: var(--accent, #f2b705); color: var(--on-accent, #0e0e10);
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.5em 0.9em;
+}
+.slide[data-template="compare"] .layer-type {
+  inset: 0 0 auto 0; height: calc(var(--H) * 0.30);
+  justify-content: flex-end;
+  padding: var(--safe-t) var(--safe-x) calc(var(--H) * 0.03);
+}
+
+/* === VERTICAL JAPANESE TYPE ============================================
+   Opt in per slide with "vertical": true. Only for JP/CJK copy.           */
+.slide[data-vertical="1"] .layer-type {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--safe-t) calc(var(--W) * 0.10) var(--safe-b) var(--safe-x);
+}
+/* height:auto is the point: in vertical writing mode the box's physical
+   height IS the length of the line, which is what autofit measures. Forcing
+   100% here made every vertical slide shrink to the minimum size. */
+.slide[data-vertical="1"] .type-box { width: auto; height: auto; max-height: 100%; }
+.slide[data-vertical="1"] .headline { --leading: 1.5; --tracking: 0.04em; text-wrap: initial; }
+
+/* === SAFE-ZONE X-RAY ====================================================
+   Draws exactly what TikTok's chrome covers. Never exported.               */
+.layer-safe::before, .layer-safe::after, .layer-safe .rail {
+  content: ""; position: absolute;
+  background: rgba(255,0,64,0.26);
+  outline: 2px dashed rgba(255,0,64,0.8);
+}
+.layer-safe::before { top: 0; left: 0; right: 0; height: var(--safe-top); }
+.layer-safe::after  { bottom: 0; left: 0; right: 0; height: var(--safe-bottom); }
+.layer-safe .rail   { right: 0; top: calc(var(--f-railtop) * 100%); bottom: var(--safe-bottom); width: var(--rail); }
+/* What survives the profile grid's 1:1 crop of a cover. */
+.layer-safe .gridcrop {
+  position: absolute; left: 0; right: 0; top: 21.875%; height: 56.25%;
+  background: none; outline: 3px dashed rgba(80,200,255,0.85);
+}
+.slide[data-template="cover"] .layer-safe .gridcrop { outline-color: rgba(70,255,150,0.95); }
+
+/* Any element the verifier flagged gets outlined. */
+.overflow-flag { outline: 4px solid #ff0040 !important; outline-offset: 6px; }
+
+/* === FAKE TIKTOK CHROME =================================================
+   A realistic preview of the app over the slide. Never exported.           */
+.layer-chrome { font-family: -apple-system, system-ui, sans-serif; color: #fff; }
+.layer-chrome .tt-rail {
+  position: absolute; right: 24px; bottom: 28%;
+  display: flex; flex-direction: column; gap: 34px; align-items: center;
+}
+.layer-chrome .tt-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+.layer-chrome .tt-caption {
+  position: absolute; left: 32px; right: 180px; bottom: 150px;
+  font-size: 34px; line-height: 1.35; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.layer-chrome .tt-caption b { display: block; font-size: 38px; margin-bottom: 10px; }
+.layer-chrome .tt-progress {
+  position: absolute; left: 0; right: 0; bottom: 92px; height: 5px;
+  background: rgba(255,255,255,0.3);
+}
+.layer-chrome .tt-progress i { display: block; height: 100%; background: #fff; width: var(--prog, 20%); }
+.layer-chrome .tt-tabs {
+  position: absolute; top: 60px; left: 0; right: 0; text-align: center;
+  font-size: 34px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
+
+
+/* ===================== STUDIO SHELL =====================================
+   Everything below is review furniture. `?export=1` hides all of it and
+   lays the slides out at their true 1080x1920 so Playwright can shoot them.
+   ======================================================================== */
+:root {
+  --k: 0.26;                                   /* preview scale */
+  --grain-url: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.55'/></svg>");
+  --linen-url: repeating-linear-gradient(45deg, rgba(0,0,0,0.022) 0 2px, transparent 2px 5px),
+               repeating-linear-gradient(-45deg, rgba(0,0,0,0.018) 0 2px, transparent 2px 5px);
+  --ui: #e8e6e1;
+  --ui-dim: #8e8b85;
+  --ui-bg: #121214;
+  --ui-panel: #1b1b1f;
+  --ui-line: #2c2c32;
+}
+body {
+  background: var(--ui-bg);
+  color: var(--ui);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
+  padding: 92px 28px 120px;
+}
+
+/* --- toolbar --- */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 22px;
+  background: rgba(18,18,20,0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ui-line);
+}
+#hud .title { font-weight: 650; letter-spacing: -0.01em; margin-right: 6px; }
+#hud .meta { color: var(--ui-dim); margin-right: auto; font-size: 13px; }
+#hud button {
+  font: inherit; font-size: 13px;
+  color: var(--ui); background: #26262c;
+  border: 1px solid var(--ui-line); border-radius: 8px;
+  padding: 7px 13px; cursor: pointer;
+}
+#hud button:hover { background: #32323a; }
+#hud button.on { background: var(--ui); color: #111; border-color: var(--ui); }
+#hud button.primary { background: #3d7dff; border-color: #3d7dff; color: #fff; }
+#hud kbd {
+  font: 11px ui-monospace, monospace; opacity: 0.55;
+  border: 1px solid currentColor; border-radius: 4px; padding: 0 4px; margin-left: 6px;
+}
+
+/* --- slide grid --- */
+#deck {
+  display: flex; flex-wrap: wrap; gap: 30px 22px;
+  align-items: flex-start; justify-content: center;
+}
+.cell { width: calc(1080px * var(--k)); }
+.frame {
+  position: relative;
+  width: calc(1080px * var(--k));
+  height: calc(1920px * var(--k));
+  overflow: hidden;
+  border-radius: 20px;
+  background: #000;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.55), 0 0 0 1px var(--ui-line);
+}
+.frame > .slide { transform: scale(var(--k)); transform-origin: top left; }
+.frame-cap {
+  display: flex; gap: 8px; align-items: baseline;
+  margin-top: 9px; font-size: 12px; color: var(--ui-dim);
+}
+.frame-cap b { color: var(--ui); font-variant-numeric: tabular-nums; }
+.frame-cap i { margin-left: auto; font-style: normal; opacity: 0.6; }
+
+/* --- edit mode --- */
+body[data-edit="1"] .headline,
+body[data-edit="1"] .sub,
+body[data-edit="1"] .kicker,
+body[data-edit="1"] .cta {
+  outline: 2px dashed rgba(61,125,255,0.85); outline-offset: 5px; cursor: text;
+}
+body[data-edit="1"] .frame { overflow: visible; }
+
+/* --- notes + report --- */
+#side {
+  position: fixed; right: 20px; bottom: 20px; z-index: 100;
+  width: 340px; display: flex; flex-direction: column; gap: 10px;
+}
+#notes {
+  font: inherit; color: var(--ui); background: var(--ui-panel);
+  border: 1px solid var(--ui-line); border-radius: 10px;
+  padding: 11px 13px; min-height: 86px; resize: vertical;
+}
+#notes::placeholder { color: var(--ui-dim); }
+#report {
+  display: none; max-height: 42vh; overflow: auto;
+  background: var(--ui-panel); border: 1px solid var(--ui-line);
+  border-radius: 10px; padding: 13px;
+}
+#report.show { display: block; }
+#report ul { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-top: 8px; }
+#report li { font-size: 12.5px; border-left: 2px solid #ff3b5c; padding-left: 9px; }
+#report li span { color: var(--ui-dim); }
+#report code { background: #000; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+#report .ok { color: #46d07f; }
+#report .bad { color: #ff6b84; }
+
+#toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+  background: var(--ui); color: #111; font-weight: 600;
+  padding: 11px 20px; border-radius: 999px;
+  opacity: 0; pointer-events: none; transition: 0.22s; z-index: 200;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* --- export mode: nothing but the slides, at full size --- */
+body.export { padding: 0; background: #000; }
+body.export #hud, body.export #side, body.export #toast { display: none; }
+body.export #deck { display: block; }
+body.export .layer-safe, body.export .layer-chrome { display: none !important; }
+body.export .overflow-flag { outline: none !important; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <span class="title">New templates</span>
+  <span class="meta">6 slides · cover · index-card · quote-pull · diagonal-split · caption-bar · compare</span>
+  <button data-k="xray"   onclick="CAROUSEL.toggle('xray')">Safe zones<kbd>X</kbd></button>
+  <button data-k="chrome" onclick="CAROUSEL.toggle('chrome')">TikTok UI<kbd>C</kbd></button>
+  <button data-k="edit"   onclick="CAROUSEL.toggle('edit')">Edit text<kbd>E</kbd></button>
+  <button onclick="CAROUSEL.toggle('verify')">Check<kbd>V</kbd></button>
+  <button class="primary" onclick="CAROUSEL.toggle('save')">Export edits<kbd>Ctrl+S</kbd></button>
+</div>
+
+<div id="deck"></div>
+
+<div id="side">
+  <div id="report"></div>
+  <textarea id="notes" placeholder="Notes for the agent - what to change, per slide. Saved into edits.json."></textarea>
+</div>
+
+<div id="toast"></div>
+
+<!-- Torn-paper clip path, referenced by the torn-reveal template. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="tearClip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0.46 C0.08,0.44 0.14,0.49 0.22,0.47 C0.31,0.45 0.37,0.50 0.46,0.475
+               C0.56,0.45 0.63,0.495 0.72,0.468 C0.82,0.44 0.9,0.485 1,0.455
+               L1,1 L0,1 Z"/>
+    </clipPath>
+  </defs>
+</svg>
+
+<script>window.DECK = {
+  "title": "New templates",
+  "handle": "yourhandle",
+  "caption": "Templates 13-18",
+  "photos": "../photos",
+  "theme": {
+    "display": "Bricolage Grotesque",
+    "text": "Instrument Sans",
+    "hand": "Caveat",
+    "mono": "Space Mono",
+    "displayWeight": 800,
+    "accent": "#f2b705",
+    "highlight": "marker",
+    "grain": 0.07,
+    "vignette": 0.34,
+    "palette": [
+      "#0e2036",
+      "#1d324e",
+      "#5f4f58",
+      "#9f6d54",
+      "#e09a59"
+    ]
+  },
+  "slides": [
+    {
+      "role": "cover",
+      "template": "cover",
+      "photo": "sunset.jpg",
+      "kicker": "osaka",
+      "text": "The harbour at 16:40",
+      "sub": "nobody films it",
+      "swipe": "swipe",
+      "pos": "upper",
+      "scrim": 0.49,
+      "shadow": true,
+      "focus": [
+        0.5,
+        0.555
+      ]
+    },
+    {
+      "role": "build",
+      "template": "index-card",
+      "photo": "sea.jpg",
+      "edgeLabel": "nanko bay",
+      "text": "A rule, a vertical label",
+      "sub": "and the headline hanging off it",
+      "pos": "upper",
+      "scrim": 0.66,
+      "shadow": true,
+      "focus": [
+        0.502,
+        0.78
+      ]
+    },
+    {
+      "role": "build",
+      "template": "quote-pull",
+      "photo": "hallway.jpg",
+      "text": "The line is the subject and the photograph is only a ground",
+      "sub": "slide three",
+      "pos": "upper",
+      "scrim": 0.74,
+      "shadow": true,
+      "focus": [
+        0.499,
+        0.454
+      ]
+    },
+    {
+      "role": "build",
+      "template": "diagonal-split",
+      "photo": "sunset.jpg",
+      "text": "Cut on a rising diagonal",
+      "sub": "the copy sits in the wedge",
+      "pos": "upper",
+      "scrim": 0.49,
+      "shadow": true,
+      "focus": [
+        0.5,
+        0.555
+      ]
+    },
+    {
+      "role": "build",
+      "template": "caption-bar",
+      "photo": "sea.jpg",
+      "text": "A lower third, the way a subtitle sits on film",
+      "pos": "upper",
+      "scrim": 0.66,
+      "shadow": true,
+      "focus": [
+        0.502,
+        0.78
+      ]
+    },
+    {
+      "role": "payoff",
+      "template": "compare",
+      "photos": [
+        "sunset.jpg",
+        "sea.jpg"
+      ],
+      "labels": [
+        "before",
+        "after"
+      ],
+      "text": "Two frames, one split",
+      "pos": "upper"
+    }
+  ],
+  "photoBase": "../photos/"
+};</script>
+<script>
+/* ============================================================================
+   TikTok Photo Carousel - rendering engine
+   Builds slides from a DECK object, auto-fits the type, verifies the safe
+   zones, and drives the review studio. No dependencies, no build step.
+
+   Public surface (used by scripts/export.js):
+     window.CAROUSEL.ready     Promise - fonts + images loaded, autofit done
+     window.CAROUSEL.verify()  -> [{index, element, reason, overlap}]
+     window.CAROUSEL.slides    -> [HTMLElement]
+     window.CAROUSEL.deck      -> the live deck object (edits included)
+   ========================================================================= */
+(function () {
+  "use strict";
+
+  var W = 1080, H = 1920;
+
+  /* === TEXT MARKUP =====================================================
+     "*word*" highlights, " // " forces a break. Everything else is escaped
+     so a stray < in someone's copy can never become markup.               */
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function markup(s) {
+    if (!s) return "";
+    return esc(s)
+      .split(" // ").join("\u0000")
+      .replace(/\*([^*]+)\*/g, "<mark>$1</mark>")
+      .split("\u0000").join("<br>");
+  }
+  function plain(s) {
+    return String(s || "").split(" // ").join(" ").replace(/\*/g, "");
+  }
+
+  /* === SMALL HELPERS =================================================== */
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  /* Photo filenames routinely contain spaces and non-ASCII characters
+     (Japanese camera exports, for one). Encode each segment so the file://
+     src resolves on every platform. */
+  function src(deck, p) {
+    return deck.photoBase + String(p).split("/").map(encodeURIComponent).join("/");
+  }
+
+  /* === TEMPLATE ART ====================================================
+     Each template gets the extra DOM it needs. Templates that do not
+     appear here need nothing beyond photo + type.                         */
+  var ART = {
+    "duotone-poster": function (slide, s) {
+      slide.querySelector(".layer-art").appendChild(el("div", "halftone"));
+    },
+
+    "torn-reveal": function (slide, s) {
+      slide.insertBefore(el("div", "paper-top"), slide.querySelector(".layer-type"));
+    },
+
+    "film-strip": function (slide, s, deck) {
+      var photos = s.photos || [s.photo];
+      var strip = el("div", "strip");
+      // minmax(0,1fr): a plain 1fr row has min-height auto, so the images
+      // keep their intrinsic height and burst out of the strip.
+      strip.style.gridTemplateRows = "repeat(" + photos.length + ", minmax(0, 1fr))";
+      photos.forEach(function (p) {
+        var img = el("img");
+        img.src = src(deck, p);
+        strip.appendChild(img);
+      });
+      strip.appendChild(el("div", "sprockets left"));
+      strip.appendChild(el("div", "sprockets right"));
+      slide.querySelector(".layer-art").appendChild(strip);
+    },
+
+    "polaroid-stack": function (slide, s, deck) {
+      var art = slide.querySelector(".layer-art");
+      if (s.photos && s.photos[1]) {
+        var behind = el("div", "polaroid behind");
+        var bimg = el("img"); bimg.src = src(deck, s.photos[1]);
+        behind.appendChild(bimg);
+        art.appendChild(behind);
+      }
+      var card = el("div", "polaroid");
+      var img = el("img"); img.src = src(deck, s.photo);
+      card.appendChild(img);
+      art.appendChild(card);
+      card.style.setProperty("--tilt", (s.tilt != null ? s.tilt : -3) + "deg");
+
+      var tape = el("div", "tape");
+      tape.style.left = "6%"; tape.style.top = (0.09 * H) + "px";
+      tape.style.transform = "rotate(-24deg)";
+      art.appendChild(tape);
+    },
+
+    "sticker-chaos": function (slide, s) {
+      var art = slide.querySelector(".layer-art");
+      // Hand-drawn marks. Coordinates are in canvas space (1080x1920).
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+      svg.innerHTML =
+        '<g fill="none" stroke="var(--accent,#f2b705)" stroke-width="14" ' +
+        'stroke-linecap="round" stroke-linejoin="round">' +
+        (s.circle !== false
+          ? '<path d="M 300 980 C 170 980 150 1150 330 1180 C 560 1210 700 1120 650 1000 ' +
+            'C 610 900 390 890 300 960" opacity="0.9"/>'
+          : "") +
+        (s.arrow !== false
+          ? '<path d="M 760 820 C 700 900 640 940 560 960"/>' +
+            '<path d="M 560 960 L 620 930 M 560 960 L 600 1010"/>'
+          : "") +
+        "</g>";
+      art.appendChild(svg);
+
+      (s.stickers || []).forEach(function (st) {
+        var n = el("div", "sticker", esc(st.text));
+        n.style.left = (st.x != null ? st.x : 0.1) * 100 + "%";
+        n.style.top = (st.y != null ? st.y : 0.6) * 100 + "%";
+        n.style.setProperty("--rot", (st.rot != null ? st.rot : -6) + "deg");
+        art.appendChild(n);
+      });
+    },
+
+    "dreamcore-glow": function (slide, s) {
+      var art = slide.querySelector(".layer-art");
+      var seeds = [[0.18, 0.26, 54], [0.78, 0.18, 38], [0.66, 0.52, 46], [0.3, 0.62, 30]];
+      seeds.forEach(function (p) {
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "sparkle");
+        svg.setAttribute("viewBox", "0 0 100 100");
+        svg.setAttribute("width", p[2]); svg.setAttribute("height", p[2]);
+        svg.style.left = p[0] * 100 + "%";
+        svg.style.top = p[1] * 100 + "%";
+        svg.innerHTML =
+          '<path d="M50 0 C54 36 64 46 100 50 C64 54 54 64 50 100 ' +
+          'C46 64 36 54 0 50 C36 46 46 36 50 0 Z" fill="rgba(255,255,255,0.9)"/>';
+        art.appendChild(svg);
+      });
+    }
+  };
+
+  /* --- templates 13-18 -------------------------------------------------
+     Declared after the literal so each one stays a readable unit.        */
+
+  ART["cover"] = function (slide, s) {
+    // Only the feed ever sees this band; the profile grid crops it away.
+    var sw = el("div", "swipe");
+    sw.innerHTML = esc(s.swipe || "swipe") + "<i></i>";
+    slide.querySelector(".layer-art").appendChild(sw);
+  };
+
+  ART["index-card"] = function (slide, s) {
+    var art = slide.querySelector(".layer-art");
+    art.appendChild(el("div", "edge-rule"));
+    if (s.edgeLabel) art.appendChild(el("div", "edge-label", esc(s.edgeLabel)));
+  };
+
+  ART["quote-pull"] = function (slide, s) {
+    slide.querySelector(".layer-art")
+      .appendChild(el("div", "quote-mark", s.quoteMark || "“"));
+  };
+
+  ART["diagonal-split"] = function (slide) {
+    slide.querySelector(".layer-art").appendChild(el("div", "cut"));
+  };
+
+  ART["caption-bar"] = function (slide, s, deck) {
+    var art = slide.querySelector(".layer-art");
+    art.appendChild(el("div", "bar"));
+    if (s.counter !== false) {
+      var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+      art.appendChild(el("div", "counter",
+        pad(deck.slides.indexOf(s) + 1) + " / " + pad(deck.slides.length)));
+    }
+  };
+
+  ART["compare"] = function (slide, s, deck) {
+    var photos = s.photos || [s.photo];
+    var labels = s.labels || [];
+    var pair = el("div", "pair");
+    photos.slice(0, 2).forEach(function (p, i) {
+      var fig = el("figure");
+      var img = el("img");
+      img.src = src(deck, p);
+      fig.appendChild(img);
+      if (labels[i]) fig.appendChild(el("figcaption", null, esc(labels[i])));
+      pair.appendChild(fig);
+    });
+    slide.querySelector(".layer-art").appendChild(pair);
+  };
+
+  /* Templates whose copy sits inside a card element. */
+  var CARDED = { "frosted-card": 1, "notes-card": 1 };
+
+  /* Pick black or white for whatever sits on top of a colour. */
+  function onColor(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ""));
+    if (!m) return "#0e0e10";
+    var n = parseInt(m[1], 16);
+    var lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+    return lum > 0.58 ? "#0e0e10" : "#ffffff";
+  }
+
+  /* === BUILD ONE SLIDE ================================================= */
+  function buildSlide(s, i, deck) {
+    var t = deck.theme || {};
+    var slide = el("section", "slide");
+    slide.dataset.template = s.template || "full-bleed-hook";
+    slide.dataset.role = s.role || "build";
+    slide.dataset.index = i;
+    slide.dataset.pos = s.pos || "upper";
+    slide.dataset.align = s.align || t.align || "left";
+    slide.dataset.hl = s.highlight || t.highlight || "plain";
+    slide.dataset.fit = s.fit || t.fit || "cover";
+    slide.dataset.rail = s.rail === false ? "0" : "1";
+    if (s.shadow !== false && s.photo) slide.dataset.shadow = "1";
+    if (s.stroke) slide.dataset.stroke = "1";
+    if (s.vertical) slide.dataset.vertical = "1";
+    if (s.aberration || t.aberration) slide.dataset.aberration = "1";
+    if (s.scanlines || t.scanlines) slide.dataset.scanlines = "1";
+
+    // Per-slide colour overrides on top of the deck theme.
+    if (s.accent) {
+      slide.style.setProperty("--accent", s.accent);
+      slide.style.setProperty("--on-accent", onColor(s.accent));
+    }
+    if (s.block) slide.style.setProperty("--block", s.block);
+    if (s.bg) {
+      slide.style.setProperty("--slide-bg", s.bg);
+      slide.style.setProperty("--on-slide-bg", onColor(s.bg));
+    }
+    if (s.duotone) {
+      slide.style.setProperty("--duo-dark", s.duotone[0]);
+      slide.style.setProperty("--duo-light", s.duotone[1]);
+    }
+
+    /* Per-slide type. Needed by the concept gate, where three directions
+       have to differ by typeface inside one page. */
+    if (s.fonts) {
+      var F = s.fonts;
+      if (F.display) slide.style.setProperty("--font-display", F.display);
+      if (F.text) slide.style.setProperty("--font-text", F.text);
+      if (F.hand) slide.style.setProperty("--font-hand", F.hand);
+      if (F.mono) slide.style.setProperty("--font-mono", F.mono);
+      if (F.weight) slide.style.setProperty("--display-weight", F.weight);
+      if (F.tracking) slide.style.setProperty("--tracking", F.tracking);
+      if (F.leading) slide.style.setProperty("--leading", F.leading);
+    }
+
+    /* --- photo layer --- */
+    var photo = el("div", "layer-photo");
+    if (s.photo) {
+      if (slide.dataset.fit === "blur") {
+        var pad = el("img", "photo-pad");
+        pad.src = src(deck, s.photo);
+        photo.appendChild(pad);
+      }
+      var img = el("img", "photo");
+      img.src = src(deck, s.photo);
+      img.alt = plain(s.text);
+      photo.appendChild(img);
+      var f = s.focus || [0.5, 0.5];
+      slide.style.setProperty("--focus", (f[0] * 100) + "% " + (f[1] * 100) + "%");
+    }
+    slide.appendChild(photo);
+
+    /* --- scrim: strength comes from analyze.py, direction from position --- */
+    var scrim = el("div", "layer-scrim");
+    scrim.dataset.dir = s.scrimDir || (s.pos === "lower" ? "bottom" : "top");
+    slide.appendChild(scrim);
+    if (s.scrim != null) slide.style.setProperty("--scrim", s.scrim);
+
+    /* --- texture --- */
+    slide.appendChild(el("div", "layer-texture"));
+    if (s.grain != null) slide.style.setProperty("--grain", s.grain);
+    if (s.vignette != null) slide.style.setProperty("--vignette", s.vignette);
+
+    /* --- template art --- */
+    slide.appendChild(el("div", "layer-art"));
+    if (ART[slide.dataset.template]) ART[slide.dataset.template](slide, s, deck);
+
+    /* --- type --- */
+    var type = el("div", "layer-type");
+    var box = el("div", "type-box");
+    var inner = CARDED[slide.dataset.template] ? el("div", "card") : box;
+
+    if (slide.dataset.template === "notes-card") {
+      inner.appendChild(el("div", "note-bar", esc(s.noteLabel || "notes")));
+    }
+    if (s.kicker) inner.appendChild(el("div", "kicker", esc(s.kicker)));
+    if (s.text) inner.appendChild(el("h2", "headline", markup(s.text)));
+    if (s.sub) inner.appendChild(el("p", "sub", markup(s.sub)));
+    if (s.cta) inner.appendChild(el("div", "cta", esc(s.cta)));
+    if (inner !== box) box.appendChild(inner);
+
+    type.appendChild(box);
+    slide.appendChild(type);
+
+    /* --- overlays (studio only, stripped on export) --- */
+    var safe = el("div", "layer-safe");
+    safe.appendChild(el("div", "rail"));
+    safe.appendChild(el("div", "gridcrop"));
+    slide.appendChild(safe);
+
+    var chrome = el("div", "layer-chrome");
+    chrome.innerHTML =
+      '<div class="tt-tabs">For You</div>' +
+      '<div class="tt-rail">' +
+      '<div class="tt-icon"></div><div class="tt-icon"></div>' +
+      '<div class="tt-icon"></div><div class="tt-icon"></div></div>' +
+      '<div class="tt-caption"><b>@' + esc(deck.handle || "yourhandle") + "</b>" +
+      esc((deck.caption || "your caption sits here and covers this much of the frame").slice(0, 90)) +
+      "</div>" +
+      '<div class="tt-progress"><i></i></div>';
+    chrome.querySelector(".tt-progress i").style.setProperty(
+      "--prog", Math.round(((i + 1) / deck.slides.length) * 100) + "%");
+    slide.appendChild(chrome);
+
+    return slide;
+  }
+
+  /* === AUTOFIT =========================================================
+     Binary search the display size until the copy fits the padding box of
+     .layer-type. Measuring the real rendered box beats estimating, which
+     is why the HTML engine can run type far larger than the Pillow one.   */
+  function autofit(slide, s, deck) {
+    var t = deck.theme || {};
+    var type = slide.querySelector(".layer-type");
+    var box = slide.querySelector(".type-box");
+    if (!box || !box.firstChild) return;
+
+    var vertical = slide.dataset.vertical === "1";
+    var cs = getComputedStyle(type);
+    var availH = type.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var availW = type.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+
+    var min = s.sizeMin || t.sizeMin || 48;   // TikTok headline floor
+    var max = s.size || t.sizeMax || 132;
+
+    function fits(px) {
+      slide.style.setProperty("--fs", px + "px");
+      // Force layout before measuring.
+      var r = box.getBoundingClientRect();
+      var scale = slide.getBoundingClientRect().width / W || 1;
+      var h = r.height / scale, w = r.width / scale;
+
+      // A single long word ("Checkerboard") overflows the box without making
+      // the block's rect any wider, so the rect alone says it fits. Compare
+      // scroll extent too, or the word runs off the edge of the slide.
+      if (vertical) {
+        if (box.scrollHeight > box.clientHeight + 1) return false;
+        return w <= availW + 1 && h <= availH + 1;
+      }
+      if (box.scrollWidth > box.clientWidth + 1) return false;
+      return h <= availH && w <= availW + 1;
+    }
+
+    if (fits(max)) { slide.style.setProperty("--fs", max + "px"); return; }
+    var lo = min, hi = max;
+    for (var i = 0; i < 9 && hi - lo > 1; i++) {
+      var mid = (lo + hi) / 2;
+      if (fits(mid)) lo = mid; else hi = mid;
+    }
+    slide.style.setProperty("--fs", Math.floor(lo) + "px");
+    if (lo <= min + 1) slide.dataset.tooLong = "1";   // copy is too long; shorten it
+  }
+
+  /* Point the scrim ramp at wherever the copy actually ended up. A fixed
+     ramp leaves the last line of a tall headline sitting on bare photo. */
+  function fitScrim(slide) {
+    var box = slide.querySelector(".type-box");
+    var scrim = slide.querySelector(".layer-scrim");
+    if (!box || !scrim) return;
+    var sr = slide.getBoundingClientRect();
+    var br = box.getBoundingClientRect();
+    var scale = sr.width / W || 1;
+    var top = (br.top - sr.top) / scale / H;
+    var bottom = (br.bottom - sr.top) / scale / H;
+    if (scrim.dataset.dir === "bottom") {
+      slide.style.setProperty("--scrim-mid", ((1 - top) * 100).toFixed(1) + "%");
+      slide.style.setProperty("--scrim-end", (Math.min(1, 1 - top + 0.16) * 100).toFixed(1) + "%");
+    } else {
+      slide.style.setProperty("--scrim-mid", (bottom * 100).toFixed(1) + "%");
+      slide.style.setProperty("--scrim-end", (Math.min(1, bottom + 0.16) * 100).toFixed(1) + "%");
+    }
+  }
+
+  /* === SAFE-ZONE VERIFY ================================================
+     Measures every copy element against the three zones TikTok covers and
+     reports real overlaps in canvas pixels. This replaces eyeballing a
+     contact sheet after the fact.                                         */
+  function verify(deck) {
+    var out = [];
+    // Defaults follow TikTok's published media specs on a 1080x1920 canvas:
+    // ~150px username row, ~250-270px caption and buttons, icon column right.
+    var zones = Object.assign(
+      { top: 0.085, bottom: 0.15, side: 0.07, rail: 0.16, railTop: 0.42 },
+      deck.safe || {}
+    );
+    window.CAROUSEL.slides.forEach(function (slide, i) {
+      var sr = slide.getBoundingClientRect();
+      var scale = sr.width / W || 1;
+      var bands = [
+        { name: "top bar", x1: 0, y1: 0, x2: W, y2: zones.top * H },
+        { name: "caption area", x1: 0, y1: (1 - zones.bottom) * H, x2: W, y2: H },
+        { name: "side margin", x1: 0, y1: 0, x2: zones.side * W, y2: H },
+        { name: "side margin", x1: (1 - zones.side) * W, y1: 0, x2: W, y2: H }
+      ];
+      if (slide.dataset.rail === "1") {
+        // The like/comment/share column is a block in the lower right, not
+        // the whole right edge - checking the whole edge flags type that is
+        // actually fine.
+        bands.push({
+          name: "icon rail", x1: (1 - zones.rail) * W, y1: (zones.railTop || 0.42) * H,
+          x2: W, y2: (1 - zones.bottom) * H
+        });
+      }
+      slide.querySelectorAll(".headline, .sub, .kicker, .cta, .card").forEach(function (node) {
+        if (node.classList.contains("card")) return;      // the card's children are checked
+        var r = node.getBoundingClientRect();
+        var b = {
+          x1: (r.left - sr.left) / scale, y1: (r.top - sr.top) / scale,
+          x2: (r.right - sr.left) / scale, y2: (r.bottom - sr.top) / scale
+        };
+        bands.forEach(function (z) {
+          var ow = Math.min(b.x2, z.x2) - Math.max(b.x1, z.x1);
+          var oh = Math.min(b.y2, z.y2) - Math.max(b.y1, z.y1);
+          if (ow > 2 && oh > 2) {
+            node.classList.add("overflow-flag");
+            out.push({
+              index: i, slide: i + 1, el: node.className.split(" ")[0],
+              reason: "overlaps the " + z.name,
+              overlap: Math.round(ow) + "x" + Math.round(oh) + "px",
+              text: plain(node.textContent).slice(0, 48)
+            });
+          }
+        });
+      });
+      if (slide.dataset.tooLong === "1") {
+        out.push({
+          index: i, slide: i + 1, el: "headline",
+          reason: "copy hit the minimum size and may still be cramped",
+          overlap: "-", text: plain(slide.querySelector(".headline") ?
+            slide.querySelector(".headline").textContent : "").slice(0, 48)
+        });
+      }
+    });
+    return out;
+  }
+
+  /* === MEASURE =========================================================
+     Hands scripts/audit.py the one thing it cannot work out from a PNG:
+     where each piece of copy is, what colour it was asked to be, and how
+     big it actually rendered. The audit then samples the exported pixels
+     underneath and computes real contrast.                                */
+  function measure() {
+    var out = [];
+    window.CAROUSEL.slides.forEach(function (slide, i) {
+      var sr = slide.getBoundingClientRect();
+      var scale = sr.width / W || 1;
+      slide.querySelectorAll(".headline, .sub, .kicker, .cta, .counter, .edge-label, figcaption")
+        .forEach(function (node) {
+          var r = node.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          var cs = getComputedStyle(node);
+          out.push({
+            slide: i + 1,
+            el: node.className.split(" ")[0] || node.tagName.toLowerCase(),
+            role: slide.dataset.role,
+            template: slide.dataset.template,
+            // canvas pixels, so the audit can index straight into the PNG
+            box: [
+              Math.round((r.left - sr.left) / scale),
+              Math.round((r.top - sr.top) / scale),
+              Math.round((r.right - sr.left) / scale),
+              Math.round((r.bottom - sr.top) / scale)
+            ],
+            color: cs.color,
+            // Whether the element paints its own ground (a label chip, a
+            // CTA pill). The audit samples inside those instead of around.
+            ownBg: cs.backgroundColor,
+            fontSize: Math.round(parseFloat(cs.fontSize) / scale),
+            weight: cs.fontWeight,
+            text: plain(node.textContent).slice(0, 60)
+          });
+        });
+    });
+    return out;
+  }
+
+  /* === THEME =========================================================== */
+  function applyTheme(root, deck) {
+    var t = deck.theme || {};
+    var p = t.palette || [];
+    var set = function (k, v) { if (v != null) root.style.setProperty(k, v); };
+    set("--W", W + "px"); set("--H", H + "px");
+
+    // deck.safe drives both the CSS clearances and the verifier, so the
+    // layout and the check can never disagree about where the zones are.
+    var z = deck.safe || {};
+    set("--f-top", z.top); set("--f-bottom", z.bottom); set("--f-side", z.side);
+    set("--f-rail", z.rail); set("--f-railtop", z.railTop);
+    // p is sorted dark-to-light, so the page background is p[0]. Taking a
+    // middle swatch here once produced grey type on the end card.
+    set("--bg", t.bg || p[0] || "#0e0e10");
+    set("--ink", t.ink || "#ffffff");
+    var accent = t.accent || p[2] || "#f2b705";
+    set("--accent", accent);
+    set("--on-accent", t.onAccent || onColor(accent));
+    set("--block", t.block || p[1] || "#141414");
+    set("--paper", t.paper || "#efe9dd");
+    set("--muted", t.muted || "rgba(255,255,255,0.93)");
+    set("--duo-dark", (t.duotone && t.duotone[0]) || p[1] || "#101b3a");
+    set("--duo-light", (t.duotone && t.duotone[1]) || p[0] || "#c8102e");
+    set("--font-display", t.display || "system-ui, sans-serif");
+    set("--font-text", t.text || t.display || "system-ui, sans-serif");
+    set("--font-hand", t.hand || "cursive");
+    set("--font-mono", t.mono || "ui-monospace, monospace");
+    set("--display-weight", t.displayWeight);
+    set("--grain", t.grain);
+    set("--vignette", t.vignette);
+    set("--sub-ratio", t.subRatio);
+  }
+
+  /* === RENDER ========================================================== */
+  function render(deck, mount) {
+    mount.innerHTML = "";
+    applyTheme(document.documentElement, deck);
+    var slides = deck.slides.map(function (s, i) {
+      var node = buildSlide(s, i, deck);
+      mount.appendChild(wrap(node, i, deck));
+      return node;
+    });
+    window.CAROUSEL.slides = slides;
+    return slides;
+  }
+
+  /* Studio wrapper: scales the 1080x1920 canvas down to something you can
+     actually look at, and labels it. Export mode skips the wrapper. */
+  function wrap(slide, i, deck) {
+    if (window.CAROUSEL.exportMode) return slide;
+    var frame = el("div", "frame");
+    frame.appendChild(slide);
+    var cap = el("div", "frame-cap",
+      "<b>" + (i + 1) + "</b> " + esc(deck.slides[i].template || "") +
+      " <i>" + esc(deck.slides[i].role || "") + "</i>");
+    var cell = el("div", "cell");
+    cell.appendChild(frame);
+    cell.appendChild(cap);
+    return cell;
+  }
+
+  /* === READY: fonts + images, then fit ================================= */
+  function ready(deck) {
+    var imgs = Array.prototype.slice.call(document.images);
+    var loads = imgs.map(function (im) {
+      return im.complete ? Promise.resolve() : new Promise(function (res) {
+        im.addEventListener("load", res, { once: true });
+        im.addEventListener("error", res, { once: true });
+      });
+    });
+    return Promise.all(loads.concat([document.fonts ? document.fonts.ready : null]))
+      .then(function () {
+        window.CAROUSEL.slides.forEach(function (slide, i) {
+          autofit(slide, deck.slides[i], deck);
+        });
+        // Second pass: fitting changed gap sizes, so re-measure once.
+        window.CAROUSEL.slides.forEach(function (slide, i) {
+          autofit(slide, deck.slides[i], deck);
+          fitScrim(slide);
+        });
+        document.body.dataset.ready = "1";
+      });
+  }
+
+  /* === STUDIO CONTROLS =================================================
+     X toggles the safe-zone x-ray, C the fake TikTok chrome, E edit mode,
+     Ctrl+S downloads the edits. Everything here is stripped on export.    */
+  function studio(deck) {
+    var state = { xray: false, chrome: false, edit: false };
+
+    function apply() {
+      window.CAROUSEL.slides.forEach(function (s) {
+        s.dataset.xray = state.xray ? "1" : "0";
+        s.dataset.chrome = state.chrome ? "1" : "0";
+      });
+      document.body.dataset.edit = state.edit ? "1" : "0";
+      document.querySelectorAll(".headline, .sub, .kicker, .cta").forEach(function (n) {
+        n.contentEditable = state.edit ? "true" : "false";
+      });
+      var bar = document.getElementById("hud");
+      if (bar) {
+        bar.querySelector("[data-k=xray]").classList.toggle("on", state.xray);
+        bar.querySelector("[data-k=chrome]").classList.toggle("on", state.chrome);
+        bar.querySelector("[data-k=edit]").classList.toggle("on", state.edit);
+      }
+    }
+
+    /* Pull the edited copy back out of the DOM into deck shape, so the
+       agent can merge it into deck.json and re-render. */
+    function collectEdits() {
+      var out = { slides: [] };
+      window.CAROUSEL.slides.forEach(function (slide, i) {
+        var h = slide.querySelector(".headline");
+        var sub = slide.querySelector(".sub");
+        var k = slide.querySelector(".kicker");
+        var c = slide.querySelector(".cta");
+        var rec = { index: i };
+        // innerHTML back to source markup: <mark> -> *x*, <br> -> " // "
+        var toSrc = function (node) {
+          if (!node) return undefined;
+          return node.innerHTML
+            .replace(/<mark[^>]*>/g, "*").replace(/<\/mark>/g, "*")
+            .replace(/<br\s*\/?>/g, " // ")
+            .replace(/<[^>]+>/g, "")
+            .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+            .trim();
+        };
+        if (h) rec.text = toSrc(h);
+        if (sub) rec.sub = toSrc(sub);
+        if (k) rec.kicker = toSrc(k);
+        if (c) rec.cta = toSrc(c);
+        out.slides.push(rec);
+      });
+      var notes = document.getElementById("notes");
+      if (notes && notes.value.trim()) out.notes = notes.value.trim();
+      return out;
+    }
+
+    function download() {
+      var data = JSON.stringify(collectEdits(), null, 2);
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+      a.download = "edits.json";
+      a.click();
+      toast("edits.json downloaded - tell the agent to apply it");
+    }
+
+    function toast(msg) {
+      var t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = msg; t.classList.add("show");
+      setTimeout(function () { t.classList.remove("show"); }, 2600);
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.ctrlKey && e.key.toLowerCase() === "s") { e.preventDefault(); download(); return; }
+      if (e.target.isContentEditable) return;
+      var k = e.key.toLowerCase();
+      if (k === "x") { state.xray = !state.xray; apply(); }
+      if (k === "c") { state.chrome = !state.chrome; apply(); }
+      if (k === "e") { state.edit = !state.edit; apply(); toast(state.edit ? "edit mode on - click any text" : "edit mode off"); }
+      if (k === "v") { showReport(verify(deck)); }
+    });
+
+    window.CAROUSEL.toggle = function (key) {
+      if (key === "save") return download();
+      if (key === "verify") return showReport(verify(deck));
+      state[key] = !state[key]; apply();
+    };
+    window.CAROUSEL.collectEdits = collectEdits;
+
+    function showReport(rows) {
+      var box = document.getElementById("report");
+      if (!box) return;
+      if (!rows.length) {
+        box.innerHTML = '<p class="ok">All slides clear of the TikTok interface.</p>';
+      } else {
+        box.innerHTML = "<p class='bad'>" + rows.length + " issue(s):</p><ul>" +
+          rows.map(function (r) {
+            return "<li><b>slide " + r.slide + "</b> " + esc(r.el) + " " + esc(r.reason) +
+              " <code>" + esc(r.overlap) + "</code><br><span>" + esc(r.text) + "</span></li>";
+          }).join("") + "</ul>";
+      }
+      box.classList.add("show");
+    }
+
+    apply();
+  }
+
+  /* === BOOT ============================================================ */
+  window.CAROUSEL = {
+    exportMode: /[?&]export=1/.test(location.search),
+    slides: [],
+    verify: function () { return verify(window.CAROUSEL.deck); },
+    measure: measure,
+    render: render
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var deck = window.DECK;
+    if (!deck) { console.error("No DECK found"); return; }
+    deck.photoBase = deck.photoBase || "";
+    window.CAROUSEL.deck = deck;
+
+    var mount = document.getElementById("deck");
+    if (window.CAROUSEL.exportMode) document.body.classList.add("export");
+    render(deck, mount);
+    window.CAROUSEL.ready = ready(deck);
+    if (!window.CAROUSEL.exportMode) {
+      window.CAROUSEL.ready.then(function () { studio(deck); });
+    }
+  });
+})();
+
+</script>
+</body>
+</html>

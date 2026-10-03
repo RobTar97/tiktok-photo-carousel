@@ -12,7 +12,7 @@ shoots it, and browser edits merge back into it. Nothing else holds state.
   "photos": "./photos",                  // relative to THIS file
 
   "theme":  { ... },                     // see below
-  "safe":   { "top": 0.12, "bottom": 0.25, "side": 0.08,
+  "safe":   { "top": 0.085, "bottom": 0.15, "side": 0.07,
               "rail": 0.16, "railTop": 0.42 },   // optional override
 
   "slides": [ { ... } ]
@@ -62,23 +62,9 @@ Every field is optional. Anything missing falls back to a sane default, and
   "highlight": "marker",          // per-slide override
   "vertical": true,               // vertical Japanese type
   "rail": false,                  // this slide ignores the icon rail
-  "fit": "blur",                  // letterbox on a blurred copy of itself
-
-  "bg": "#0D2137",                // end-card: its own ground instead of the accent
-  "fonts": {                      // per-slide type, overriding the theme
-    "display": "Bebas Neue", "text": "Inter",
-    "weight": 400, "tracking": "0.01em", "leading": "1.12"
-  }
+  "fit": "blur"                   // letterbox on a blurred copy of itself
 }
 ```
-
-`fonts` exists for the concept gate, where three directions have to differ by
-typeface inside one page. `build.js` adds any family it finds here to the same
-Google Fonts request, so nothing extra is needed.
-
-`bg` exists because a brand that caps its accent at a share of the slide
-cannot use a full-bleed accent end card. Setting it also recomputes the text
-colour for contrast.
 
 ### Copy markup
 

@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.1.0
+
+Six more templates, safe zones rebased on TikTok's published specs, a
+grid-safe cover, and an audit of the pixels that actually ship.
+
+### Added
+- **Six templates** - `cover`, `index-card`, `quote-pull`, `diagonal-split`,
+  `caption-bar`, `compare`. Eighteen in total.
+- **A grid-safe cover.** On a photo post the first image is the cover and the
+  profile grid centre-crops it to 1:1, cutting the top and bottom 420px. The
+  `cover` template keeps the title inside the square that survives and puts
+  the swipe cue in the band that does not. `export.js` writes `cover.png`;
+  `audit.py` writes `_cover_grid.png` and reports anything outside the square.
+- **`scripts/audit.py`** - real WCAG contrast for every line against the
+  pixels behind it, plus TikTok's 48px headline / 32px body floors. It reads
+  background plates that `export.js` renders with the glyphs made transparent
+  and every card, chip and scrim still painted; measuring a finished slide
+  does not work, because antialiased glyph edges form a continuous ramp
+  between the text colour and the ground and every headline measures 1.1:1.
+  A highlighted word is measured in its own right and cut out of its parent's
+  sample.
+- **Per-slide type and ground** - `slides[].fonts` and `slides[].bg`.
+
+### Changed
+- **Safe zones follow the published specs**: top 0.085, bottom 0.15, side
+  0.07, icon column 0.16 wide from 0.42 down. The old 0.12/0.25 was safe but
+  threw away about 300px of canvas - on a 9:16 frame, the difference between
+  a 96px headline and a 132px one. `deck.safe` now drives both the CSS
+  clearances and the verifier, so layout and check cannot disagree, and every
+  template derives its padding from those fractions.
+- **Legibility floors are absolute.** `.sub`, `.kicker`, `.cta` and the small
+  labels never render below 32px however far the headline shrinks. Previously
+  a sub line could reach 18px.
+
+### Fixed
+- The `marker` highlight set white text on an accent band - 2.1:1, which made
+  the highlighted word the hardest one on the slide to read. The word now
+  takes the colour that reads on the band.
+- `torn-reveal` no longer darkens its own paper ground with the photo scrim.
+
 ## 2.0.0
 
 HTML rendering engine. The Pillow renderer stays as the offline fallback.

@@ -1,25 +1,68 @@
 # Safe zones
 
-TikTok draws its interface over your slides. Text under it is hidden or hard to read.
+TikTok draws its interface over your slides. Copy under it is hidden.
 
-| Area | Covered by | Default in this skill |
-|---|---|---|
-| Top | status bar, tabs | 12% of the height kept clear |
-| Bottom | caption, username, music, progress bar | 25% kept clear |
-| Right edge | like, comment, share, profile buttons | 8% side margin each side |
+## The numbers
 
-On the default 1080x1920 canvas the text block lives between about y=230 and y=1440, x=86 to x=994, and the font shrinks (style `size_max` to `size_min`) until it fits. Positions: `top` centers the block 22% down, `upper` 32%, `middle` 43%.
+On the 1080x1920 canvas, from TikTok's published media specs:
 
-## Check it
+| Area | Covered by | Default here | Pixels |
+|---|---|---|---|
+| Top | username row, tabs | `top: 0.085` | 163 |
+| Bottom | caption, music, buttons, progress | `bottom: 0.15` | 288 |
+| Sides | margin | `side: 0.07` | 76 each |
+| Lower right | like / comment / share column | `rail: 0.16` from `railTop: 0.42` | 173 wide |
 
-Run with `--debug`: the unsafe zones are shaded red on every slide. Keep important text and the subject out of the red.
+That leaves roughly the centre 1080x1470 fully visible, and the icon column
+only matters below 42% of the height.
 
-## Tune it
+Earlier versions of this skill reserved 12% and 25%. That is safe but throws
+away about 300px of usable canvas, and on a 9:16 frame that is the difference
+between a headline at 96px and one at 132px.
 
-- `--safe top,bottom,side` changes the fractions, e.g. `--safe 0.10,0.30,0.06`.
-- `--preset instagram` uses a 1080x1350 (4:5) canvas with smaller margins for Instagram carousels.
-- `--size 1080x1440` gives 3:4 if you prefer that ratio.
+## One source of truth
 
-## Why text is not at the bottom
+`deck.safe` drives both the CSS clearances and the verifier, so the layout and
+the check can never disagree:
 
-The bottom quarter is the busiest part of the interface and differs per device and per post (caption length changes how much is covered). Keeping text higher is the only layout that is safe everywhere.
+```json
+"safe": { "top": 0.085, "bottom": 0.15, "side": 0.07,
+          "rail": 0.16, "railTop": 0.42 }
+```
+
+Every template derives its padding from these. Adding a template means setting
+padding on `.layer-type` in terms of `--safe-t` / `--safe-b`, never a
+hard-coded fraction.
+
+## Seeing it
+
+In the studio, `X` shades the covered areas in red and `C` draws a mock of the
+real interface over the slide. Press `C` - watching your own caption block eat
+the bottom of the frame explains the zones faster than this page does.
+
+## The cover is different
+
+On a photo post the first image **is** the cover, and the profile grid
+centre-crops it to 1:1. The top and bottom 420px vanish there, so only the
+centre 1080x1080 survives.
+
+The `cover` template is built around that: the title sits inside the square,
+and the swipe cue goes in the band below it, which the feed shows and the grid
+crops away. `scripts/audit.py` writes `_cover_grid.png` so you can see the
+cropped version, and reports anything that falls outside the square.
+
+## Minimum sizes
+
+TikTok's own floor is 48px for a headline and 32px for body text on this
+canvas. The stylesheet enforces the body floor absolutely - `.sub`, `.kicker`,
+`.cta` and the small labels never scale below 32px however far the headline
+shrinks - and `audit.py` fails anything under either number.
+
+## Checking
+
+`scripts/export.js` measures every piece of copy against these zones and
+reports real overlaps in pixels. It does not judge whether text sits on a
+face; look at the contact sheet for that.
+
+For whether the copy is *readable* rather than merely *visible*, run
+`scripts/audit.py`. See [review-loop.md](review-loop.md).

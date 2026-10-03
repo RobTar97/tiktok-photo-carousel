@@ -20,12 +20,25 @@
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 
-  /* Safe-zone geometry. Overridable per deck. */
-  --safe-top: 12%;
-  --safe-bottom: 25%;
-  --safe-side: 8%;
-  --rail: 16%;                 /* right-hand icon rail width */
-  --safe-x: calc(var(--W, 1080px) * 0.08);
+  /* Safe-zone geometry, from TikTok's own media specs on a 1080x1920 canvas:
+     ~150px of username row at the top, ~250-270px of caption and buttons at
+     the bottom, and the like/comment/share column down the right. Stated as
+     unitless fractions so every template derives its padding from one place.
+     Override per deck with deck.safe. */
+  --f-top: 0.085;              /* 163px */
+  --f-bottom: 0.15;            /* 288px */
+  --f-side: 0.07;              /* 76px  */
+  --f-rail: 0.16;              /* icon column width */
+  --f-railtop: 0.42;           /* where that column starts */
+
+  --safe-x: calc(var(--W, 1080px) * var(--f-side));
+  --safe-t: calc(var(--H, 1920px) * var(--f-top));
+  --safe-b: calc(var(--H, 1920px) * var(--f-bottom));
+
+  /* percentage forms, for the x-ray overlay */
+  --safe-top: calc(var(--f-top) * 100%);
+  --safe-bottom: calc(var(--f-bottom) * 100%);
+  --rail: calc(var(--f-rail) * 100%);
 }
 
 /* === LAYER STACK ======================================================== */
@@ -118,7 +131,7 @@
    vertically. Font size comes from --fs, written by the autofit pass.      */
 .layer-type {
   display: flex; flex-direction: column;
-  padding: calc(var(--H) * 0.12) var(--safe-x) calc(var(--H) * 0.25) var(--safe-x);
+  padding: var(--safe-t) var(--safe-x) var(--safe-b) var(--safe-x);
 }
 /* Every template's copy lives in exactly one .type-box. The autofit pass
    measures this box against the padding box of .layer-type, so adding a
@@ -132,12 +145,12 @@
 .slide[data-align="right"]  .type-box { align-items: flex-end; }
 /* Icon-rail clearance lives on the box, not on .layer-type: templates
    rewrite .layer-type padding wholesale and would otherwise drop it. */
-.slide[data-rail="1"] .type-box { padding-right: calc(var(--W) * 0.13); }
+.slide[data-rail="1"] .type-box { padding-right: calc(var(--W) * (var(--f-rail) - var(--f-side) + 0.04)); }
 
-.slide[data-pos="top"]    .layer-type { justify-content: flex-start; padding-top: calc(var(--H) * 0.14); }
-.slide[data-pos="upper"]  .layer-type { justify-content: flex-start; padding-top: calc(var(--H) * 0.22); }
-.slide[data-pos="middle"] .layer-type { justify-content: center; padding-bottom: calc(var(--H) * 0.32); }
-.slide[data-pos="lower"]  .layer-type { justify-content: flex-end; padding-bottom: calc(var(--H) * 0.30); }
+.slide[data-pos="top"]    .layer-type { justify-content: flex-start; padding-top: calc(var(--safe-t) + var(--H) * 0.02); }
+.slide[data-pos="upper"]  .layer-type { justify-content: flex-start; padding-top: calc(var(--H) * 0.20); }
+.slide[data-pos="middle"] .layer-type { justify-content: center; padding-bottom: calc(var(--safe-b) + var(--H) * 0.09); }
+.slide[data-pos="lower"]  .layer-type { justify-content: flex-end; padding-bottom: calc(var(--safe-b) + var(--H) * 0.03); }
 
 .slide[data-align="center"] .layer-type { align-items: center; text-align: center; }
 .slide[data-align="right"]  .layer-type { align-items: flex-end; text-align: right; }
@@ -153,7 +166,9 @@
 }
 .sub {
   font-family: var(--font-text, sans-serif);
-  font-size: calc(var(--fs, 96px) * var(--sub-ratio, 0.38));
+  /* 32px is the smallest body text that stays readable on a phone, so the
+     floor is absolute - it does not scale down with the headline. */
+  font-size: max(32px, calc(var(--fs, 96px) * var(--sub-ratio, 0.38)));
   line-height: 1.32;
   font-weight: 500;
   color: var(--muted, rgba(255,255,255,0.93));
@@ -162,7 +177,7 @@
 }
 .kicker {
   font-family: var(--font-mono, monospace);
-  font-size: calc(var(--fs, 96px) * 0.20);
+  font-size: max(32px, calc(var(--fs, 96px) * 0.20));
   letter-spacing: 0.34em;
   text-transform: uppercase;
   color: var(--accent, #f2b705);
@@ -185,10 +200,15 @@
   box-shadow: inset 0 -0.14em 0 var(--accent, #f2b705);
 }
 .slide[data-hl="marker"] .headline mark {
-  color: inherit;
-  background: linear-gradient(to bottom, transparent 56%, var(--accent, #f2b705) 56%,
-                              var(--accent, #f2b705) 94%, transparent 94%);
-  padding: 0 0.1em;
+  /* The band has to carry the word, so the word takes the colour that reads
+     on the band. Leaving the text white over an accent swipe measured 2.1:1
+     - a highlight that made the highlighted word the hardest one to read. */
+  color: var(--on-accent, #0e0e10);
+  background: linear-gradient(to bottom, transparent 7%, var(--accent, #f2b705) 7%,
+                              var(--accent, #f2b705) 96%, transparent 96%);
+  padding: 0 0.12em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 /* Readability armour: a soft shadow under type on busy photos. */
@@ -265,7 +285,7 @@
 .slide[data-template="editorial-split"] .layer-texture,
 .slide[data-template="editorial-split"] .layer-art { inset: 0 0 42% 0; }
 .slide[data-template="editorial-split"] .layer-type {
-  inset: 58% 0 25% 0;              /* stops at the bottom safe zone */
+  inset: 58% 0 var(--safe-b) 0;    /* stops at the bottom safe zone */
   justify-content: center;
   padding: calc(var(--H) * 0.03) var(--safe-x);
   gap: calc(var(--fs) * 0.30);
@@ -298,7 +318,7 @@
 .slide[data-template="arch-window"] .layer-type {
   justify-content: flex-end;
   padding-top: calc(var(--H) * 0.615);     /* starts below the arch */
-  padding-bottom: calc(var(--H) * 0.26);
+  padding-bottom: var(--safe-b);
   color: #1b1b1b;
 }
 .slide[data-template="arch-window"] .sub { color: rgba(27,27,27,0.62); }
@@ -311,7 +331,7 @@
 .slide[data-template="frosted-card"] .photo { filter: blur(3px) saturate(1.1); transform: scale(1.06); }
 .slide[data-template="frosted-card"] .layer-type {
   justify-content: center;
-  padding-bottom: calc(var(--H) * 0.26);
+  padding-bottom: calc(var(--safe-b) + var(--H) * 0.04);
 }
 .slide[data-template="frosted-card"] .card {
   background: rgba(14,14,18,0.34);
@@ -350,7 +370,7 @@
 .slide[data-template="film-strip"] .layer-type {
   justify-content: flex-end;
   padding-top: calc(var(--H) * 0.64);      /* the copy sits below the strip */
-  padding-bottom: calc(var(--H) * 0.26);
+  padding-bottom: var(--safe-b);
 }
 
 /* --- 8. notes-card ------------------------------------------------------
@@ -362,7 +382,7 @@
 .slide[data-template="notes-card"] .layer-texture { inset: 0 0 34% 0; }
 .slide[data-template="notes-card"] .layer-type {
   justify-content: flex-end;
-  padding: calc(var(--H) * 0.40) calc(var(--W) * 0.055) calc(var(--H) * 0.26);
+  padding: calc(var(--H) * 0.40) calc(var(--W) * 0.055) var(--safe-b);
 }
 .slide[data-template="notes-card"] .card {
   background: var(--note-bg, #fbf7ec);
@@ -375,8 +395,8 @@
 .slide[data-template="notes-card"] .card .sub { color: rgba(26,26,26,0.60); }
 .slide[data-template="notes-card"] .note-bar {
   display: flex; gap: 10px; align-items: center;
-  font-family: var(--font-mono); font-size: calc(var(--fs) * 0.17);
-  letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.45;
+  font-family: var(--font-mono); font-size: max(32px, calc(var(--fs) * 0.17));
+  letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.55;
 }
 
 /* --- 9. polaroid-stack --------------------------------------------------
@@ -408,7 +428,7 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 .slide[data-template="polaroid-stack"] .layer-type {
-  justify-content: flex-end; padding-bottom: calc(var(--H) * 0.26); color: #1d1d1d;
+  justify-content: flex-end; padding-bottom: var(--safe-b); color: #1d1d1d;
 }
 .slide[data-template="polaroid-stack"] .headline {
   font-family: var(--font-hand, cursive); font-weight: 700; --tracking: 0; --leading: 1.0;
@@ -464,19 +484,191 @@
 .slide[data-template="end-card"] .layer-scrim,
 .slide[data-template="end-card"] .layer-texture { display: none; }
 .slide[data-template="end-card"] .layer-type {
-  justify-content: center; padding-bottom: calc(var(--H) * 0.30);
+  justify-content: center; padding-bottom: calc(var(--safe-b) + var(--H) * 0.09);
 }
 .slide[data-template="end-card"] .headline { --leading: 0.98; --tracking: -0.04em; }
 .slide[data-template="end-card"] .sub { color: currentColor; opacity: 0.62; }
 .slide[data-template="end-card"] .cta {
   margin-top: calc(var(--fs) * 0.4);
   font-family: var(--font-mono);
-  font-size: calc(var(--fs) * 0.22);
+  font-size: max(32px, calc(var(--fs) * 0.22));
   letter-spacing: 0.22em; text-transform: uppercase;
   border: 3px solid currentColor; border-radius: 999px;
   padding: 0.6em 1.2em; align-self: flex-start;
 }
 .slide[data-align="center"][data-template="end-card"] .cta { align-self: center; }
+
+
+/* ============================================================================
+   TEMPLATES 13-18
+   Added after reading TikTok's published media specs. Each spends its boldness
+   on a single signature element and keeps everything around it quiet, and each
+   structural device carries real information - a place, a position in the
+   deck, a pairing - rather than decorating the frame.
+   ========================================================================= */
+
+/* --- 13. cover ----------------------------------------------------------
+   The thumbnail. The profile grid centre-crops a 9:16 cover to 1:1, cutting
+   the top and bottom ~420px, so this is the one template where centring is
+   right: the crop is centred, so the title has to be. The lower band carries
+   the swipe cue, which only the feed ever shows - the grid never sees it.   */
+/* The cover is read in a fraction of a second in a crowded feed, so it gets
+   a floor on its scrim rather than whatever the photo's luminance suggested. */
+.slide[data-template="cover"] .layer-scrim { opacity: max(var(--scrim, 0.45), 0.52); }
+.slide[data-template="cover"] .layer-type {
+  justify-content: center;
+  align-items: center; text-align: center;
+  /* the 1080x1080 band that survives the crop is y 420..1500 */
+  padding: calc(var(--H) * 0.26) calc(var(--W) * 0.17) calc(var(--H) * 0.26);
+}
+.slide[data-template="cover"] .type-box { align-items: center; padding-right: 0; }
+.slide[data-template="cover"] .headline { --leading: 1.0; --tracking: -0.035em; }
+.slide[data-template="cover"] .kicker {
+  align-self: center;
+  border: 2px solid currentColor; border-radius: 999px;
+  padding: 0.5em 1.1em; letter-spacing: 0.26em;
+}
+.slide[data-template="cover"] .swipe {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-b) + var(--H) * 0.015);
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: #fff; opacity: 0.82; text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+}
+.slide[data-template="cover"] .swipe i {
+  display: block; width: 46px; height: 2px; background: currentColor;
+  position: relative;
+}
+.slide[data-template="cover"] .swipe i::after {
+  content: ""; position: absolute; right: 0; top: -5px;
+  width: 12px; height: 12px;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* --- 14. index-card -----------------------------------------------------
+   Asymmetric editorial. A rule runs the height of the safe area with the
+   section label set vertically along it; the headline hangs to its right.
+   Signature: the vertical edge label, naming a real place or section.       */
+.slide[data-template="index-card"] .layer-type {
+  justify-content: flex-end;
+  padding: var(--safe-t) var(--safe-x) calc(var(--safe-b) + var(--H) * 0.03) calc(var(--W) * 0.19);
+}
+.slide[data-template="index-card"] .edge-rule {
+  position: absolute; left: calc(var(--W) * 0.075);
+  top: var(--safe-t); bottom: var(--safe-b);
+  width: 3px; background: var(--accent, #f2b705);
+}
+.slide[data-template="index-card"] .edge-label {
+  position: absolute; left: calc(var(--W) * 0.075 + 22px);
+  bottom: calc(var(--safe-b) + var(--H) * 0.03);
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-family: var(--font-mono); font-size: max(32px, calc(var(--fs) * 0.19));
+  letter-spacing: 0.34em; text-transform: uppercase;
+  color: var(--accent, #f2b705);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+.slide[data-template="index-card"] .headline { --tracking: -0.03em; }
+
+/* --- 15. quote-pull -----------------------------------------------------
+   The line is the subject and the photograph is only a ground, so the photo
+   is desaturated and pushed back. Signature: an oversized quotation glyph
+   bleeding off the left edge with the quote set across it.                  */
+.slide[data-template="quote-pull"] .photo {
+  filter: grayscale(0.78) contrast(1.06) brightness(0.72);
+}
+.slide[data-template="quote-pull"] .quote-mark {
+  position: absolute; left: calc(var(--W) * -0.02); top: calc(var(--H) * 0.085);
+  font-family: Georgia, "Times New Roman", var(--font-display), serif;
+  font-weight: 700;
+  /* A display face renders this glyph small inside a large em box; a serif
+     fills it, which is what makes it read as a graphic rather than a tick. */
+  font-size: 820px; line-height: 0.62;
+  color: var(--accent, #f2b705); opacity: 0.28;
+}
+.slide[data-template="quote-pull"] .layer-type {
+  justify-content: center;
+  padding: calc(var(--H) * 0.26) var(--safe-x) calc(var(--safe-b) + var(--H) * 0.05);
+}
+.slide[data-template="quote-pull"] .headline {
+  font-family: var(--font-text, serif);
+  font-weight: 500; --leading: 1.24; --tracking: -0.005em;
+}
+.slide[data-template="quote-pull"] .sub {
+  font-family: var(--font-mono);
+  letter-spacing: 0.2em; text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* --- 16. diagonal-split -------------------------------------------------
+   The photo is cut on a rising diagonal and the copy sits in the solid wedge
+   beneath it. Signature: a hairline accent stroke along the cut.            */
+.slide[data-template="diagonal-split"] { background: var(--block, #141414); }
+.slide[data-template="diagonal-split"] .layer-photo,
+.slide[data-template="diagonal-split"] .layer-scrim,
+.slide[data-template="diagonal-split"] .layer-texture {
+  clip-path: polygon(0 0, 100% 0, 100% 44%, 0 62%);
+}
+.slide[data-template="diagonal-split"] .cut {
+  position: absolute; inset: 0;
+  background: var(--accent, #f2b705);
+  clip-path: polygon(0 62%, 100% 44%, 100% 44.6%, 0 62.6%);
+}
+.slide[data-template="diagonal-split"] .layer-type {
+  justify-content: flex-start;
+  padding: calc(var(--H) * 0.665) var(--safe-x) var(--safe-b);
+}
+
+/* --- 17. caption-bar ----------------------------------------------------
+   A lower-third over a full-bleed photo, the way a subtitle sits on film.
+   Signature: the position counter - real information, and the single best
+   lever there is on swipe-through.                                          */
+.slide[data-template="caption-bar"] .bar {
+  position: absolute; left: 0; right: 0;
+  top: 60%; bottom: calc(var(--f-bottom) * 100%);
+  background: var(--block, #141414);
+  border-top: 3px solid var(--accent, #f2b705);
+}
+.slide[data-template="caption-bar"] .counter {
+  position: absolute; right: var(--safe-x); top: calc(60% + 28px);
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.22em; color: var(--accent, #f2b705);
+}
+.slide[data-template="caption-bar"] .layer-type {
+  inset: 60% 0 calc(var(--f-bottom) * 100%) 0;
+  justify-content: center;
+  padding: calc(var(--H) * 0.04) var(--safe-x);
+}
+.slide[data-template="caption-bar"] .type-box { padding-right: calc(var(--W) * 0.12); }
+
+/* --- 18. compare --------------------------------------------------------
+   Two frames, hard split, one label each. Only reach for it when the pairing
+   is real - a before and an after, two sides of the same place.             */
+.slide[data-template="compare"] .layer-photo,
+.slide[data-template="compare"] .layer-scrim { display: none; }
+.slide[data-template="compare"] .pair {
+  position: absolute; left: 0; right: 0;
+  top: calc(var(--H) * 0.30); bottom: var(--safe-b);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  background: var(--bg, #0e0e10);
+}
+.slide[data-template="compare"] .pair figure { position: relative; overflow: hidden; }
+.slide[data-template="compare"] .pair img {
+  width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block;
+}
+.slide[data-template="compare"] .pair figcaption {
+  position: absolute; left: 0; bottom: 0;
+  background: var(--accent, #f2b705); color: var(--on-accent, #0e0e10);
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 0.5em 0.9em;
+}
+.slide[data-template="compare"] .layer-type {
+  inset: 0 0 auto 0; height: calc(var(--H) * 0.30);
+  justify-content: flex-end;
+  padding: var(--safe-t) var(--safe-x) calc(var(--H) * 0.03);
+}
 
 /* === VERTICAL JAPANESE TYPE ============================================
    Opt in per slide with "vertical": true. Only for JP/CJK copy.           */
@@ -485,7 +677,7 @@
   text-orientation: upright;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: calc(var(--H) * 0.13) calc(var(--W) * 0.10) calc(var(--H) * 0.26) var(--safe-x);
+  padding: var(--safe-t) calc(var(--W) * 0.10) var(--safe-b) var(--safe-x);
 }
 /* height:auto is the point: in vertical writing mode the box's physical
    height IS the length of the line, which is what autofit measures. Forcing
@@ -502,7 +694,13 @@
 }
 .layer-safe::before { top: 0; left: 0; right: 0; height: var(--safe-top); }
 .layer-safe::after  { bottom: 0; left: 0; right: 0; height: var(--safe-bottom); }
-.layer-safe .rail   { right: 0; top: var(--safe-top); bottom: var(--safe-bottom); width: var(--rail); }
+.layer-safe .rail   { right: 0; top: calc(var(--f-railtop) * 100%); bottom: var(--safe-bottom); width: var(--rail); }
+/* What survives the profile grid's 1:1 crop of a cover. */
+.layer-safe .gridcrop {
+  position: absolute; left: 0; right: 0; top: 21.875%; height: 56.25%;
+  background: none; outline: 3px dashed rgba(80,200,255,0.85);
+}
+.slide[data-template="cover"] .layer-safe .gridcrop { outline-color: rgba(70,255,150,0.95); }
 
 /* Any element the verifier flagged gets outlined. */
 .overflow-flag { outline: 4px solid #ff0040 !important; outline-offset: 6px; }

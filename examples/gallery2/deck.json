@@ -1,0 +1,69 @@
+{
+  "title": "New templates",
+  "handle": "yourhandle",
+  "caption": "Templates 13-18",
+  "photos": "../photos",
+  "theme": {
+    "display": "Bricolage Grotesque",
+    "text": "Instrument Sans",
+    "hand": "Caveat",
+    "mono": "Space Mono",
+    "displayWeight": 800,
+    "accent": "#f2b705",
+    "highlight": "marker",
+    "grain": 0.07,
+    "vignette": 0.34
+  },
+  "slides": [
+    {
+      "role": "cover",
+      "template": "cover",
+      "photo": "sunset.jpg",
+      "kicker": "osaka",
+      "text": "The harbour at 16:40",
+      "sub": "nobody films it",
+      "swipe": "swipe"
+    },
+    {
+      "role": "build",
+      "template": "index-card",
+      "photo": "sea.jpg",
+      "edgeLabel": "nanko bay",
+      "text": "A rule, a vertical label",
+      "sub": "and the headline hanging off it"
+    },
+    {
+      "role": "build",
+      "template": "quote-pull",
+      "photo": "hallway.jpg",
+      "text": "The line is the subject and the photograph is only a ground",
+      "sub": "slide three"
+    },
+    {
+      "role": "build",
+      "template": "diagonal-split",
+      "photo": "sunset.jpg",
+      "text": "Cut on a rising diagonal",
+      "sub": "the copy sits in the wedge"
+    },
+    {
+      "role": "build",
+      "template": "caption-bar",
+      "photo": "sea.jpg",
+      "text": "A lower third, the way a subtitle sits on film"
+    },
+    {
+      "role": "payoff",
+      "template": "compare",
+      "photos": [
+        "sunset.jpg",
+        "sea.jpg"
+      ],
+      "labels": [
+        "before",
+        "after"
+      ],
+      "text": "Two frames, one split"
+    }
+  ]
+}
