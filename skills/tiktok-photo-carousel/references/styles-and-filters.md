@@ -1,5 +1,9 @@
 # Styles and filters
 
+> **Legacy engine.** These styles and filters belong to `scripts/carousel.py`.
+> The HTML engine uses templates and a theme instead - see
+> [templates.md](templates.md) and [design-system.md](design-system.md).
+
 ## Contents
 - [Styles](#styles)
 - [Filters](#filters)

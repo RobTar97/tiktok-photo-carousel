@@ -78,7 +78,23 @@ cheap layers:
 Grain at 0.06 is invisible if you look for it and obvious if you remove it.
 That is the right amount.
 
-## 4. Contrast is measured, not guessed
+## 4. Legibility is a floor, not a preference
+
+TikTok's own numbers on a 1080x1920 canvas: **48px for a headline, 32px for
+body text**. The stylesheet enforces the body floor absolutely - `.sub`,
+`.kicker`, `.cta` and the small labels never render below 32px however far
+the headline shrinks - and `scripts/audit.py` fails anything under either.
+
+Two consequences worth knowing before you design:
+
+- **A highlight has to carry its word.** An accent band with the text left
+  white measured 2.1:1 - the highlighted word came out the hardest one on the
+  slide to read. `marker` and `box` now flip the word to whichever of black or
+  white reads on the accent. If you invent a highlight treatment, do the same.
+- **Long copy does not shrink its way to safety.** Once the headline hits the
+  floor the slide is carrying two ideas. Split it.
+
+## 5. Contrast is measured, not guessed
 
 The old renderer picked a shadow and hoped. This one measures:
 
@@ -93,7 +109,17 @@ If a slide still reads badly, the fix is the photo or the position, not more
 black. A scrim above about 0.7 means the photo is fighting the copy — move the
 text with `pos`, or use `frosted-card` and let the photo be atmosphere.
 
-## 5. Hierarchy per slide
+## 6. The cover is designed twice
+
+On a photo post the first image is the cover, and it is seen in two shapes:
+full 9:16 in the feed, and centre-cropped to 1:1 on the profile grid. The
+`cover` template puts the title in the square that survives both and the swipe
+cue in the band only the feed shows.
+
+This is the one place where centring is correct - the crop is centred, so the
+title has to be. Everywhere else, prefer asymmetry.
+
+## 7. Hierarchy per slide
 
 One idea. One emphasis. The sizes are already proportional (`sub` is 0.38 of
 the headline, `kicker` is 0.20), so hierarchy is about **what you leave out**.
@@ -102,7 +128,7 @@ the headline, `kicker` is 0.20), so hierarchy is about **what you leave out**.
 - If the headline needs a comma, it probably needs to be two slides.
 - The hook slide carries no kicker and no CTA. Only the hook.
 
-## 6. Motion
+## 8. Motion
 
 The export is still images, so motion is not part of the output. The studio
 animates nothing on purpose: you are judging what a viewer sees in one second,

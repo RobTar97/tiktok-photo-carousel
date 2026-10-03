@@ -1,5 +1,9 @@
 # Script format
 
+> **Legacy engine.** This script format belongs to `scripts/carousel.py`.
+> The HTML engine is driven by `deck.json` - see
+> [deck-format.md](deck-format.md).
+
 The script lists one entry per slide. Photos are taken from `--photos` in sorted filename order unless a slide names its own `photo`.
 
 ## Contents

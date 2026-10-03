@@ -16,9 +16,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r skills/tiktok-photo-carousel/requirements.txt
       - run: npm install
       - run: npx playwright install --with-deps chromium
-      - run: node skills/tiktok-photo-carousel/scripts/selftest.js
+      - name: Every template renders, fits and clears the safe zones
+        run: node skills/tiktok-photo-carousel/scripts/selftest.js
+      - name: Build the example gallery
+        run: |
+          node skills/tiktok-photo-carousel/scripts/build.js             --deck examples/gallery/deck.json --out examples/gallery/carousel.html
+          node skills/tiktok-photo-carousel/scripts/export.js             --html examples/gallery/carousel.html --out out/gallery --no-contact --strict
+      - name: Readability audit of the exported slides
+        run: python skills/tiktok-photo-carousel/scripts/audit.py --out out/gallery --strict
 
   legacy-pil:
     strategy:
