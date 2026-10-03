@@ -62,9 +62,23 @@ Every field is optional. Anything missing falls back to a sane default, and
   "highlight": "marker",          // per-slide override
   "vertical": true,               // vertical Japanese type
   "rail": false,                  // this slide ignores the icon rail
-  "fit": "blur"                   // letterbox on a blurred copy of itself
+  "fit": "blur",                  // letterbox on a blurred copy of itself
+
+  "bg": "#0D2137",                // end-card: its own ground instead of the accent
+  "fonts": {                      // per-slide type, overriding the theme
+    "display": "Bebas Neue", "text": "Inter",
+    "weight": 400, "tracking": "0.01em", "leading": "1.12"
+  }
 }
 ```
+
+`fonts` exists for the concept gate, where three directions have to differ by
+typeface inside one page. `build.js` adds any family it finds here to the same
+Google Fonts request, so nothing extra is needed.
+
+`bg` exists because a brand that caps its accent at a share of the slide
+cannot use a full-bleed accent end card. Setting it also recomputes the text
+colour for contrast.
 
 ### Copy markup
 

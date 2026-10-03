@@ -100,6 +100,15 @@ function fontsTag(t) {
   push(t.text, "300;400;500;600");
   push(t.hand, "400;700");
   push(t.mono, "400;700");
+  // Slides may override the type (the concept gate relies on it), so their
+  // families have to make it into the same font request.
+  (deck.slides || []).forEach((s) => {
+    if (!s.fonts) return;
+    push(s.fonts.display, "400;600;700;800;900");
+    push(s.fonts.text, "300;400;500;600");
+    push(s.fonts.hand, "400;700");
+    push(s.fonts.mono, "400;700");
+  });
   if (!fams.length) return "";
   const q = fams
     .map((f) => "family=" + f.fam.replace(/ /g, "+") + ":wght@" + f.weights)

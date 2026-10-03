@@ -240,6 +240,10 @@
 /* --- 3. torn-reveal -----------------------------------------------------
    Photo visible through a torn-paper tear; headline on the paper above.    */
 .slide[data-template="torn-reveal"] { background: var(--paper, #efe9dd); color: #141414; }
+/* The copy sits on paper, not on the photo, so the photo scrim would only
+   dirty the paper. Same reasoning as arch-window and polaroid-stack. */
+.slide[data-template="torn-reveal"] .layer-scrim { display: none; }
+.slide[data-template="torn-reveal"] .layer-texture::after { opacity: 0; }
 .slide[data-template="torn-reveal"] .layer-photo { clip-path: url(#tearClip); }
 .slide[data-template="torn-reveal"] .paper-top {
   position: absolute; inset: 0 0 auto 0; height: 46%;
@@ -451,8 +455,10 @@
 /* --- 12. end-card -------------------------------------------------------
    Flat colour, oversized type, one call to action.                         */
 .slide[data-template="end-card"] {
-  background: var(--accent, #f2b705);
-  color: var(--on-accent, #0e0e10);        /* contrast-checked, not assumed */
+  /* Defaults to the accent, but a brand that caps accent at 10% of a slide
+     wants to set its own ground here - hence the per-slide "bg". */
+  background: var(--slide-bg, var(--accent, #f2b705));
+  color: var(--on-slide-bg, var(--on-accent, #0e0e10));  /* contrast-checked */
 }
 .slide[data-template="end-card"] .layer-photo,
 .slide[data-template="end-card"] .layer-scrim,

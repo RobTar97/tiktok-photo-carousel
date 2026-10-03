@@ -35,9 +35,18 @@ HTML rendering engine. The Pillow renderer stays as the offline fallback.
 - New references: templates, deck-format, design-system, review-loop,
   brand-kit. `examples/output-templates/` shows all twelve.
 
+- **Per-slide type and ground** - `slides[].fonts` overrides the theme's
+  typefaces for one slide (the concept gate needs three directions in one
+  page), and `slides[].bg` gives the end card its own ground instead of
+  forcing the accent across the whole frame.
+
 ### Fixed
 - Japanese filenames no longer crash the Python scripts on Windows consoles
   (cp932/cp1252); stdout is forced to UTF-8.
+- Autofit now catches a single long word overflowing its box. The block's
+  rect does not grow when a word spills out, so the word ran off the edge of
+  the slide while the verifier reported the slide clear.
+- `torn-reveal` no longer darkens its paper ground with the photo scrim.
 
 ### Unchanged
 - `scripts/carousel.py`, its 8 styles, 7 filters and script formats.

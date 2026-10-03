@@ -142,6 +142,15 @@
   /* Templates whose copy sits inside a card element. */
   var CARDED = { "frosted-card": 1, "notes-card": 1 };
 
+  /* Pick black or white for whatever sits on top of a colour. */
+  function onColor(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ""));
+    if (!m) return "#0e0e10";
+    var n = parseInt(m[1], 16);
+    var lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+    return lum > 0.58 ? "#0e0e10" : "#ffffff";
+  }
+
   /* === BUILD ONE SLIDE ================================================= */
   function buildSlide(s, i, deck) {
     var t = deck.theme || {};
@@ -161,11 +170,31 @@
     if (s.scanlines || t.scanlines) slide.dataset.scanlines = "1";
 
     // Per-slide colour overrides on top of the deck theme.
-    if (s.accent) slide.style.setProperty("--accent", s.accent);
+    if (s.accent) {
+      slide.style.setProperty("--accent", s.accent);
+      slide.style.setProperty("--on-accent", onColor(s.accent));
+    }
     if (s.block) slide.style.setProperty("--block", s.block);
+    if (s.bg) {
+      slide.style.setProperty("--slide-bg", s.bg);
+      slide.style.setProperty("--on-slide-bg", onColor(s.bg));
+    }
     if (s.duotone) {
       slide.style.setProperty("--duo-dark", s.duotone[0]);
       slide.style.setProperty("--duo-light", s.duotone[1]);
+    }
+
+    /* Per-slide type. Needed by the concept gate, where three directions
+       have to differ by typeface inside one page. */
+    if (s.fonts) {
+      var F = s.fonts;
+      if (F.display) slide.style.setProperty("--font-display", F.display);
+      if (F.text) slide.style.setProperty("--font-text", F.text);
+      if (F.hand) slide.style.setProperty("--font-hand", F.hand);
+      if (F.mono) slide.style.setProperty("--font-mono", F.mono);
+      if (F.weight) slide.style.setProperty("--display-weight", F.weight);
+      if (F.tracking) slide.style.setProperty("--tracking", F.tracking);
+      if (F.leading) slide.style.setProperty("--leading", F.leading);
     }
 
     /* --- photo layer --- */
@@ -263,7 +292,16 @@
       var r = box.getBoundingClientRect();
       var scale = slide.getBoundingClientRect().width / W || 1;
       var h = r.height / scale, w = r.width / scale;
-      return vertical ? (w <= availW && h <= availH) : (h <= availH && w <= availW + 1);
+
+      // A single long word ("Checkerboard") overflows the box without making
+      // the block's rect any wider, so the rect alone says it fits. Compare
+      // scroll extent too, or the word runs off the edge of the slide.
+      if (vertical) {
+        if (box.scrollHeight > box.clientHeight + 1) return false;
+        return w <= availW + 1 && h <= availH + 1;
+      }
+      if (box.scrollWidth > box.clientWidth + 1) return false;
+      return h <= availH && w <= availW + 1;
     }
 
     if (fits(max)) { slide.style.setProperty("--fs", max + "px"); return; }
@@ -352,15 +390,6 @@
       }
     });
     return out;
-  }
-
-  /* Pick black or white for whatever sits on top of a colour. */
-  function onColor(hex) {
-    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ""));
-    if (!m) return "#0e0e10";
-    var n = parseInt(m[1], 16);
-    var lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
-    return lum > 0.58 ? "#0e0e10" : "#ffffff";
   }
 
   /* === THEME =========================================================== */
