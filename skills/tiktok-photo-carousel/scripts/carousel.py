@@ -13,6 +13,13 @@ import argparse
 import json
 import re
 import sys
+
+# Windows consoles default to cp932/cp1252 and blow up on Japanese file
+# names. The skill is used with Japanese photo sets constantly, so force
+# UTF-8 on stdout instead of letting a print() kill the run.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 
 try:

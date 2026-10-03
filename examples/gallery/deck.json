@@ -1,0 +1,120 @@
+{
+  "title": "Template gallery",
+  "handle": "yourhandle",
+  "caption": "Every template in the skill, rendered on the same three photos",
+  "photos": "../photos",
+  "theme": {
+    "display": "Bricolage Grotesque",
+    "text": "Instrument Sans",
+    "hand": "Caveat",
+    "mono": "Space Mono",
+    "displayWeight": 800,
+    "accent": "#f2b705",
+    "highlight": "marker",
+    "grain": 0.07,
+    "vignette": 0.34
+  },
+  "slides": [
+    {
+      "role": "hook",
+      "template": "full-bleed-hook",
+      "photo": "sunset.jpg",
+      "text": "Nobody films this *harbour* at 16:40",
+      "sub": "and it is free to stand here"
+    },
+    {
+      "role": "build",
+      "template": "editorial-split",
+      "photo": "sea.jpg",
+      "kicker": "01",
+      "text": "It starts at the water",
+      "sub": "A promenade with room to breathe."
+    },
+    {
+      "role": "build",
+      "template": "duotone-poster",
+      "photo": "hallway.jpg",
+      "text": "Then it goes inside",
+      "pos": "top"
+    },
+    {
+      "role": "build",
+      "template": "arch-window",
+      "photo": "sea.jpg",
+      "text": "A window on the bay",
+      "sub": "calm, unhurried, premium"
+    },
+    {
+      "role": "build",
+      "template": "frosted-card",
+      "photo": "hallway.jpg",
+      "kicker": "02",
+      "text": "Three things to know",
+      "sub": "the photo becomes atmosphere, the card carries the copy"
+    },
+    {
+      "role": "build",
+      "template": "notes-card",
+      "photo": "sunset.jpg",
+      "noteLabel": "go at",
+      "text": "16:40 in winter",
+      "sub": "The west deck faces the water. Usually empty."
+    },
+    {
+      "role": "build",
+      "template": "torn-reveal",
+      "photo": "hallway.jpg",
+      "text": "Torn open",
+      "sub": "paper over photograph"
+    },
+    {
+      "role": "build",
+      "template": "film-strip",
+      "photos": [
+        "sunset.jpg",
+        "sea.jpg",
+        "hallway.jpg"
+      ],
+      "text": "Three frames, one roll"
+    },
+    {
+      "role": "build",
+      "template": "dreamcore-glow",
+      "photo": "hallway.jpg",
+      "text": "Level 1994",
+      "sub": "it felt wrong and I could not leave"
+    },
+    {
+      "role": "build",
+      "template": "sticker-chaos",
+      "photo": "sea.jpg",
+      "text": "look at this bit",
+      "stickers": [
+        {
+          "text": "here",
+          "x": 0.58,
+          "y": 0.52,
+          "rot": -8
+        }
+      ]
+    },
+    {
+      "role": "payoff",
+      "template": "polaroid-stack",
+      "photo": "sunset.jpg",
+      "photos": [
+        "sunset.jpg",
+        "sea.jpg"
+      ],
+      "text": "and you get it // to yourself",
+      "tilt": -3.5
+    },
+    {
+      "role": "cta",
+      "template": "end-card",
+      "text": "Save this for later",
+      "sub": "twelve templates, one theme",
+      "cta": "part 2?"
+    }
+  ]
+}

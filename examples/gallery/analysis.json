@@ -1,0 +1,138 @@
+{
+ "hallway.jpg": {
+  "w": 1600,
+  "h": 2400,
+  "orient": "portrait",
+  "palette": [
+   "#9cabd2",
+   "#bac4dc",
+   "#e1e4e9"
+  ],
+  "duotone": [
+   "#20232b",
+   "#909ec2"
+  ],
+  "focus": [
+   0.499,
+   0.454
+  ],
+  "bands": {
+   "top": {
+    "luma": 221.7,
+    "busy": 19.4,
+    "scrim": 0.74,
+    "needsShadow": true
+   },
+   "upper": {
+    "luma": 221.7,
+    "busy": 18.2,
+    "scrim": 0.74,
+    "needsShadow": true
+   },
+   "middle": {
+    "luma": 221.2,
+    "busy": 17.9,
+    "scrim": 0.74,
+    "needsShadow": true
+   },
+   "lower": {
+    "luma": 219.8,
+    "busy": 18.8,
+    "scrim": 0.74,
+    "needsShadow": true
+   }
+  }
+ },
+ "sea.jpg": {
+  "w": 1600,
+  "h": 2400,
+  "orient": "portrait",
+  "palette": [
+   "#224c74",
+   "#336693",
+   "#8bb9ec",
+   "#a6caf2",
+   "#c5dff8"
+  ],
+  "duotone": [
+   "#11263b",
+   "#4cabff"
+  ],
+  "focus": [
+   0.502,
+   0.78
+  ],
+  "bands": {
+   "top": {
+    "luma": 201.6,
+    "busy": 10.2,
+    "scrim": 0.68,
+    "needsShadow": true
+   },
+   "upper": {
+    "luma": 192.9,
+    "busy": 36.5,
+    "scrim": 0.66,
+    "needsShadow": true
+   },
+   "middle": {
+    "luma": 160.4,
+    "busy": 56.1,
+    "scrim": 0.58,
+    "needsShadow": true
+   },
+   "lower": {
+    "luma": 124.8,
+    "busy": 50.5,
+    "scrim": 0.45,
+    "needsShadow": true
+   }
+  }
+ },
+ "sunset.jpg": {
+  "w": 1600,
+  "h": 2400,
+  "orient": "portrait",
+  "palette": [
+   "#0e2036",
+   "#1d324e",
+   "#5f4f58",
+   "#9f6d54",
+   "#e09a59"
+  ],
+  "duotone": [
+   "#102640",
+   "#4aa9ff"
+  ],
+  "focus": [
+   0.5,
+   0.555
+  ],
+  "bands": {
+   "top": {
+    "luma": 126.8,
+    "busy": 25.2,
+    "scrim": 0.42,
+    "needsShadow": true
+   },
+   "upper": {
+    "luma": 148.8,
+    "busy": 25.6,
+    "scrim": 0.49,
+    "needsShadow": true
+   },
+   "middle": {
+    "luma": 154.9,
+    "busy": 44.8,
+    "scrim": 0.54,
+    "needsShadow": true
+   },
+   "lower": {
+    "luma": 131.9,
+    "busy": 66.6,
+    "scrim": 0.5,
+    "needsShadow": true
+   }
+  }
+ }
+}

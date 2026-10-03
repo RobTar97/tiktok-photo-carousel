@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+{{FONTS}}
+<style>
+/* ===================== TEMPLATE STYLESHEET (inlined) ===================== */
+{{CSS}}
+
+/* ===================== STUDIO SHELL =====================================
+   Everything below is review furniture. `?export=1` hides all of it and
+   lays the slides out at their true 1080x1920 so Playwright can shoot them.
+   ======================================================================== */
+:root {
+  --k: 0.26;                                   /* preview scale */
+  --grain-url: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='0.55'/></svg>");
+  --linen-url: repeating-linear-gradient(45deg, rgba(0,0,0,0.022) 0 2px, transparent 2px 5px),
+               repeating-linear-gradient(-45deg, rgba(0,0,0,0.018) 0 2px, transparent 2px 5px);
+  --ui: #e8e6e1;
+  --ui-dim: #8e8b85;
+  --ui-bg: #121214;
+  --ui-panel: #1b1b1f;
+  --ui-line: #2c2c32;
+}
+body {
+  background: var(--ui-bg);
+  color: var(--ui);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
+  padding: 92px 28px 120px;
+}
+
+/* --- toolbar --- */
+#hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 22px;
+  background: rgba(18,18,20,0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ui-line);
+}
+#hud .title { font-weight: 650; letter-spacing: -0.01em; margin-right: 6px; }
+#hud .meta { color: var(--ui-dim); margin-right: auto; font-size: 13px; }
+#hud button {
+  font: inherit; font-size: 13px;
+  color: var(--ui); background: #26262c;
+  border: 1px solid var(--ui-line); border-radius: 8px;
+  padding: 7px 13px; cursor: pointer;
+}
+#hud button:hover { background: #32323a; }
+#hud button.on { background: var(--ui); color: #111; border-color: var(--ui); }
+#hud button.primary { background: #3d7dff; border-color: #3d7dff; color: #fff; }
+#hud kbd {
+  font: 11px ui-monospace, monospace; opacity: 0.55;
+  border: 1px solid currentColor; border-radius: 4px; padding: 0 4px; margin-left: 6px;
+}
+
+/* --- slide grid --- */
+#deck {
+  display: flex; flex-wrap: wrap; gap: 30px 22px;
+  align-items: flex-start; justify-content: center;
+}
+.cell { width: calc(1080px * var(--k)); }
+.frame {
+  position: relative;
+  width: calc(1080px * var(--k));
+  height: calc(1920px * var(--k));
+  overflow: hidden;
+  border-radius: 20px;
+  background: #000;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.55), 0 0 0 1px var(--ui-line);
+}
+.frame > .slide { transform: scale(var(--k)); transform-origin: top left; }
+.frame-cap {
+  display: flex; gap: 8px; align-items: baseline;
+  margin-top: 9px; font-size: 12px; color: var(--ui-dim);
+}
+.frame-cap b { color: var(--ui); font-variant-numeric: tabular-nums; }
+.frame-cap i { margin-left: auto; font-style: normal; opacity: 0.6; }
+
+/* --- edit mode --- */
+body[data-edit="1"] .headline,
+body[data-edit="1"] .sub,
+body[data-edit="1"] .kicker,
+body[data-edit="1"] .cta {
+  outline: 2px dashed rgba(61,125,255,0.85); outline-offset: 5px; cursor: text;
+}
+body[data-edit="1"] .frame { overflow: visible; }
+
+/* --- notes + report --- */
+#side {
+  position: fixed; right: 20px; bottom: 20px; z-index: 100;
+  width: 340px; display: flex; flex-direction: column; gap: 10px;
+}
+#notes {
+  font: inherit; color: var(--ui); background: var(--ui-panel);
+  border: 1px solid var(--ui-line); border-radius: 10px;
+  padding: 11px 13px; min-height: 86px; resize: vertical;
+}
+#notes::placeholder { color: var(--ui-dim); }
+#report {
+  display: none; max-height: 42vh; overflow: auto;
+  background: var(--ui-panel); border: 1px solid var(--ui-line);
+  border-radius: 10px; padding: 13px;
+}
+#report.show { display: block; }
+#report ul { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-top: 8px; }
+#report li { font-size: 12.5px; border-left: 2px solid #ff3b5c; padding-left: 9px; }
+#report li span { color: var(--ui-dim); }
+#report code { background: #000; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+#report .ok { color: #46d07f; }
+#report .bad { color: #ff6b84; }
+
+#toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+  background: var(--ui); color: #111; font-weight: 600;
+  padding: 11px 20px; border-radius: 999px;
+  opacity: 0; pointer-events: none; transition: 0.22s; z-index: 200;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* --- export mode: nothing but the slides, at full size --- */
+body.export { padding: 0; background: #000; }
+body.export #hud, body.export #side, body.export #toast { display: none; }
+body.export #deck { display: block; }
+body.export .layer-safe, body.export .layer-chrome { display: none !important; }
+body.export .overflow-flag { outline: none !important; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <span class="title">{{TITLE}}</span>
+  <span class="meta">{{META}}</span>
+  <button data-k="xray"   onclick="CAROUSEL.toggle('xray')">Safe zones<kbd>X</kbd></button>
+  <button data-k="chrome" onclick="CAROUSEL.toggle('chrome')">TikTok UI<kbd>C</kbd></button>
+  <button data-k="edit"   onclick="CAROUSEL.toggle('edit')">Edit text<kbd>E</kbd></button>
+  <button onclick="CAROUSEL.toggle('verify')">Check<kbd>V</kbd></button>
+  <button class="primary" onclick="CAROUSEL.toggle('save')">Export edits<kbd>Ctrl+S</kbd></button>
+</div>
+
+<div id="deck"></div>
+
+<div id="side">
+  <div id="report"></div>
+  <textarea id="notes" placeholder="Notes for the agent - what to change, per slide. Saved into edits.json."></textarea>
+</div>
+
+<div id="toast"></div>
+
+<!-- Torn-paper clip path, referenced by the torn-reveal template. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="tearClip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0.46 C0.08,0.44 0.14,0.49 0.22,0.47 C0.31,0.45 0.37,0.50 0.46,0.475
+               C0.56,0.45 0.63,0.495 0.72,0.468 C0.82,0.44 0.9,0.485 1,0.455
+               L1,1 L0,1 Z"/>
+    </clipPath>
+  </defs>
+</svg>
+
+<script>window.DECK = {{DECK}};</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>

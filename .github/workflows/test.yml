@@ -5,7 +5,22 @@ on:
   pull_request:
 
 jobs:
-  selftest:
+  html-engine:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: node skills/tiktok-photo-carousel/scripts/selftest.js
+
+  legacy-pil:
     strategy:
       fail-fast: false
       matrix:
@@ -19,5 +34,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -r skills/tiktok-photo-carousel/requirements.txt
       - run: python skills/tiktok-photo-carousel/scripts/selftest.py
-      - name: Render the example
+      - name: Analyse the example photos
+        run: python skills/tiktok-photo-carousel/scripts/analyze.py --photos examples/photos --out out/analysis.json
+      - name: Render the legacy example
         run: python skills/tiktok-photo-carousel/scripts/carousel.py --photos examples/photos --script examples/demo-script.json --out out --style editorial

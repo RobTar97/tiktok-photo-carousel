@@ -1,61 +1,178 @@
 ---
 name: tiktok-photo-carousel
-description: Builds TikTok photo-mode carousels from the user's own photos by writing hook-first slide text and a caption, then burning the text onto the images with Python (Pillow) inside TikTok's safe zones. Includes style presets (dreamcore, editorial travel, bold, handwritten, VHS), simple photo filters, highlight words and Japanese/CJK support. No video and no AI image generation. Use when the user asks for a TikTok carousel, a photo slideshow, text over photos, slide captions, "dreamcore slides", a travel or list carousel, or burning text onto a folder of images.
+description: Designs and renders TikTok photo-mode carousels from the user's own photos. Composes each slide in HTML from twelve layout templates (editorial split, duotone poster, polaroid, notes card, arch window, film strip and more), derives colour and crop from the photographs themselves, lets the user review and edit the deck in their browser before anything is final, then exports pixel-exact 1080x1920 slides with Playwright and verifies nothing lands under TikTok's interface. Writes the hooks, slide copy and caption when the user has none. Use when the user asks for a TikTok carousel, a photo-mode post, a photo slideshow, text over photos, slide captions, "dreamcore slides", a travel or list carousel, or burning text onto a folder of images.
 license: MIT
-compatibility: Requires Python 3.9+ and Pillow (pip install -r requirements.txt). Works offline on Windows, macOS and Linux.
+compatibility: Node 18+ and Playwright for the HTML engine (npm install, then npx playwright install chromium). Python 3.9+ and Pillow for photo analysis and the legacy renderer. Works on Windows, macOS and Linux.
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # TikTok Photo Carousel
 
-Turns a folder of photos into numbered 9:16 slides with on-image text, plus a caption. The image work is deterministic code (`scripts/carousel.py`, Pillow only): crop, simple filters, text layout, safe zones. Your judgment goes into choosing photos, writing copy and checking the result.
+Turns a folder of photos into numbered 9:16 slides with real layout, plus a
+caption. Your judgment goes into choosing photos, writing copy and directing
+the design. The geometry — crop, contrast, type fitting, safe zones — is
+measured by code, not estimated.
 
-Run every command from this skill's directory (the folder containing this SKILL.md). Use `python3` on macOS/Linux and `python` on Windows. First run: `pip install -r requirements.txt`, then `python3 scripts/selftest.py` should print `OK`.
+Run every command from this skill's directory. Use `python3` on macOS/Linux
+and `python` on Windows.
 
-## Workflow
-
-1. **Brief** - ask what the carousel is for (skip anything already answered): niche, goal, language, slide count. Niches and what each implies: [references/niches.md](references/niches.md).
-2. **Brand context** - if the user has brand guidelines or notes (files, docs, a notes app), read the tone rules, palette and forbidden words first. Their rules beat these defaults.
-3. **Pick photos** - view every candidate (a numbered contact sheet is fastest). Prefer bright, one clear subject, strong geometry; mix wide shots, details and one human-warmth frame. Reject dim, cluttered and duplicate shots. Slide 1 is the most striking frame, not the most informative.
-4. **Write copy** - hook first, then one idea per slide, then payoff + one call to action. Rules and caption format: [references/captions.md](references/captions.md). Never invent facts (prices, rankings, dates); use only what the user or their notes provide.
-5. **Render** - write a script file and run the renderer (below).
-6. **Check** - view `_contact_sheet.png`, then any risky slide at full size. Fix and re-render. Report the output folder. Do not post anything for the user.
-
-## Render
+First run:
 
 ```bash
-python3 scripts/carousel.py --photos <photo-dir> --script <script.json|script.txt> --out <out-dir> --style dreamcore
+pip install -r requirements.txt
+npm install && npx playwright install chromium
+node scripts/selftest.js            # prints: OK
 ```
 
-Simple script (`.txt`, one slide per line, photos used in sorted filename order):
+## Which engine
 
-```text
-top | Accidentally found *Level 1994* in Osaka...
-upper | This hallway felt wrong // and I could not leave
+| | `html` (default) | `pil` (legacy) |
+|---|---|---|
+| Layout | 12 composition templates | text over the photo, nothing else |
+| Review | browser studio, inline editing | contact sheet after the fact |
+| Needs | Node + Playwright | Pillow only, fully offline |
+| Use when | almost always | no Node available, or re-running a v1 script |
+
+The legacy path is unchanged and documented in
+[references/styles-and-filters.md](references/styles-and-filters.md) and
+[references/script-format.md](references/script-format.md). Everything below
+is the HTML engine.
+
+---
+
+## Phase 0 — Brief
+
+Ask only what you do not already know: niche, goal, language, slide count,
+where the photos are. Niches and what each implies:
+[references/niches.md](references/niches.md).
+
+Then read any brand context the user has — guidelines, a notes app, an
+existing design system file. **Their rules beat every default in this skill.**
+If they have a kit, use it ([references/brand-kit.md](references/brand-kit.md)).
+
+## Phase 1 — Photos
+
+```bash
+python3 scripts/analyze.py --photos <photo-dir> \
+        --out work/<name>/analysis.json --resize work/<name>/photos
 ```
 
-`*word*` highlights a word, ` // ` forces a line break, `top|upper|middle` sets the position.
-Per-slide control (`photo`, `focus`, `style`, `filter`, `kicker`, `sub`, `align`, `size`, `stamp`) uses `.json`: see [references/script-format.md](references/script-format.md).
+`--resize` is not optional in practice: a folder of 16 MP originals makes the
+studio crawl, and the slide is 1080px wide. The resized copies become the
+deck's photo folder; the originals are never touched.
 
-Key options: `--style` (see below), `--filter none|dreamcore|bloom|golden|warm|vhs|contrast|bw`, `--preset tiktok|instagram`, `--fit cover|blur`, `--format png|jpg`, `--cjk-font PATH`, `--debug` (shades unsafe zones red). `--list-styles` and `--list-filters` print what is available.
+This writes, per photo: a five-colour palette, a focus point for the crop, and
+the luminance and busyness of each text band with the scrim strength that
+follows from them.
 
-## Check list (step 6)
+Then **look at every photo yourself** — a numbered contact sheet is fastest.
+The analysis cannot tell you what a picture is about. Judge:
 
-- Text inside the safe zone, nothing at the bottom (run once with `--debug` if unsure).
-- Text does not cover faces or the main subject. Fix with `pos`, or `focus: [x, y]` to move the crop.
-- Contrast is fine on bright skies/walls. Fix with another style, `--filter`, or shorter text.
-- Awkward line breaks: add ` // `. A `WARNING` line in the log means the text is too long; shorten it.
-- Highlights: at most one word per slide.
+- Slide 1 is the most striking frame, not the most informative.
+- Prefer one clear subject and strong geometry. Reject dim, cluttered,
+  duplicated.
+- Mix wide shots, details, and one frame with human warmth in it.
+- Assign a role as you go: hook, build, payoff, cta.
 
-## Styles
+## Phase 2 — Copy
 
-`dreamcore` (soft rounded, glow, faded teal) | `dreamcore-quiet` (serif, bloom) | `editorial` (left-aligned travel-magazine look, top gradient; use `kicker` for "01") | `clean-bold` | `impact-meme` | `handwritten` | `vhs-mono` | `serif-soft`. Details, adding your own style and font licensing: [references/styles-and-filters.md](references/styles-and-filters.md).
+If the user gave you text, use theirs.
 
-## Safe zones
+If not, write it — hook first, then one idea per slide, then the payoff and
+**one** call to action. The `/hook-generator` skill is good for three
+competing openers and `/copywriting` for the bodies; `/pinned-comment` for the
+comment hook. Rules and caption format:
+[references/captions.md](references/captions.md).
 
-TikTok covers the top ~12% (status bar), the bottom ~25% (caption, music, progress bar) and the right edge (like/comment/share). Text is laid out inside the remaining area with 8% side margins and auto-shrinks to fit. Why and how to tune it: [references/safe-zones.md](references/safe-zones.md).
+Never invent facts — prices, rankings, opening times, dates. Use only what the
+user or their notes provide.
+
+## Phase 3 — Concepts (review gate 1)
+
+Build **slide 1 only, three ways**, and open it in the browser. Vary template,
+type, colour and texture; keep the hook copy and the photo fixed. Then ask
+which direction, offering "mix".
+
+How to structure the three and what to vary:
+[references/review-loop.md](references/review-loop.md).
+
+Do not skip this. Three rendered options settle a design conversation that
+twenty questions will not.
+
+## Phase 4 — Build the deck (review gate 2)
+
+Write `deck.json` ([references/deck-format.md](references/deck-format.md)),
+choosing a template per slide by the job that slide does
+([references/templates.md](references/templates.md)). Read
+[references/design-system.md](references/design-system.md) before settling the
+theme.
+
+```bash
+node scripts/build.js --deck work/<name>/deck.json \
+                      --out work/<name>/carousel.html
+```
+
+Open `carousel.html` and hand it to the user. Tell them the four keys:
+`X` safe zones, `C` the real TikTok interface, `E` edit any text in place,
+`Ctrl+S` download `edits.json`.
+
+When `edits.json` comes back, merge it into `deck.json` by index and rebuild.
+Copy and layout are separate files on purpose — a round of text edits cannot
+break the geometry.
+
+## Phase 5 — Export and verify
+
+```bash
+node scripts/export.js --html work/<name>/carousel.html --out ./out
+```
+
+Produces `01.png`…`NN.png` at exactly 1080x1920, a labelled
+`_contact_sheet.png`, and `_report.json`. The safe-zone verifier runs as part
+of the export and prints what it found.
+
+**Fix everything it reports, then re-export.** What each message means and how
+to fix it is in [references/review-loop.md](references/review-loop.md).
+
+Then look at the contact sheet yourself, and at any slide the verifier was
+quiet about but you are unsure of, at full size. Check:
+
+- Copy does not sit on a face or the subject — fix with `pos` or `focus`.
+- The hook reads in about one second with no context.
+- At most one highlighted word per slide.
+- No two neighbouring slides use the same template.
+- Line breaks fall where you would break them — add ` // ` if not.
+
+## Phase 6 — Deliver
+
+Write `caption.md` next to the slides. Report the output folder, the slide
+count and anything you changed from the user's brief.
+
+Do not post anything for the user.
+
+---
+
+## Files
+
+| Path | What it is |
+|---|---|
+| `scripts/analyze.py` | photos -> palette, focus, contrast; optional resize |
+| `scripts/build.js` | deck.json -> one self-contained carousel.html |
+| `scripts/export.js` | carousel.html -> slides + contact sheet + report |
+| `scripts/selftest.js` | end-to-end check on generated demo photos |
+| `scripts/carousel.py` | legacy Pillow renderer (v1, unchanged) |
+| `html/templates.css` | the twelve templates and the layer system |
+| `html/engine.js` | rendering, autofit, scrim fitting, verifier, studio |
+| `html/shell.html` | page shell the build fills in |
+| `brand/` | brand kits |
 
 ## Limits
 
-Cannot remove objects, cut out subjects, extend backgrounds or restyle photos; those need an image editor or a generative model. Filters are intentionally simple. Emoji are not rendered (Pillow limitation).
+Cannot remove objects, cut subjects out, extend backgrounds or restyle
+photographs — those need an image editor or a generative model. The engine
+composes and treats what it is given.
+
+Fonts load from Google Fonts by default, so the first build of a new theme
+needs a network connection. Set `theme.fontSource: "local"` and supply your
+own `@font-face` to work fully offline; the legacy Pillow path bundles its
+fonts and never needs the network.

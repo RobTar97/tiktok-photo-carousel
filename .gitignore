@@ -3,6 +3,11 @@ __pycache__/
 .venv/
 .DS_Store
 Thumbs.db
+node_modules/
+package-lock.json
 # local test output (examples/output* are committed on purpose)
 /out/
 /tmp/
+/work/
+skills/tiktok-photo-carousel/.selftest/
+examples/gallery/carousel.html

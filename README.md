@@ -4,9 +4,11 @@
 [![test](https://github.com/RobTar97/tiktok-photo-carousel/actions/workflows/test.yml/badge.svg)](https://github.com/RobTar97/tiktok-photo-carousel/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-An agent skill that turns a folder of your own photos into a **TikTok photo-mode carousel**: it picks and orders the photos, writes the hook, slide text and caption, and burns the text onto the images inside TikTok's safe zones. No video, no AI image generation, no API keys, no network.
+An agent skill that turns a folder of your own photos into a **TikTok photo-mode carousel**. It picks and orders the photos, writes the hook, slide text and caption, lays each slide out in HTML from a set of composition templates, lets you review and edit the whole deck in your browser, then exports pixel-exact 1080x1920 slides and checks that nothing landed under TikTok's interface.
 
-![Eight text styles rendered on demo images](examples/output-styles/_contact_sheet.png)
+No video, no AI image generation, no API keys.
+
+![Twelve templates rendered on the same three demo photos](examples/output-templates/_gallery.png)
 
 ## Install
 
@@ -14,19 +16,12 @@ An agent skill that turns a folder of your own photos into a **TikTok photo-mode
 npx skills add RobTar97/tiktok-photo-carousel
 ```
 
-The [skills CLI](https://github.com/vercel-labs/skills) installs it into the agents you choose (Claude Code, Cursor, Codex, and others). Useful flags:
+The [skills CLI](https://github.com/vercel-labs/skills) installs it into the agents you choose (Claude Code, Cursor, Codex, and others). Then, from the installed skill folder:
 
 ```bash
-npx skills add RobTar97/tiktok-photo-carousel --list          # see what is inside
-npx skills add RobTar97/tiktok-photo-carousel -a claude-code  # one specific agent
-npx skills add RobTar97/tiktok-photo-carousel -g              # global instead of per-project
-```
-
-Then install the one dependency, [Pillow](https://pypi.org/project/pillow/) (Python 3.9+), and run the self-test from the installed skill folder:
-
-```bash
-pip install -r requirements.txt
-python3 scripts/selftest.py        # prints: OK - 8 styles rendered
+npm install && npx playwright install chromium   # HTML engine
+pip install -r requirements.txt                  # photo analysis
+node scripts/selftest.js                         # prints: OK
 ```
 
 <details>
@@ -37,96 +32,131 @@ Copy `skills/tiktok-photo-carousel/` into your agent's skills folder (for Claude
 
 ## Use it
 
-Just ask your agent, pointing it at a folder of photos:
+Point your agent at a folder of photos:
 
 > Make a TikTok carousel from the photos in `./trip-photos`. Travel-guide style, about Kyoto, goal is saves.
 
-> Add dreamcore text to these 7 photos. Hook: "Accidentally found Level 1994 in Osaka". Write the caption too.
+> Build a carousel from these 7 photos. Hook: "Accidentally found Level 1994 in Osaka". Write the caption too.
 
-The skill asks what the carousel is for (niche, goal, language, slide count), chooses photos, writes the copy, renders numbered slides plus a contact sheet, checks the result, and fixes problems it finds. Output:
+The agent asks what the carousel is for, analyses and views the photos, writes the copy, shows you **three design directions** as a single slide each, builds the full deck, hands you a browser studio to review and edit it, then exports.
 
 ```text
 out/
   01.png ... 08.png     1080x1920 slides
-  _contact_sheet.png    all slides at a glance
+  _contact_sheet.png    every slide, labelled
+  _report.json          safe-zone verification
   caption.md            caption + hashtags
 ```
 
-You can also run the renderer yourself:
+## The pipeline
+
+```bash
+# 1. palette, crop focus, per-band contrast - and web-sized copies
+python3 scripts/analyze.py --photos ./photos \
+        --out work/analysis.json --resize work/photos
+
+# 2. deck.json -> one self-contained carousel.html
+node scripts/build.js --deck work/deck.json --out work/carousel.html
+
+# 3. open carousel.html, review, edit, Ctrl+S -> edits.json
+
+# 4. slides + contact sheet + verification report
+node scripts/export.js --html work/carousel.html --out ./out
+```
+
+`deck.json` is the only state. Copy and layout live in separate fields, so a round of text edits can never break the geometry.
+
+```jsonc
+{
+  "photos": "./photos",
+  "theme": { "display": "Bricolage Grotesque", "accent": "#f2b705", "highlight": "marker" },
+  "slides": [
+    { "template": "full-bleed-hook", "photo": "a.jpg",
+      "text": "Osaka built a *rainbow* machine in 1994", "sub": "and almost nobody films it" },
+    { "template": "editorial-split", "photo": "b.jpg", "kicker": "01",
+      "text": "It starts at the water", "sub": "A mosaic plaza, a white bridge, palm trees." }
+  ]
+}
+```
+
+Full schema: [deck-format.md](skills/tiktok-photo-carousel/references/deck-format.md).
+
+## What you get
+
+- **12 composition templates** — full-bleed hook, duotone poster, torn reveal, editorial split, arch window, frosted card, film strip, notes card, polaroid stack, sticker chaos, dreamcore glow, end card. A template sets the layout; the theme sets type and colour, so a deck still reads as one deck. [Catalogue](skills/tiktok-photo-carousel/references/templates.md)
+- **Colour from the photographs** — a five-colour palette per photo seeds the theme, so the accent belongs to the images instead of to a default.
+- **Measured contrast** — scrim strength comes from the real luminance and busyness of the strip the text sits on, and the gradient ends just past the last line, whatever size the type settled at.
+- **A browser review studio** — safe-zone x-ray, a mock of TikTok's actual interface over your slide, and in-place text editing that exports back as `edits.json`. [How the loop works](skills/tiktok-photo-carousel/references/review-loop.md)
+- **Safe-zone verification** — every copy element is measured against the zones TikTok covers, and overlaps are reported in pixels. [Details](skills/tiktok-photo-carousel/references/safe-zones.md)
+- **Autofit that measures** — binary search against the real rendered box, so type runs as large as it actually can.
+- **Japanese as a first-class path** — JP display and text faces, looser leading, manual line breaking, and vertical type. [Design system](skills/tiktok-photo-carousel/references/design-system.md)
+- **Brand kits** — a reusable theme plus copy rules, merged under the deck's own choices. [Brand kits](skills/tiktok-photo-carousel/references/brand-kit.md)
+- **Niche playbooks and caption rules** — [niches](skills/tiktok-photo-carousel/references/niches.md), [captions](skills/tiktok-photo-carousel/references/captions.md).
+
+## Layout
+
+```text
+skills/tiktok-photo-carousel/
+  SKILL.md                 workflow + commands (the only file always read)
+  html/
+    templates.css          the 12 templates and the layer system
+    engine.js              rendering, autofit, scrim fitting, verifier, studio
+    shell.html             page shell the build fills in
+  scripts/
+    analyze.py             photos -> palette, focus, contrast, resized copies
+    build.js               deck.json -> carousel.html
+    export.js              carousel.html -> slides + contact sheet + report
+    selftest.js            renders every template and asserts the output
+    carousel.py            legacy Pillow renderer (v1, unchanged)
+  references/              read on demand
+    templates.md  deck-format.md  design-system.md  review-loop.md
+    brand-kit.md  niches.md  captions.md  safe-zones.md
+    script-format.md  styles-and-filters.md        (legacy engine)
+  brand/                   brand kits
+  fonts/                   bundled OFL fonts for the legacy engine
+```
+
+## The legacy engine
+
+v1's Pillow renderer is still here and unchanged. It needs no Node and no network:
 
 ```bash
 python3 scripts/carousel.py --photos ./photos --script ./script.json --out ./out --style editorial
 ```
 
-```json
-[
-  {"photo": "sunset.jpg", "text": "Best sunset spots // in *your city*", "sub": "(nobody tells you these)", "pos": "top", "size": 104},
-  {"photo": "sea.jpg", "kicker": "01", "text": "A seaside promenade // with room to breathe", "pos": "top"}
-]
-```
+Eight text styles, seven filters, safe zones, bundled fonts. Use it when Node is not available or you are re-running an existing v1 script. [Styles and filters](skills/tiktok-photo-carousel/references/styles-and-filters.md) · [script format](skills/tiktok-photo-carousel/references/script-format.md)
 
-That script renders like this (`editorial` style):
+![The eight legacy text styles](examples/output-styles/_contact_sheet.png)
 
-![Example carousel](examples/output/_contact_sheet.png)
-
-The slides are in [`examples/output/`](examples/output). All demo images are generated by `examples/make_demo_photos.py`, so nothing is copyrighted. Regenerate them with `python3 examples/make_demo_photos.py`.
-
-## What you get
-
-- **Safe zones built in** - text avoids the status bar, the caption/button area and the right-hand icons; `--debug` shows the zones in red. [Details](skills/tiktok-photo-carousel/references/safe-zones.md)
-- **8 style presets** - `dreamcore`, `dreamcore-quiet`, `editorial`, `clean-bold`, `impact-meme`, `handwritten`, `vhs-mono`, `serif-soft`. [Styles and filters](skills/tiktok-photo-carousel/references/styles-and-filters.md)
-- **7 simple filters** - dreamcore, bloom, golden, warm, vhs, contrast, black and white.
-- **Auto-fit text** - word wrap, auto-shrink, highlight words (`*word*`), forced breaks (` // `), kicker numbers, sub lines, retro date stamp.
-- **Niche playbooks** - dreamcore, travel guide, romantic, POV story, tips list, retro. [Niches](skills/tiktok-photo-carousel/references/niches.md)
-- **Caption writing** - hook, context, one call to action, 3-5 hashtags. [Guide](skills/tiktok-photo-carousel/references/captions.md)
-- **Japanese / Chinese / Korean text** - uses a system CJK font automatically (or `--cjk-font`).
-- **Cross-platform** - Windows, macOS, Linux; fonts are bundled.
-- **Instagram too** - `--preset instagram` gives a 1080x1350 canvas with Instagram margins.
-
-## How it works
-
-The skill is split so an agent loads only what it needs:
-
-```text
-skills/tiktok-photo-carousel/
-  SKILL.md                 workflow + commands (the only file always read)
-  requirements.txt         Pillow
-  scripts/
-    carousel.py            the renderer (Pillow only)
-    styles.json            style presets - edit or add your own
-    selftest.py            smoke test
-  references/              read on demand
-    script-format.md  niches.md  captions.md  safe-zones.md  styles-and-filters.md
-  fonts/                   Inter, Fredoka, Lora, Anton, Caveat, Space Mono (+ OFL licences)
-```
-
-The image work is deterministic: crop, tints, blur-and-screen glow, grain, and font rendering. The same inputs always give the same pixels. The agent supplies the judgment around it: choosing and ordering photos, writing copy, placing text away from the subject, and reviewing the result.
+All demo images are generated by `examples/make_demo_photos.py`, so nothing is copyrighted.
 
 ## Limits
 
 - It does not edit photo content: no object removal, cut-outs, background extension or restyling.
-- Filters are intentionally simple.
-- Emoji do not render (a Pillow limitation).
-- CJK fonts are not bundled; install one or pass `--cjk-font`.
+- Fonts load from Google Fonts by default, so the first build of a new theme needs a network connection. Set `theme.fontSource: "local"` to supply your own.
+- The verifier checks copy against the safe zones. It does not judge whether text sits on a face — look at the contact sheet.
+- The legacy engine does not render emoji (a Pillow limitation). The HTML engine does.
 
 ## Troubleshooting
 
 | Problem | Fix |
 |---|---|
+| `Playwright is missing` | `npm install && npx playwright install chromium` |
 | `Pillow is required` | `pip install -r requirements.txt` |
-| Text shows as empty boxes (Japanese etc.) | pass `--cjk-font /path/to/font` |
-| `WARNING: text may not fit` | shorten the text or add ` // ` breaks |
-| Text hard to read on a bright photo | try another style/filter, shorter text, or `editorial` (adds a gradient) |
+| `photo not found` warning from `build.js` | the name in `deck.json` must match the file in the photos folder exactly |
+| Fonts fall back to system faces | the Google Fonts request was blocked; check the network or set `fontSource: "local"` |
+| The studio is slow | you skipped `--resize`; re-run `analyze.py` with it |
+| `copy hit the minimum size` | the slide carries two ideas — split it |
+| Colours look different on the phone | TikTok recompresses; avoid thin fonts and very low contrast |
 | `python3: command not found` on Windows | use `python` |
-| Colors look different on the phone | TikTok recompresses; keep text white with shadow/outline and avoid thin fonts |
 
 ## Privacy and security
 
-Runs entirely locally. The script makes no network requests, spawns no subprocesses, reads only the files you point it at and writes only to `--out`. Original photos are never modified.
+Everything runs locally. The scripts read only the files you point them at and write only to the output folder you name; original photos are never modified. The one network request is the Google Fonts stylesheet in the built page, which you can turn off with `theme.fontSource: "local"`.
 
 ## Contributing
 
-Issues and pull requests are welcome, especially new styles, filters and niche playbooks. Run `python3 skills/tiktok-photo-carousel/scripts/selftest.py` before opening a PR. If you add a font, include its licence file and list it in `references/styles-and-filters.md`.
+Issues and pull requests welcome, especially new templates and niche playbooks. Run `node skills/tiktok-photo-carousel/scripts/selftest.js` before opening a PR. Adding a template is four steps — see the end of [templates.md](skills/tiktok-photo-carousel/references/templates.md).
 
 ## License
 

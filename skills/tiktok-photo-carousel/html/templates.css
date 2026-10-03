@@ -1,0 +1,529 @@
+/* ============================================================================
+   TikTok Photo Carousel - template stylesheet
+   Canvas is a fixed 1080x1920 box. Everything inside is absolute or grid.
+   Never use viewport units here: the slide is a fixed-size element, not a page.
+   ========================================================================= */
+
+/* === RESET ============================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* === CANVAS ============================================================= */
+.slide {
+  position: relative;
+  width: var(--W, 1080px);
+  height: var(--H, 1920px);
+  overflow: hidden;
+  background: var(--bg, #0e0e10);
+  color: var(--ink, #ffffff);
+  font-family: var(--font-text, serif);
+  isolation: isolate;          /* keeps blend modes from leaking out */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Safe-zone geometry. Overridable per deck. */
+  --safe-top: 12%;
+  --safe-bottom: 25%;
+  --safe-side: 8%;
+  --rail: 16%;                 /* right-hand icon rail width */
+  --safe-x: calc(var(--W, 1080px) * 0.08);
+}
+
+/* === LAYER STACK ======================================================== */
+.layer-photo, .layer-scrim, .layer-texture, .layer-art,
+.layer-type, .layer-safe, .layer-chrome {
+  position: absolute; inset: 0;
+}
+.layer-photo  { z-index: 1; }
+.layer-scrim  { z-index: 2; pointer-events: none; }
+.layer-texture{ z-index: 3; pointer-events: none; }
+.layer-art    { z-index: 4; pointer-events: none; }
+.layer-type   { z-index: 5; }
+.layer-safe   { z-index: 8; pointer-events: none; display: none; }
+.layer-chrome { z-index: 9; pointer-events: none; display: none; }
+
+.slide[data-xray="1"] .layer-safe     { display: block; }
+.slide[data-chrome="1"] .layer-chrome { display: block; }
+
+/* === PHOTO ============================================================== */
+.layer-photo .photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: var(--focus, 50% 50%);
+  display: block;
+}
+/* Blur-pad fit: photo letterboxed over a blown-up blurred copy of itself. */
+.slide[data-fit="blur"] .layer-photo { display: grid; place-items: center; }
+.slide[data-fit="blur"] .photo { object-fit: contain; position: relative; z-index: 1; }
+.slide[data-fit="blur"] .photo-pad {
+  position: absolute; inset: -5%;
+  width: 110%; height: 110%;
+  object-fit: cover;
+  filter: blur(48px) saturate(1.2) brightness(0.7);
+}
+
+/* === SCRIM =============================================================
+   Opacity is computed per slide from the real luminance under the type box
+   (see scripts/analyze.py). --scrim is 0..1, data-dir picks the ramp.      */
+.layer-scrim { opacity: var(--scrim, 0.45); }
+.layer-scrim[data-dir="top"] {
+  /* --scrim-mid / --scrim-end are written per slide by fitScrim() so the
+     ramp ends just past the last line, whatever size the copy settled at. */
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,0.96) calc(var(--scrim-mid, 42%) * 0.55),
+    rgba(0,0,0,0.88) var(--scrim-mid, 42%),
+    rgba(0,0,0,0) var(--scrim-end, 62%));
+}
+.layer-scrim[data-dir="bottom"] {
+  background: linear-gradient(to top,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,0.96) calc(var(--scrim-mid, 42%) * 0.55),
+    rgba(0,0,0,0.88) var(--scrim-mid, 42%),
+    rgba(0,0,0,0) var(--scrim-end, 62%));
+}
+.layer-scrim[data-dir="full"]  { background: rgba(0,0,0,0.55); }
+.layer-scrim[data-dir="radial"] {
+  background: radial-gradient(60% 42% at 50% 34%,
+    rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.30) 55%, rgba(0,0,0,0) 100%);
+}
+.layer-scrim[data-dir="none"] { background: none; }
+
+/* === TEXTURE ===========================================================
+   Grain, vignette and a hairline chromatic fringe. All three are optional
+   and all three are what stop a flat render from reading as "generated".   */
+.layer-texture::before {              /* grain */
+  content: ""; position: absolute; inset: -50%;
+  opacity: var(--grain, 0.06);
+  background-image: var(--grain-url);
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+.layer-texture::after {               /* vignette */
+  content: ""; position: absolute; inset: 0;
+  opacity: var(--vignette, 0.35);
+  background: radial-gradient(118% 78% at 50% 44%,
+    rgba(0,0,0,0) 48%, rgba(0,0,0,0.85) 100%);
+}
+.slide[data-aberration="1"] .layer-photo .photo {
+  filter: drop-shadow(2px 0 0 rgba(255,0,64,0.22))
+          drop-shadow(-2px 0 0 rgba(0,210,255,0.22));
+}
+.slide[data-scanlines="1"] .layer-texture {
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 1px, transparent 1px, transparent 4px);
+}
+
+/* === TYPE ==============================================================
+   The type block lives inside the safe box. Position variants decide where
+   vertically. Font size comes from --fs, written by the autofit pass.      */
+.layer-type {
+  display: flex; flex-direction: column;
+  padding: calc(var(--H) * 0.12) var(--safe-x) calc(var(--H) * 0.25) var(--safe-x);
+}
+/* Every template's copy lives in exactly one .type-box. The autofit pass
+   measures this box against the padding box of .layer-type, so adding a
+   template means setting padding on .layer-type - never on the box. */
+.layer-type > .type-box {
+  display: flex; flex-direction: column;
+  width: 100%;
+  gap: calc(var(--fs, 96px) * 0.22);
+}
+.slide[data-align="center"] .type-box { align-items: center; }
+.slide[data-align="right"]  .type-box { align-items: flex-end; }
+/* Icon-rail clearance lives on the box, not on .layer-type: templates
+   rewrite .layer-type padding wholesale and would otherwise drop it. */
+.slide[data-rail="1"] .type-box { padding-right: calc(var(--W) * 0.13); }
+
+.slide[data-pos="top"]    .layer-type { justify-content: flex-start; padding-top: calc(var(--H) * 0.14); }
+.slide[data-pos="upper"]  .layer-type { justify-content: flex-start; padding-top: calc(var(--H) * 0.22); }
+.slide[data-pos="middle"] .layer-type { justify-content: center; padding-bottom: calc(var(--H) * 0.32); }
+.slide[data-pos="lower"]  .layer-type { justify-content: flex-end; padding-bottom: calc(var(--H) * 0.30); }
+
+.slide[data-align="center"] .layer-type { align-items: center; text-align: center; }
+.slide[data-align="right"]  .layer-type { align-items: flex-end; text-align: right; }
+
+.headline {
+  font-family: var(--font-display, sans-serif);
+  font-size: var(--fs, 96px);
+  font-weight: var(--display-weight, 800);
+  line-height: var(--leading, 1.06);
+  letter-spacing: var(--tracking, -0.02em);
+  text-wrap: balance;
+  max-width: 100%;
+}
+.sub {
+  font-family: var(--font-text, sans-serif);
+  font-size: calc(var(--fs, 96px) * var(--sub-ratio, 0.38));
+  line-height: 1.32;
+  font-weight: 500;
+  color: var(--muted, rgba(255,255,255,0.93));
+  letter-spacing: 0.005em;
+  max-width: 86%;
+}
+.kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: calc(var(--fs, 96px) * 0.20);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--accent, #f2b705);
+}
+.headline mark {
+  background: none;
+  color: var(--accent, #f2b705);
+  font-style: inherit;
+}
+/* Highlight variants: set theme.highlight to swap the treatment. */
+.slide[data-hl="box"] .headline mark {
+  color: var(--bg, #0e0e10);
+  background: var(--accent, #f2b705);
+  padding: 0.02em 0.16em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.slide[data-hl="underline"] .headline mark {
+  color: inherit;
+  box-shadow: inset 0 -0.14em 0 var(--accent, #f2b705);
+}
+.slide[data-hl="marker"] .headline mark {
+  color: inherit;
+  background: linear-gradient(to bottom, transparent 56%, var(--accent, #f2b705) 56%,
+                              var(--accent, #f2b705) 94%, transparent 94%);
+  padding: 0 0.1em;
+}
+
+/* Readability armour: a soft shadow under type on busy photos. */
+.slide[data-shadow="1"] .headline { text-shadow: 0 4px 22px rgba(0,0,0,0.55); }
+/* The secondary line is smaller and thinner, so it needs a tighter, denser
+   shadow than the headline rather than the same one. */
+.slide[data-shadow="1"] .sub {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.85), 0 0 26px rgba(0,0,0,0.5);
+}
+.slide[data-stroke="1"] .headline {
+  -webkit-text-stroke: calc(var(--fs) * 0.018) var(--stroke-color, #000);
+  paint-order: stroke fill;
+}
+
+/* ============================================================================
+   TEMPLATES
+   Each sets layout, colour behaviour and which art the engine should inject.
+   ========================================================================= */
+
+/* --- 1. full-bleed-hook -------------------------------------------------
+   Photo edge to edge, display type as large as the safe box allows.        */
+.slide[data-template="full-bleed-hook"] {
+  --leading: 1.02; --tracking: -0.035em;
+}
+
+/* --- 2. duotone-poster --------------------------------------------------
+   Photo crushed to two brand colours, halftone dots, condensed caps.       */
+.slide[data-template="duotone-poster"] { background: var(--duo-dark, #101b3a); }
+.slide[data-template="duotone-poster"] .photo {
+  filter: grayscale(1) contrast(1.22) brightness(1.04);
+  mix-blend-mode: luminosity;
+}
+.slide[data-template="duotone-poster"] .layer-photo {
+  background: linear-gradient(140deg, var(--duo-dark, #101b3a), var(--duo-light, #c8102e));
+}
+.slide[data-template="duotone-poster"] .halftone {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at center, var(--duo-light, #c8102e) 28%, transparent 29%);
+  background-size: 14px 14px;
+  opacity: 0.30; mix-blend-mode: screen;
+}
+.slide[data-template="duotone-poster"] .headline {
+  text-transform: uppercase;
+  font-stretch: condensed;
+  letter-spacing: -0.015em;
+  line-height: 0.94;
+}
+
+/* --- 3. torn-reveal -----------------------------------------------------
+   Photo visible through a torn-paper tear; headline on the paper above.    */
+.slide[data-template="torn-reveal"] { background: var(--paper, #efe9dd); color: #141414; }
+.slide[data-template="torn-reveal"] .layer-photo { clip-path: url(#tearClip); }
+.slide[data-template="torn-reveal"] .paper-top {
+  position: absolute; inset: 0 0 auto 0; height: 46%;
+  background: var(--paper, #efe9dd);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+}
+.slide[data-template="torn-reveal"] .layer-type {
+  justify-content: flex-start;
+  padding-top: calc(var(--H) * 0.13);
+  color: #141414;
+}
+.slide[data-template="torn-reveal"] .sub { color: rgba(20,20,20,0.66); }
+
+/* --- 4. editorial-split -------------------------------------------------
+   Photo 62%, flat colour block 38% carrying kicker + headline + rules.     */
+.slide[data-template="editorial-split"] { background: var(--block, #141414); }
+.slide[data-template="editorial-split"] .layer-photo,
+.slide[data-template="editorial-split"] .layer-scrim,
+.slide[data-template="editorial-split"] .layer-texture,
+.slide[data-template="editorial-split"] .layer-art { inset: 0 0 42% 0; }
+.slide[data-template="editorial-split"] .layer-type {
+  inset: 58% 0 25% 0;              /* stops at the bottom safe zone */
+  justify-content: center;
+  padding: calc(var(--H) * 0.03) var(--safe-x);
+  gap: calc(var(--fs) * 0.30);
+  border-top: 3px solid var(--accent, #f2b705);
+}
+.slide[data-template="editorial-split"] .headline { letter-spacing: -0.015em; }
+.slide[data-template="editorial-split"] .kicker {
+  display: flex; align-items: center; gap: 0.9em; align-self: stretch;
+}
+.slide[data-template="editorial-split"] .kicker::after {
+  content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.4;
+}
+
+/* --- 5. arch-window -----------------------------------------------------
+   Photo masked into an arch with a hairline border. Calm, premium.         */
+.slide[data-template="arch-window"] { background: var(--paper, #e8e2d6); color: #1b1b1b; }
+.slide[data-template="arch-window"] .layer-photo {
+  inset: calc(var(--H) * 0.075) calc(var(--W) * 0.10) calc(var(--H) * 0.41);
+  border-radius: 50% 50% 8px 8px / 32% 32% 2% 2%;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+}
+.slide[data-template="arch-window"] .layer-photo::after {
+  content: ""; position: absolute; inset: 0;
+  border: 2px solid rgba(255,255,255,0.55);
+  border-radius: inherit;
+}
+.slide[data-template="arch-window"] .layer-scrim,
+.slide[data-template="arch-window"] .layer-texture { display: none; }
+.slide[data-template="arch-window"] .layer-type {
+  justify-content: flex-end;
+  padding-top: calc(var(--H) * 0.615);     /* starts below the arch */
+  padding-bottom: calc(var(--H) * 0.26);
+  color: #1b1b1b;
+}
+.slide[data-template="arch-window"] .sub { color: rgba(27,27,27,0.62); }
+.slide[data-template="arch-window"] .headline {
+  font-family: var(--font-text); font-weight: 500; --tracking: 0.005em;
+}
+
+/* --- 6. frosted-card ----------------------------------------------------
+   Glass card over the blurred photo. The list / tips slide.                */
+.slide[data-template="frosted-card"] .photo { filter: blur(3px) saturate(1.1); transform: scale(1.06); }
+.slide[data-template="frosted-card"] .layer-type {
+  justify-content: center;
+  padding-bottom: calc(var(--H) * 0.26);
+}
+.slide[data-template="frosted-card"] .card {
+  background: rgba(14,14,18,0.34);
+  border: 1px solid rgba(255,255,255,0.26);
+  border-radius: 34px;
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.35);
+  padding: calc(var(--fs) * 0.70) calc(var(--fs) * 0.62);
+  display: flex; flex-direction: column; gap: calc(var(--fs) * 0.26);
+}
+
+/* --- 7. film-strip ------------------------------------------------------
+   Two or three frames stacked with sprocket holes and a date stamp.        */
+.slide[data-template="film-strip"] { background: #0b0b0b; }
+.slide[data-template="film-strip"] .layer-photo,
+.slide[data-template="film-strip"] .layer-scrim { display: none; }
+.slide[data-template="film-strip"] .strip {
+  position: absolute; inset: calc(var(--H) * 0.09) calc(var(--W) * 0.07) calc(var(--H) * 0.38);
+  display: grid; gap: 14px;
+  background: #121212;
+  padding: 26px 46px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.slide[data-template="film-strip"] .strip img {
+  width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block;
+}
+.slide[data-template="film-strip"] .sprockets {
+  position: absolute; top: 0; bottom: 0; width: 30px;
+  background-image: radial-gradient(circle, #0b0b0b 38%, transparent 39%);
+  background-size: 30px 46px;
+}
+.slide[data-template="film-strip"] .sprockets.left  { left: 8px; }
+.slide[data-template="film-strip"] .sprockets.right { right: 8px; }
+.slide[data-template="film-strip"] .layer-type {
+  justify-content: flex-end;
+  padding-top: calc(var(--H) * 0.64);      /* the copy sits below the strip */
+  padding-bottom: calc(var(--H) * 0.26);
+}
+
+/* --- 8. notes-card ------------------------------------------------------
+   Photo on top, an iOS-notes style card underneath holding the line.
+   The most native-feeling format on the app.                               */
+.slide[data-template="notes-card"] { background: #0e0e10; }
+.slide[data-template="notes-card"] .layer-photo,
+.slide[data-template="notes-card"] .layer-scrim,
+.slide[data-template="notes-card"] .layer-texture { inset: 0 0 34% 0; }
+.slide[data-template="notes-card"] .layer-type {
+  justify-content: flex-end;
+  padding: calc(var(--H) * 0.40) calc(var(--W) * 0.055) calc(var(--H) * 0.26);
+}
+.slide[data-template="notes-card"] .card {
+  background: var(--note-bg, #fbf7ec);
+  color: var(--note-ink, #1a1a1a);
+  border-radius: 26px;
+  padding: calc(var(--fs) * 0.58);
+  display: flex; flex-direction: column; gap: calc(var(--fs) * 0.22);
+  box-shadow: 0 -10px 50px rgba(0,0,0,0.45);
+}
+.slide[data-template="notes-card"] .card .sub { color: rgba(26,26,26,0.60); }
+.slide[data-template="notes-card"] .note-bar {
+  display: flex; gap: 10px; align-items: center;
+  font-family: var(--font-mono); font-size: calc(var(--fs) * 0.17);
+  letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.45;
+}
+
+/* --- 9. polaroid-stack --------------------------------------------------
+   Tilted print on linen, tape corners, handwritten caption.                */
+.slide[data-template="polaroid-stack"] {
+  background: var(--paper, #ded7c8);
+  background-image: var(--linen-url);
+  color: #1d1d1d;
+}
+.slide[data-template="polaroid-stack"] .layer-photo,
+.slide[data-template="polaroid-stack"] .layer-scrim,
+.slide[data-template="polaroid-stack"] .layer-texture { display: none; }
+.slide[data-template="polaroid-stack"] .polaroid {
+  position: absolute; left: 11%; right: 11%;
+  top: calc(var(--H) * 0.11); height: calc(var(--H) * 0.52);
+  background: #fff; padding: 26px 26px 112px;
+  transform: rotate(var(--tilt, -3deg));
+  box-shadow: 0 26px 54px rgba(0,0,0,0.30);
+}
+.slide[data-template="polaroid-stack"] .polaroid.behind {
+  transform: rotate(calc(var(--tilt, -3deg) * -1.7)) translateY(10px);
+  filter: brightness(0.94);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.22);
+}
+.slide[data-template="polaroid-stack"] .polaroid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slide[data-template="polaroid-stack"] .tape {
+  position: absolute; width: 180px; height: 52px;
+  background: rgba(255,250,224,0.80);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.slide[data-template="polaroid-stack"] .layer-type {
+  justify-content: flex-end; padding-bottom: calc(var(--H) * 0.26); color: #1d1d1d;
+}
+.slide[data-template="polaroid-stack"] .headline {
+  font-family: var(--font-hand, cursive); font-weight: 700; --tracking: 0; --leading: 1.0;
+}
+.slide[data-template="polaroid-stack"] .sub { color: rgba(29,29,29,0.58); }
+
+/* --- 10. sticker-chaos --------------------------------------------------
+   Rough SVG arrows, circles and highlighter over the photo.                */
+.slide[data-template="sticker-chaos"] .headline {
+  font-family: var(--font-hand, cursive); --tracking: 0;
+}
+.slide[data-template="sticker-chaos"] .layer-art svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.slide[data-template="sticker-chaos"] .sticker {
+  position: absolute;
+  font-family: var(--font-hand, cursive);
+  background: var(--accent, #f2b705);
+  color: #111;
+  padding: 0.22em 0.6em;
+  border-radius: 10px;
+  font-size: calc(var(--fs) * 0.30);
+  transform: rotate(var(--rot, -6deg));
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* --- 11. dreamcore-glow -------------------------------------------------
+   The v1 dreamcore look, rebuilt: bloom, haze, sparkles, soft rounded type.*/
+.slide[data-template="dreamcore-glow"] .photo {
+  filter: saturate(0.82) contrast(0.94) brightness(1.08) blur(0.4px);
+}
+.slide[data-template="dreamcore-glow"] .layer-photo::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(70% 46% at 50% 38%, rgba(255,241,200,0.40), transparent 70%),
+              linear-gradient(180deg, rgba(126,186,255,0.18), rgba(255,170,220,0.14));
+  mix-blend-mode: screen;
+}
+.slide[data-template="dreamcore-glow"] .headline {
+  text-shadow: 0 0 36px rgba(255,255,255,0.55), 0 4px 18px rgba(0,0,0,0.35);
+  --tracking: -0.01em;
+}
+.slide[data-template="dreamcore-glow"] .sparkle { position: absolute; opacity: 0.85; }
+
+/* --- 12. end-card -------------------------------------------------------
+   Flat colour, oversized type, one call to action.                         */
+.slide[data-template="end-card"] {
+  background: var(--accent, #f2b705);
+  color: var(--on-accent, #0e0e10);        /* contrast-checked, not assumed */
+}
+.slide[data-template="end-card"] .layer-photo,
+.slide[data-template="end-card"] .layer-scrim,
+.slide[data-template="end-card"] .layer-texture { display: none; }
+.slide[data-template="end-card"] .layer-type {
+  justify-content: center; padding-bottom: calc(var(--H) * 0.30);
+}
+.slide[data-template="end-card"] .headline { --leading: 0.98; --tracking: -0.04em; }
+.slide[data-template="end-card"] .sub { color: currentColor; opacity: 0.62; }
+.slide[data-template="end-card"] .cta {
+  margin-top: calc(var(--fs) * 0.4);
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs) * 0.22);
+  letter-spacing: 0.22em; text-transform: uppercase;
+  border: 3px solid currentColor; border-radius: 999px;
+  padding: 0.6em 1.2em; align-self: flex-start;
+}
+.slide[data-align="center"][data-template="end-card"] .cta { align-self: center; }
+
+/* === VERTICAL JAPANESE TYPE ============================================
+   Opt in per slide with "vertical": true. Only for JP/CJK copy.           */
+.slide[data-vertical="1"] .layer-type {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: calc(var(--H) * 0.13) calc(var(--W) * 0.10) calc(var(--H) * 0.26) var(--safe-x);
+}
+/* height:auto is the point: in vertical writing mode the box's physical
+   height IS the length of the line, which is what autofit measures. Forcing
+   100% here made every vertical slide shrink to the minimum size. */
+.slide[data-vertical="1"] .type-box { width: auto; height: auto; max-height: 100%; }
+.slide[data-vertical="1"] .headline { --leading: 1.5; --tracking: 0.04em; text-wrap: initial; }
+
+/* === SAFE-ZONE X-RAY ====================================================
+   Draws exactly what TikTok's chrome covers. Never exported.               */
+.layer-safe::before, .layer-safe::after, .layer-safe .rail {
+  content: ""; position: absolute;
+  background: rgba(255,0,64,0.26);
+  outline: 2px dashed rgba(255,0,64,0.8);
+}
+.layer-safe::before { top: 0; left: 0; right: 0; height: var(--safe-top); }
+.layer-safe::after  { bottom: 0; left: 0; right: 0; height: var(--safe-bottom); }
+.layer-safe .rail   { right: 0; top: var(--safe-top); bottom: var(--safe-bottom); width: var(--rail); }
+
+/* Any element the verifier flagged gets outlined. */
+.overflow-flag { outline: 4px solid #ff0040 !important; outline-offset: 6px; }
+
+/* === FAKE TIKTOK CHROME =================================================
+   A realistic preview of the app over the slide. Never exported.           */
+.layer-chrome { font-family: -apple-system, system-ui, sans-serif; color: #fff; }
+.layer-chrome .tt-rail {
+  position: absolute; right: 24px; bottom: 28%;
+  display: flex; flex-direction: column; gap: 34px; align-items: center;
+}
+.layer-chrome .tt-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+.layer-chrome .tt-caption {
+  position: absolute; left: 32px; right: 180px; bottom: 150px;
+  font-size: 34px; line-height: 1.35; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.layer-chrome .tt-caption b { display: block; font-size: 38px; margin-bottom: 10px; }
+.layer-chrome .tt-progress {
+  position: absolute; left: 0; right: 0; bottom: 92px; height: 5px;
+  background: rgba(255,255,255,0.3);
+}
+.layer-chrome .tt-progress i { display: block; height: 100%; background: #fff; width: var(--prog, 20%); }
+.layer-chrome .tt-tabs {
+  position: absolute; top: 60px; left: 0; right: 0; text-align: center;
+  font-size: 34px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
