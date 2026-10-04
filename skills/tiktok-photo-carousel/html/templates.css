@@ -189,7 +189,7 @@
 }
 /* Highlight variants: set theme.highlight to swap the treatment. */
 .slide[data-hl="box"] .headline mark {
-  color: var(--bg, #0e0e10);
+  color: var(--on-accent, #0e0e10);   /* contrast-checked, like marker */
   background: var(--accent, #f2b705);
   padding: 0.02em 0.16em;
   box-decoration-break: clone;
@@ -210,6 +210,33 @@
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+
+/* An inline background paints the font's whole content area, which for a
+   tall display face reaches well into the line above. inline-block with a
+   tight line-height makes the band exactly the word. */
+.slide[data-hl="box"] .headline mark,
+.slide[data-hl="marker"] .headline mark { display: inline-block; line-height: 1.04; }
+.slide[data-hl="box"] .headline mark { padding: 0.05em 0.16em 0.07em; }
+
+/* A kicker set in the accent colour straight onto a photograph is a
+   gamble on the photo - red on red steel measured 1.0:1. Where the kicker
+   sits over the photo it becomes a solid label instead. */
+.slide[data-template="full-bleed-hook"] .kicker,
+.slide[data-template="index-card"] .kicker,
+.slide[data-template="dreamcore-glow"] .kicker,
+.slide[data-template="duotone-poster"] .kicker,
+.slide[data-template="sticker-chaos"] .kicker,
+.slide[data-template="quote-pull"] .kicker {
+  align-self: flex-start;
+  background: var(--accent); color: var(--on-accent);
+  padding: 0.32em 0.6em 0.28em; border-radius: 6px;
+  text-shadow: none; letter-spacing: 0.22em;
+}
+.slide[data-align="center"][data-template="full-bleed-hook"] .kicker { align-self: center; }
+
+/* dreamcore-glow screens a haze over the photo after the scrim was sized,
+   so it carries a higher floor. */
+.slide[data-template="dreamcore-glow"] .layer-scrim { opacity: max(var(--scrim, 0.45), 0.62); }
 
 /* Readability armour: a soft shadow under type on busy photos. */
 .slide[data-shadow="1"] .headline { text-shadow: 0 4px 22px rgba(0,0,0,0.55); }
@@ -294,6 +321,7 @@
 .slide[data-template="editorial-split"] .headline { letter-spacing: -0.015em; }
 .slide[data-template="editorial-split"] .kicker {
   display: flex; align-items: center; gap: 0.9em; align-self: stretch;
+  color: var(--accent-on-block, var(--accent));
 }
 .slide[data-template="editorial-split"] .kicker::after {
   content: ""; flex: 1; height: 1px; background: currentColor; opacity: 0.4;
@@ -565,9 +593,11 @@
   bottom: calc(var(--safe-b) + var(--H) * 0.03);
   writing-mode: vertical-rl; transform: rotate(180deg);
   font-family: var(--font-mono); font-size: max(32px, calc(var(--fs) * 0.19));
-  letter-spacing: 0.34em; text-transform: uppercase;
-  color: var(--accent, #f2b705);
-  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+  letter-spacing: 0.3em; text-transform: uppercase;
+  /* A tab on the rule rather than loose letters on the photo: accent text
+     straight onto a bright window measured 2.1:1. */
+  background: var(--accent, #f2b705); color: var(--on-accent, #0e0e10);
+  padding: 0.7em 0.32em; border-radius: 0 6px 6px 0;
 }
 .slide[data-template="index-card"] .headline { --tracking: -0.03em; }
 
@@ -630,10 +660,11 @@
   background: var(--block, #141414);
   border-top: 3px solid var(--accent, #f2b705);
 }
+.slide[data-template="caption-bar"] .kicker { color: var(--accent-on-block, var(--accent)); }
 .slide[data-template="caption-bar"] .counter {
   position: absolute; right: var(--safe-x); top: calc(60% + 28px);
   font-family: var(--font-mono); font-size: 32px;
-  letter-spacing: 0.22em; color: var(--accent, #f2b705);
+  letter-spacing: 0.22em; color: var(--accent-on-block, var(--accent, #f2b705));
 }
 .slide[data-template="caption-bar"] .layer-type {
   inset: 60% 0 calc(var(--f-bottom) * 100%) 0;
@@ -670,6 +701,70 @@
   padding: var(--safe-t) var(--safe-x) calc(var(--H) * 0.03);
 }
 
+
+/* ============================================================================
+   GENERATED ART
+   Code-drawn imagery from html/art.js. Photo-derived art lives inside the
+   photo layer (so it follows that layer's crop, mask and arch); everything
+   else draws into .layer-gen, which no template insets or clips.
+   ========================================================================= */
+.layer-gen { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.layer-gen > svg.gen { position: absolute; overflow: visible; }
+.layer-photo > svg.gen {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: hidden;
+}
+.layer-gen > svg.tear-edge { inset: 0; width: 100%; height: 100%; }
+/* When the art IS the image, the photograph steps out of the way. */
+.layer-photo.replaced > .photo,
+.layer-photo.replaced > .photo-pad { opacity: 0; }
+.slide[data-template="torn-reveal"] .paper-top { display: none; }
+
+/* --- 19. bento ----------------------------------------------------------
+   A photo dump: three to five frames in an asymmetric grid, headline above.
+   The format people already use for "my week in ...", made tidy.          */
+.slide[data-template="bento"] .layer-photo,
+.slide[data-template="bento"] .layer-scrim { display: none; }
+.slide[data-template="bento"] .bento {
+  position: absolute; left: var(--safe-x); right: var(--safe-x);
+  top: calc(var(--H) * 0.30); bottom: calc(var(--safe-b) + var(--H) * 0.01);
+  display: grid; gap: 12px;
+}
+.slide[data-template="bento"] .bento figure {
+  position: relative; overflow: hidden; border-radius: 22px;
+  background: rgba(127,127,127,0.18);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.28);
+}
+.slide[data-template="bento"] .bento img {
+  width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block;
+}
+.slide[data-template="bento"] .bento figcaption {
+  position: absolute; left: 14px; bottom: 14px;
+  background: var(--accent, #f2b705); color: var(--on-accent, #0e0e10);
+  font-family: var(--font-mono); font-size: 32px; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 0.3em 0.7em; border-radius: 10px;
+}
+.slide[data-template="bento"] .bento-3 {
+  grid-template-columns: 1.35fr 1fr; grid-template-rows: minmax(0,1fr) minmax(0,1fr);
+}
+.slide[data-template="bento"] .bento-3 .b1 { grid-row: 1 / 3; }
+.slide[data-template="bento"] .bento-4 {
+  grid-template-columns: 1.25fr 1fr; grid-template-rows: minmax(0,1.2fr) minmax(0,1fr);
+}
+.slide[data-template="bento"] .bento-5 {
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: minmax(0,1.3fr) minmax(0,1fr);
+}
+.slide[data-template="bento"] .bento-5 .b1 { grid-column: 1 / 3; }
+.slide[data-template="bento"] .bento-5 .b4 { grid-column: 1 / 2; }
+.slide[data-template="bento"] .bento-5 .b5 { grid-column: 2 / 4; }
+.slide[data-template="bento"] .bento-2 { grid-template-rows: minmax(0,1fr) minmax(0,1fr); }
+.slide[data-template="bento"] .layer-type {
+  inset: 0 0 auto 0; height: calc(var(--H) * 0.30);
+  justify-content: flex-end;
+  padding: var(--safe-t) var(--safe-x) calc(var(--H) * 0.025);
+}
+
 /* === VERTICAL JAPANESE TYPE ============================================
    Opt in per slide with "vertical": true. Only for JP/CJK copy.           */
 .slide[data-vertical="1"] .layer-type {
@@ -677,7 +772,10 @@
   text-orientation: upright;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: var(--safe-t) calc(var(--W) * 0.10) var(--safe-b) var(--safe-x);
+  /* Sides only: the template decides where the copy may live vertically.
+     Overriding all four put arch-window's column over its photo. */
+  padding-left: var(--safe-x);
+  padding-right: calc(var(--W) * 0.10);
 }
 /* height:auto is the point: in vertical writing mode the box's physical
    height IS the length of the line, which is what autofit measures. Forcing
@@ -730,4 +828,12 @@
 .layer-chrome .tt-tabs {
   position: absolute; top: 60px; left: 0; right: 0; text-align: center;
   font-size: 34px; font-weight: 600; text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
+
+/* Japanese: break only where the copy says ( // ), never inside a word, and
+   give CJK its looser leading. Without keep-all the browser wraps between any
+   two characters and autofit happily accepts "この建 / 物には".               */
+html[lang="ja"] .slide .headline {
+  word-break: keep-all; overflow-wrap: normal; line-break: strict;
+  --leading: 1.3;
 }

@@ -1,0 +1,100 @@
+{
+  "name": "fieldnotes",
+  "label": "Field Notes",
+  "for": "travel guides, tips, 'places to go', recommendations, how-tos",
+  "signature": "Red-pen marks on the photos - circling the highlighted word, underlining the hook, an arrow from the copy to the subject - tape on the prints, graph paper on the last page.",
+  "palette": {
+    "pen-red": "#D7263D",
+    "graphite": "#16181D",
+    "graph-paper": "#EEF1F3",
+    "rule-blue": "#7FA6C9"
+  },
+  "theme": {
+    "googleFonts": [
+      "Familjen Grotesk:wght@400;500;700",
+      "Gaegu:wght@400;700",
+      "Courier Prime:wght@400;700"
+    ],
+    "display": "Familjen Grotesk",
+    "text": "Familjen Grotesk",
+    "mono": "Courier Prime",
+    "hand": "Gaegu",
+    "displayWeight": 700,
+    "accent": "#D7263D",
+    "onAccent": "#FFFFFF",
+    "bg": "#16181D",
+    "block": "#16181D",
+    "paper": "#EEF1F3",
+    "inkDark": "#16181D",
+    "highlight": "plain",
+    "grain": 0.05,
+    "vignette": 0.3
+  },
+  "art": {
+    "cover": [
+      {
+        "type": "rough",
+        "kind": "circle",
+        "target": "mark|headline",
+        "pad": 1.3,
+        "width": 9
+      }
+    ],
+    "full-bleed-hook": [
+      {
+        "type": "rough",
+        "kind": "underline",
+        "target": "headline",
+        "width": 8
+      },
+      {
+        "type": "rough",
+        "kind": "arrow",
+        "fromTarget": "sub|headline",
+        "width": 8
+      }
+    ],
+    "caption-bar": [
+      {
+        "type": "rough",
+        "kind": "circle",
+        "target": "mark",
+        "pad": 1.3,
+        "width": 8
+      }
+    ],
+    "polaroid-stack": [
+      {
+        "type": "tape",
+        "on": "slide",
+        "at": [
+          0.72,
+          0.13
+        ],
+        "rotate": 9,
+        "color": "#F3E3A1",
+        "stripe": "accent"
+      }
+    ],
+    "end-card": [
+      {
+        "type": "grid",
+        "on": "slide",
+        "cell": 40,
+        "major": 5,
+        "color": "#7FA6C9",
+        "opacity": 0.55
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "full-bleed-hook",
+    "notes-card",
+    "polaroid-stack",
+    "index-card",
+    "caption-bar",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='fieldnotes'] .sub{font-family:var(--font-hand);font-size:max(40px,calc(var(--fs)*.46));font-weight:700;line-height:1.12}.slide[data-preset='fieldnotes'][data-template='end-card']{background:var(--paper);color:var(--ink-dark)}.slide[data-preset='fieldnotes'][data-template='end-card'] .sub{color:var(--accent);opacity:1}.slide[data-preset='fieldnotes'][data-template='end-card'] .cta{border-color:var(--accent);color:var(--accent)}.slide[data-preset='fieldnotes'] .headline mark{color:inherit}"
+}

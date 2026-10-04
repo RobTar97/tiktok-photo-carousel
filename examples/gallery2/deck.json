@@ -64,6 +64,23 @@
         "after"
       ],
       "text": "Two frames, one split"
+    },
+    {
+      "role": "build",
+      "template": "bento",
+      "photos": [
+        "sunset.jpg",
+        "sea.jpg",
+        "hallway.jpg",
+        "sea.jpg"
+      ],
+      "labels": [
+        "mon",
+        "",
+        "",
+        "fri"
+      ],
+      "text": "One week, // four frames"
     }
   ]
 }

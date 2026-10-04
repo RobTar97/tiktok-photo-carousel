@@ -22,12 +22,16 @@ jobs:
       - run: pip install -r skills/tiktok-photo-carousel/requirements.txt
       - run: npm install
       - run: npx playwright install --with-deps chromium
-      - name: Every template renders, fits and clears the safe zones
+      - name: ffmpeg (Linux) so the self-test covers video frames
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Every template, preset and generator - rendered, audited, reviewed
         run: node skills/tiktok-photo-carousel/scripts/selftest.js
       - name: Build the example gallery
         run: |
-          node skills/tiktok-photo-carousel/scripts/build.js             --deck examples/gallery/deck.json --out examples/gallery/carousel.html
-          node skills/tiktok-photo-carousel/scripts/export.js             --html examples/gallery/carousel.html --out out/gallery --no-contact --strict
+          python skills/tiktok-photo-carousel/scripts/analyze.py --photos examples/photos --out examples/gallery/analysis.json
+          node skills/tiktok-photo-carousel/scripts/build.js --deck examples/gallery/deck.json --out examples/gallery/carousel.html
+          node skills/tiktok-photo-carousel/scripts/export.js --html examples/gallery/carousel.html --out out/gallery --no-contact --strict
       - name: Readability audit of the exported slides
         run: python skills/tiktok-photo-carousel/scripts/audit.py --out out/gallery --strict
 

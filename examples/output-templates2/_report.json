@@ -5,13 +5,15 @@
     "03.jpg",
     "04.jpg",
     "05.jpg",
-    "06.jpg"
+    "06.jpg",
+    "07.jpg"
   ],
   "cover": "cover.jpg",
   "coverSlide": 1,
   "issues": [],
   "boxes": [
     {
+      "holes": [],
       "slide": 1,
       "el": "kicker",
       "role": "cover",
@@ -24,11 +26,15 @@
       ],
       "color": "rgb(242, 183, 5)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 32,
+      "scrim": 0.49,
+      "hasPhoto": true,
       "weight": "400",
       "text": "osaka"
     },
     {
+      "holes": [],
       "slide": 1,
       "el": "headline",
       "role": "cover",
@@ -41,11 +47,15 @@
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 132,
+      "scrim": 0.49,
+      "hasPhoto": true,
       "weight": "800",
       "text": "The harbour at 16:40"
     },
     {
+      "holes": [],
       "slide": 1,
       "el": "sub",
       "role": "cover",
@@ -58,28 +68,36 @@
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 50,
+      "scrim": 0.49,
+      "hasPhoto": true,
       "weight": "500",
       "text": "nobody films it"
     },
     {
+      "holes": [],
       "slide": 2,
       "el": "edge-label",
       "role": "build",
       "template": "index-card",
       "box": [
         103,
-        1300,
-        151,
+        1267,
+        171,
         1574
       ],
-      "color": "rgb(242, 183, 5)",
-      "ownBg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgb(242, 183, 5)",
+      "ownBgImage": false,
       "fontSize": 32,
+      "scrim": 0.66,
+      "hasPhoto": true,
       "weight": "400",
       "text": "nanko bay"
     },
     {
+      "holes": [],
       "slide": 2,
       "el": "headline",
       "role": "build",
@@ -92,11 +110,15 @@
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 132,
+      "scrim": 0.66,
+      "hasPhoto": true,
       "weight": "800",
       "text": "A rule, a vertical label"
     },
     {
+      "holes": [],
       "slide": 2,
       "el": "sub",
       "role": "build",
@@ -109,11 +131,15 @@
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 50,
+      "scrim": 0.66,
+      "hasPhoto": true,
       "weight": "500",
       "text": "and the headline hanging off it"
     },
     {
+      "holes": [],
       "slide": 3,
       "el": "headline",
       "role": "build",
@@ -126,11 +152,15 @@
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 126,
+      "scrim": 0.74,
+      "hasPhoto": true,
       "weight": "500",
       "text": "The line is the subject and the photograph is only a ground"
     },
     {
+      "holes": [],
       "slide": 3,
       "el": "sub",
       "role": "build",
@@ -143,11 +173,15 @@
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 48,
+      "scrim": 0.74,
+      "hasPhoto": true,
       "weight": "500",
       "text": "slide three"
     },
     {
+      "holes": [],
       "slide": 4,
       "el": "headline",
       "role": "build",
@@ -160,11 +194,15 @@
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 116,
+      "scrim": 0.49,
+      "hasPhoto": true,
       "weight": "800",
       "text": "Cut on a rising diagonal"
     },
     {
+      "holes": [],
       "slide": 4,
       "el": "sub",
       "role": "build",
@@ -177,11 +215,15 @@
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 44,
+      "scrim": 0.49,
+      "hasPhoto": true,
       "weight": "500",
       "text": "the copy sits in the wedge"
     },
     {
+      "holes": [],
       "slide": 5,
       "el": "counter",
       "role": "build",
@@ -194,11 +236,15 @@
       ],
       "color": "rgb(242, 183, 5)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 32,
+      "scrim": 0.66,
+      "hasPhoto": true,
       "weight": "400",
-      "text": "05 / 06"
+      "text": "05 / 07"
     },
     {
+      "holes": [],
       "slide": 5,
       "el": "headline",
       "role": "build",
@@ -211,11 +257,15 @@
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 98,
+      "scrim": 0.66,
+      "hasPhoto": true,
       "weight": "800",
       "text": "A lower third, the way a subtitle sits on film"
     },
     {
+      "holes": [],
       "slide": 6,
       "el": "figcaption",
       "role": "payoff",
@@ -228,11 +278,15 @@
       ],
       "color": "rgb(14, 14, 16)",
       "ownBg": "rgb(242, 183, 5)",
+      "ownBgImage": false,
       "fontSize": 32,
+      "scrim": null,
+      "hasPhoto": false,
       "weight": "400",
       "text": "before"
     },
     {
+      "holes": [],
       "slide": 6,
       "el": "figcaption",
       "role": "payoff",
@@ -245,11 +299,15 @@
       ],
       "color": "rgb(14, 14, 16)",
       "ownBg": "rgb(242, 183, 5)",
+      "ownBgImage": false,
       "fontSize": 32,
+      "scrim": null,
+      "hasPhoto": false,
       "weight": "400",
       "text": "after"
     },
     {
+      "holes": [],
       "slide": 6,
       "el": "headline",
       "role": "payoff",
@@ -262,9 +320,75 @@
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
       "fontSize": 132,
+      "scrim": null,
+      "hasPhoto": false,
       "weight": "800",
       "text": "Two frames, one split"
+    },
+    {
+      "holes": [],
+      "slide": 7,
+      "el": "figcaption",
+      "role": "build",
+      "template": "bento",
+      "box": [
+        90,
+        1054,
+        205,
+        1121
+      ],
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgb(242, 183, 5)",
+      "ownBgImage": false,
+      "fontSize": 32,
+      "scrim": null,
+      "hasPhoto": false,
+      "weight": "400",
+      "text": "mon"
+    },
+    {
+      "holes": [],
+      "slide": 7,
+      "el": "figcaption",
+      "role": "build",
+      "template": "bento",
+      "box": [
+        611,
+        1532,
+        726,
+        1599
+      ],
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgb(242, 183, 5)",
+      "ownBgImage": false,
+      "fontSize": 32,
+      "scrim": null,
+      "hasPhoto": false,
+      "weight": "400",
+      "text": "fri"
+    },
+    {
+      "holes": [],
+      "slide": 7,
+      "el": "headline",
+      "role": "build",
+      "template": "bento",
+      "box": [
+        76,
+        248,
+        864,
+        528
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": null,
+      "hasPhoto": false,
+      "weight": "800",
+      "text": "One week,four frames"
     }
   ],
   "pageErrors": []

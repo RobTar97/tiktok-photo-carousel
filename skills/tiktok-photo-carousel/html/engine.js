@@ -94,24 +94,10 @@
     },
 
     "sticker-chaos": function (slide, s) {
+      // The pen marks are drawn by the art library (see TEMPLATE_ART), aimed
+      // at the photo's focus point - they used to circle a fixed pixel
+      // whatever the photograph showed.
       var art = slide.querySelector(".layer-art");
-      // Hand-drawn marks. Coordinates are in canvas space (1080x1920).
-      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 " + W + " " + H);
-      svg.innerHTML =
-        '<g fill="none" stroke="var(--accent,#f2b705)" stroke-width="14" ' +
-        'stroke-linecap="round" stroke-linejoin="round">' +
-        (s.circle !== false
-          ? '<path d="M 300 980 C 170 980 150 1150 330 1180 C 560 1210 700 1120 650 1000 ' +
-            'C 610 900 390 890 300 960" opacity="0.9"/>'
-          : "") +
-        (s.arrow !== false
-          ? '<path d="M 760 820 C 700 900 640 940 560 960"/>' +
-            '<path d="M 560 960 L 620 930 M 560 960 L 600 1010"/>'
-          : "") +
-        "</g>";
-      art.appendChild(svg);
-
       (s.stickers || []).forEach(function (st) {
         var n = el("div", "sticker", esc(st.text));
         n.style.left = (st.x != null ? st.x : 0.1) * 100 + "%";
@@ -121,22 +107,38 @@
       });
     },
 
-    "dreamcore-glow": function (slide, s) {
-      var art = slide.querySelector(".layer-art");
-      var seeds = [[0.18, 0.26, 54], [0.78, 0.18, 38], [0.66, 0.52, 46], [0.3, 0.62, 30]];
-      seeds.forEach(function (p) {
-        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", "sparkle");
-        svg.setAttribute("viewBox", "0 0 100 100");
-        svg.setAttribute("width", p[2]); svg.setAttribute("height", p[2]);
-        svg.style.left = p[0] * 100 + "%";
-        svg.style.top = p[1] * 100 + "%";
-        svg.innerHTML =
-          '<path d="M50 0 C54 36 64 46 100 50 C64 54 54 64 50 100 ' +
-          'C46 64 36 54 0 50 C36 46 46 36 50 0 Z" fill="rgba(255,255,255,0.9)"/>';
-        art.appendChild(svg);
+    "bento": function (slide, s, deck) {
+      // A photo dump: 3-5 frames in an asymmetric grid. The first photo
+      // takes the big cell, so put the strongest one first.
+      var photos = (s.photos || [s.photo]).slice(0, 5);
+      var grid = el("div", "bento bento-" + photos.length);
+      photos.forEach(function (p, i) {
+        var cell = el("figure", "b" + (i + 1));
+        var img = el("img");
+        img.src = src(deck, p);
+        cell.appendChild(img);
+        if (s.labels && s.labels[i]) cell.appendChild(el("figcaption", null, esc(s.labels[i])));
+        grid.appendChild(cell);
       });
+      slide.querySelector(".layer-art").appendChild(grid);
     }
+  };
+
+  /* Art a template draws for itself unless the slide or preset says
+     otherwise. Positions are fractions of the slide; a missing "at" means
+     the photo's focus point, which is where object-position puts it.     */
+  var TEMPLATE_ART = {
+    "sticker-chaos": function (s) {
+      var f = s.focus || [0.5, 0.5], out = [];
+      if (s.circle !== false) out.push({ type: "rough", kind: "circle", on: "slide", at: f, w: 0.42, h: 0.13, width: 11 });
+      if (s.arrow !== false) out.push({
+        type: "rough", kind: "arrow", on: "slide", width: 10,
+        at: [f[0] + 0.12, f[1] - 0.075],
+        from: [Math.min(0.86, f[0] + 0.3), Math.max(0.2, f[1] - 0.2)]
+      });
+      return out;
+    },
+    "dreamcore-glow": function () { return [{ type: "sparkles", on: "slide", count: 6 }]; }
   };
 
   /* --- templates 13-18 -------------------------------------------------
@@ -192,19 +194,67 @@
   /* Templates whose copy sits inside a card element. */
   var CARDED = { "frosted-card": 1, "notes-card": 1 };
 
-  /* Pick black or white for whatever sits on top of a colour. */
-  function onColor(hex) {
+  /* WCAG relative luminance of a hex colour, or -1 if it is not one. */
+  function relLum(hex) {
     var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ""));
-    if (!m) return "#0e0e10";
+    if (!m) return -1;
     var n = parseInt(m[1], 16);
-    var lum = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
-    return lum > 0.58 ? "#0e0e10" : "#ffffff";
+    var ch = function (c) { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * ch((n >> 16) & 255) + 0.7152 * ch((n >> 8) & 255) + 0.0722 * ch(n & 255);
+  }
+
+  /* Black or white, whichever actually reads better on this colour. A
+     luminance threshold got orange wrong: white on #F25C2A is 3.0:1,
+     near-black is 7:1. */
+  function onColor(hex) {
+    var L = relLum(hex);
+    if (L < 0) return "#0e0e10";
+    var onDark = 1.05 / (L + 0.05), onLight = (L + 0.05) / 0.0555;
+    return onLight >= onDark ? "#0e0e10" : "#ffffff";
+  }
+
+  /* Pull a colour down until white text holds ~11:1 and a mid-tone accent
+     on it still clears 4.5:1. Grounds and
+     blocks taken from a photo's palette can land mid-grey, which no text
+     colour reads well on. */
+  function deepen(hex) {
+    var L = relLum(hex);
+    if (L < 0 || L <= 0.045) return hex;
+    var n = parseInt(hex.replace("#", ""), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    for (var k = 0.92; k > 0.05; k -= 0.04) {
+      var h = "#" + [r, g, b].map(function (c) { return ("0" + Math.round(c * k).toString(16)).slice(-2); }).join("");
+      if (relLum(h) <= 0.045) return h;
+    }
+    return "#111111";
   }
 
   /* === BUILD ONE SLIDE ================================================= */
   function buildSlide(s, i, deck) {
     var t = deck.theme || {};
     var slide = el("section", "slide");
+
+    // A slide that names its own preset carries that preset's theme on
+    // itself, under any explicit per-slide override that follows.
+    var sp = s.preset && deck.presets ? deck.presets[s.preset] : null;
+    if (sp) {
+      var pv = themeVars(sp.theme, true);
+      Object.keys(pv).forEach(function (k) { slide.style.setProperty(k, pv[k]); });
+      t = Object.assign({}, t, sp.theme);
+    }
+    var preset = presetFor(s, deck);
+    if (preset) slide.dataset.preset = preset.name;
+
+    // The accent on a block (editorial-split, caption-bar) only where it
+    // reads: indigo block + vermilion kicker measured 1.5:1. Otherwise the
+    // kicker takes the ink colour and the accent stays in the rule.
+    var tp = t.palette || [];
+    var acc = s.accent || t.accent || tp[2] || "#f2b705";
+    var blk = s.block || t.block || (tp[1] ? deepen(tp[1]) : "#141414");
+    var la = relLum(acc), lb = relLum(blk);
+    if (la >= 0 && lb >= 0) {
+      var ratio = (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+      slide.style.setProperty("--accent-on-block", ratio >= 4.5 ? acc : (lb < 0.3 ? "#ffffff" : "#0e0e10"));
+    }
     slide.dataset.template = s.template || "full-bleed-hook";
     slide.dataset.role = s.role || "build";
     slide.dataset.index = i;
@@ -216,8 +266,8 @@
     if (s.shadow !== false && s.photo) slide.dataset.shadow = "1";
     if (s.stroke) slide.dataset.stroke = "1";
     if (s.vertical) slide.dataset.vertical = "1";
-    if (s.aberration || t.aberration) slide.dataset.aberration = "1";
-    if (s.scanlines || t.scanlines) slide.dataset.scanlines = "1";
+    if (s.aberration !== undefined ? s.aberration : t.aberration) slide.dataset.aberration = "1";
+    if (s.scanlines !== undefined ? s.scanlines : t.scanlines) slide.dataset.scanlines = "1";
 
     // Per-slide colour overrides on top of the deck theme.
     if (s.accent) {
@@ -266,7 +316,10 @@
 
     /* --- scrim: strength comes from analyze.py, direction from position --- */
     var scrim = el("div", "layer-scrim");
-    scrim.dataset.dir = s.scrimDir || (s.pos === "lower" ? "bottom" : "top");
+    // The ramp has to start on the side the copy is on: index-card and
+    // film-strip set their copy at the foot of the frame whatever pos says.
+    var footCopy = { "index-card": 1, "film-strip": 1 };
+    scrim.dataset.dir = s.scrimDir || (s.pos === "lower" || footCopy[s.template] ? "bottom" : "top");
     slide.appendChild(scrim);
     if (s.scrim != null) slide.style.setProperty("--scrim", s.scrim);
 
@@ -275,9 +328,10 @@
     if (s.grain != null) slide.style.setProperty("--grain", s.grain);
     if (s.vignette != null) slide.style.setProperty("--vignette", s.vignette);
 
-    /* --- template art --- */
+    /* --- template art, then the generated art layer above it --- */
     slide.appendChild(el("div", "layer-art"));
     if (ART[slide.dataset.template]) ART[slide.dataset.template](slide, s, deck);
+    slide.appendChild(el("div", "layer-gen"));
 
     /* --- type --- */
     var type = el("div", "layer-type");
@@ -499,6 +553,9 @@
             // a marker band is a gradient, not a background-color
             ownBgImage: cs.backgroundImage && cs.backgroundImage !== "none",
             fontSize: Math.round(parseFloat(cs.fontSize) / scale),
+            // What audit.py --fix raises when a line over a photo is too faint.
+            scrim: parseFloat(getComputedStyle(slide).getPropertyValue("--scrim")) || null,
+            hasPhoto: !!slide.querySelector(".layer-photo .photo"),
             weight: cs.fontWeight,
             text: plain(node.textContent).slice(0, 60)
           });
@@ -508,9 +565,41 @@
   }
 
   /* === THEME =========================================================== */
+  /* A theme as custom properties. Used for the deck on :root, and again on
+     a single slide when that slide names its own preset (concept boards
+     show three presets side by side in one page). With partial=true only
+     what the theme actually sets is written, so the slide inherits the rest. */
+  function themeVars(t, partial) {
+    t = t || {};
+    var p = t.palette || [], v = {};
+    var put = function (k, val, dflt) {
+      if (val != null) v[k] = val; else if (!partial && dflt != null) v[k] = dflt;
+    };
+    // p is sorted dark-to-light, so the page background is p[0]. Taking a
+    // middle swatch here once produced grey type on the end card.
+    put("--bg", t.bg || (p[0] ? deepen(p[0]) : null), "#0e0e10");
+    put("--ink", t.ink, "#ffffff");
+    put("--ink-dark", t.inkDark, "#16181d");
+    var accent = t.accent || p[2];
+    put("--accent", accent, "#f2b705");
+    put("--on-accent", t.onAccent || (accent ? onColor(accent) : null), onColor("#f2b705"));
+    put("--block", t.block || (p[1] ? deepen(p[1]) : null), "#141414");
+    put("--paper", t.paper, "#efe9dd");
+    put("--muted", t.muted, "rgba(255,255,255,0.93)");
+    put("--duo-dark", (t.duotone && t.duotone[0]) || p[1], "#101b3a");
+    put("--duo-light", (t.duotone && t.duotone[1]) || p[0], "#c8102e");
+    put("--font-display", t.display, "system-ui, sans-serif");
+    put("--font-text", t.text || t.display, "system-ui, sans-serif");
+    put("--font-hand", t.hand, "cursive");
+    put("--font-mono", t.mono, "ui-monospace, monospace");
+    put("--display-weight", t.displayWeight);
+    put("--grain", t.grain);
+    put("--vignette", t.vignette);
+    put("--sub-ratio", t.subRatio);
+    return v;
+  }
+
   function applyTheme(root, deck) {
-    var t = deck.theme || {};
-    var p = t.palette || [];
     var set = function (k, v) { if (v != null) root.style.setProperty(k, v); };
     set("--W", W + "px"); set("--H", H + "px");
 
@@ -519,33 +608,27 @@
     var z = deck.safe || {};
     set("--f-top", z.top); set("--f-bottom", z.bottom); set("--f-side", z.side);
     set("--f-rail", z.rail); set("--f-railtop", z.railTop);
-    // p is sorted dark-to-light, so the page background is p[0]. Taking a
-    // middle swatch here once produced grey type on the end card.
-    set("--bg", t.bg || p[0] || "#0e0e10");
-    set("--ink", t.ink || "#ffffff");
-    var accent = t.accent || p[2] || "#f2b705";
-    set("--accent", accent);
-    set("--on-accent", t.onAccent || onColor(accent));
-    set("--block", t.block || p[1] || "#141414");
-    set("--paper", t.paper || "#efe9dd");
-    set("--muted", t.muted || "rgba(255,255,255,0.93)");
-    set("--duo-dark", (t.duotone && t.duotone[0]) || p[1] || "#101b3a");
-    set("--duo-light", (t.duotone && t.duotone[1]) || p[0] || "#c8102e");
-    set("--font-display", t.display || "system-ui, sans-serif");
-    set("--font-text", t.text || t.display || "system-ui, sans-serif");
-    set("--font-hand", t.hand || "cursive");
-    set("--font-mono", t.mono || "ui-monospace, monospace");
-    set("--display-weight", t.displayWeight);
-    set("--grain", t.grain);
-    set("--vignette", t.vignette);
-    set("--sub-ratio", t.subRatio);
+    var vars = themeVars(deck.theme, false);
+    Object.keys(vars).forEach(function (k) { set(k, vars[k]); });
+  }
+
+  /* The preset a slide uses: its own, or the deck's. */
+  function presetFor(s, deck) {
+    var name = s.preset || (deck.preset && deck.preset.name);
+    return name && deck.presets ? deck.presets[name] : null;
   }
 
   /* === RENDER ========================================================== */
   function render(deck, mount) {
     mount.innerHTML = "";
     applyTheme(document.documentElement, deck);
+    var lastGroup = null;
     var slides = deck.slides.map(function (s, i) {
+      // Concept boards group slides by direction; give each group a heading.
+      if (!window.CAROUSEL.exportMode && s.group && s.group !== lastGroup) {
+        mount.appendChild(el("h3", "group-head", esc(s.group)));
+        lastGroup = s.group;
+      }
       var node = buildSlide(s, i, deck);
       mount.appendChild(wrap(node, i, deck));
       return node;
@@ -555,21 +638,140 @@
   }
 
   /* Studio wrapper: scales the 1080x1920 canvas down to something you can
-     actually look at, and labels it. Export mode skips the wrapper. */
+     actually look at, labels it, and gives it its own review controls.
+     Export mode skips the wrapper. */
   function wrap(slide, i, deck) {
     if (window.CAROUSEL.exportMode) return slide;
+    var s = deck.slides[i];
     var frame = el("div", "frame");
     frame.appendChild(slide);
     var cap = el("div", "frame-cap",
-      "<b>" + (i + 1) + "</b> " + esc(deck.slides[i].template || "") +
-      " <i>" + esc(deck.slides[i].role || "") + "</i>");
+      "<b>" + (i + 1) + "</b> " + esc(s.template || "") +
+      " <i>" + esc(s.role || "") + "</i>");
+    var review = el("div", "review");
+    review.innerHTML =
+      '<div class="verdict">' +
+      '<button type="button" data-v="keep">Keep</button>' +
+      '<button type="button" data-v="change">Change</button></div>' +
+      '<textarea rows="2" placeholder="What should change on slide ' + (i + 1) + '?"></textarea>';
+    review.dataset.index = i;
     var cell = el("div", "cell");
     cell.appendChild(frame);
     cell.appendChild(cap);
+    cell.appendChild(review);
     return cell;
   }
 
-  /* === READY: fonts + images, then fit ================================= */
+  /* === GENERATED ART ===================================================
+     Which art a slide gets, most specific first:
+       slide.art            explicit list ([] or false turns art off)
+       preset.art[template] the preset's choice for this layout
+       preset.art[role]     ... for this job in the deck (cover, build, ...)
+       preset.art["*"]      ... for every slide
+     plus whatever the template draws for itself (TEMPLATE_ART).          */
+  function artFor(s, deck) {
+    if (s.art === false) return [];
+    var tpl = TEMPLATE_ART[s.template] ? TEMPLATE_ART[s.template](s) : [];
+    if (Array.isArray(s.art)) return tpl.concat(s.art);
+    var preset = presetFor(s, deck);
+    var p = (preset && preset.art) || {};
+    var picked = p[s.template] || p[s.role] || p["*"] || [];
+    var theme = Object.assign({}, deck.theme || {}, (s.preset && preset && preset.theme) || {});
+    return tpl.concat(picked.map(function (a) { return resolveSpec(a, s, theme); }).filter(Boolean));
+  }
+
+  /* Preset art can borrow words from the deck: "@seal" reads theme.seal,
+     "@badge|SAVE THIS" falls back to the text after the bar. Art that asks
+     for a word nobody supplied is dropped rather than drawn with a made-up
+     one - a seal or badge has to say something true.                     */
+  function resolveSpec(a, s, theme) {
+    // A photo-derived treatment needs a photo; drop it on slides without one.
+    var needsPhoto = ["contour", "halftone", "ascii", "dither", "mosaic"].indexOf(a.type) >= 0;
+    if (needsPhoto && !s.photo && a.source !== "noise") return null;
+    var out = {}, ok = true;
+    Object.keys(a).forEach(function (k) {
+      var v = a[k];
+      if (typeof v === "string" && v.charAt(0) === "@") {
+        var parts = v.slice(1).split("|"), got = theme[parts[0]];
+        if (got == null || got === "") got = parts.length > 1 ? parts[1] : null;
+        if (got == null) ok = false; else v = got;
+      }
+      out[k] = v;
+    });
+    return ok ? out : null;
+  }
+
+  function drawArt(slide, s, i, deck) {
+    var lib = window.CAROUSEL_ART;
+    if (!lib) return;
+    var seed = (deck.seed || deck.title || "deck") + ":" + i;
+
+    // torn-reveal gets a fresh tear per slide instead of one fixed shape.
+    if (s.template === "torn-reveal") {
+      var tear = lib.tornPath(lib.rng(seed + ":tear"), W, H, H * (s.tear || 0.47));
+      var pl = slide.querySelector(".layer-photo");
+      if (pl) pl.style.clipPath = tear.clip;
+      var edge = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      edge.setAttribute("class", "gen tear-edge");
+      edge.setAttribute("viewBox", "0 0 " + W + " " + H);
+      edge.innerHTML =
+        '<path d="' + tear.edge + '" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="9" transform="translate(0 5)" style="filter:blur(4px)"/>' +
+        '<path d="' + tear.edge + '" fill="none" style="stroke:var(--paper)" stroke-width="7"/>';
+      slide.querySelector(".layer-gen").appendChild(edge);
+    }
+
+    var specs = artFor(s, deck).map(function (a) { return aim(slide, a); }).filter(Boolean);
+    if (!specs.length) return;
+    lib.render(slide, specs, {
+      W: W, H: H, seed: seed, copy: rectOf(slide, ".type-box"),
+      grid: deck.grids ? deck.grids[s.photo] : null,
+      focus: s.focus || [0.5, 0.5]
+    });
+  }
+
+  /* Art can aim at the copy: target "mark" circles the highlighted word,
+     "headline" underlines the headline, "sub" / "kicker" likewise, and
+     "mark|headline" takes the first that exists. fromTarget starts an
+     arrow at a piece of copy. Positions are read from the laid-out slide,
+     so the mark lands on the word wherever autofit put it.               */
+  var TARGETS = { mark: ".headline mark", headline: ".headline", sub: ".sub", kicker: ".kicker" };
+  function rectOf(slide, names) {
+    var sr = slide.getBoundingClientRect(), k = sr.width / W || 1;
+    var list = String(names).split("|");
+    for (var i = 0; i < list.length; i++) {
+      var n = slide.querySelector(TARGETS[list[i]] || list[i]);
+      if (!n) continue;
+      var rs = n.getClientRects(), r = n.getBoundingClientRect();
+      // A highlight that wraps has several boxes; aim at the widest.
+      for (var j = 0; j < rs.length; j++) if (rs[j].width > (r.__w || 0) && list[i] === "mark") { r = rs[j]; r.__w = rs[j].width; }
+      if (!r.width) continue;
+      return { x: (r.left - sr.left) / k, y: (r.top - sr.top) / k, w: r.width / k, h: r.height / k };
+    }
+    return null;
+  }
+  function aim(slide, a) {
+    if (!a.target && !a.fromTarget) return a;
+    var o = Object.assign({}, a, { on: "slide" });
+    if (a.target) {
+      var r = rectOf(slide, a.target);
+      if (!r) return null;                       // nothing to annotate
+      var pad = a.pad || 1.22;
+      if (o.kind === "underline") {
+        o.at = [(r.x + r.w / 2) / W, (r.y + r.h * 0.98) / H];
+        o.w = r.w / W;
+      } else {
+        o.at = [(r.x + r.w / 2) / W, (r.y + r.h / 2) / H];
+        o.w = r.w * pad / W; o.h = r.h * (pad + 0.25) / H;
+      }
+    }
+    if (a.fromTarget) {
+      var f = rectOf(slide, a.fromTarget);
+      if (f) o.from = [(f.x + f.w * 0.82) / W, (f.y + f.h + 30) / H];
+    }
+    return o;
+  }
+
+  /* === READY: fonts + images, fit, then art ============================ */
   function ready(deck) {
     var imgs = Array.prototype.slice.call(document.images);
     var loads = imgs.map(function (im) {
@@ -588,15 +790,23 @@
           autofit(slide, deck.slides[i], deck);
           fitScrim(slide);
         });
+        // Art last: it never moves the type, and drawing after the fit lets
+        // a pen mark aim at the word it annotates rather than at a guess.
+        window.CAROUSEL.slides.forEach(function (slide, i) {
+          try { drawArt(slide, deck.slides[i], i, deck); }
+          catch (err) { console.error("art on slide " + (i + 1) + ": " + err); }
+        });
         document.body.dataset.ready = "1";
       });
   }
 
   /* === STUDIO CONTROLS =================================================
-     X toggles the safe-zone x-ray, C the fake TikTok chrome, E edit mode,
-     Ctrl+S downloads the edits. Everything here is stripped on export.    */
+     X safe zones, C TikTok chrome, E edit text, V check, P play,
+     Ctrl+S export edits. Each slide also carries Keep / Change and a note.
+     Everything here is stripped on export.                                */
   function studio(deck) {
     var state = { xray: false, chrome: false, edit: false };
+    var verdicts = {};                       // index -> "keep" | "change"
 
     function apply() {
       window.CAROUSEL.slides.forEach(function (s) {
@@ -604,28 +814,50 @@
         s.dataset.chrome = state.chrome ? "1" : "0";
       });
       document.body.dataset.edit = state.edit ? "1" : "0";
-      document.querySelectorAll(".headline, .sub, .kicker, .cta").forEach(function (n) {
+      document.querySelectorAll("#deck .headline, #deck .sub, #deck .kicker, #deck .cta").forEach(function (n) {
         n.contentEditable = state.edit ? "true" : "false";
       });
       var bar = document.getElementById("hud");
       if (bar) {
-        bar.querySelector("[data-k=xray]").classList.toggle("on", state.xray);
-        bar.querySelector("[data-k=chrome]").classList.toggle("on", state.chrome);
-        bar.querySelector("[data-k=edit]").classList.toggle("on", state.edit);
+        ["xray", "chrome", "edit"].forEach(function (k) {
+          var b = bar.querySelector("[data-k=" + k + "]");
+          if (b) b.classList.toggle("on", state[k]);
+        });
       }
+      updateTally();
     }
 
-    /* Pull the edited copy back out of the DOM into deck shape, so the
-       agent can merge it into deck.json and re-render. */
-    function collectEdits() {
-      var out = { slides: [] };
+    /* --- per-slide verdicts ------------------------------------------- */
+    document.querySelectorAll(".review").forEach(function (r) {
+      var i = +r.dataset.index;
+      r.querySelectorAll("[data-v]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          verdicts[i] = verdicts[i] === b.dataset.v ? undefined : b.dataset.v;
+          r.dataset.v = verdicts[i] || "";
+          if (verdicts[i] === "change") r.querySelector("textarea").focus();
+          updateTally();
+        });
+      });
+      r.querySelector("textarea").addEventListener("input", function (e) {
+        if (e.target.value.trim() && !verdicts[i]) { verdicts[i] = "change"; r.dataset.v = "change"; }
+        updateTally();
+      });
+    });
+
+    function updateTally() {
+      var t = document.getElementById("tally");
+      if (!t) return;
+      var n = window.CAROUSEL.slides.length, keep = 0, change = 0;
+      for (var i = 0; i < n; i++) { if (verdicts[i] === "keep") keep++; if (verdicts[i] === "change") change++; }
+      t.textContent = keep + " keep · " + change + " change · " + (n - keep - change) + " unreviewed";
+    }
+
+    /* Pull the edited copy and the verdicts back out into deck shape, so
+       scripts/apply-edits.js can merge them into deck.json. */
+    function collectEdits(approved) {
+      var out = { approved: !!approved, slides: [] };
       window.CAROUSEL.slides.forEach(function (slide, i) {
-        var h = slide.querySelector(".headline");
-        var sub = slide.querySelector(".sub");
-        var k = slide.querySelector(".kicker");
-        var c = slide.querySelector(".cta");
         var rec = { index: i };
-        // innerHTML back to source markup: <mark> -> *x*, <br> -> " // "
         var toSrc = function (node) {
           if (!node) return undefined;
           return node.innerHTML
@@ -633,12 +865,18 @@
             .replace(/<br\s*\/?>/g, " // ")
             .replace(/<[^>]+>/g, "")
             .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+            .replace(/&nbsp;/g, " ")
             .trim();
         };
+        var h = slide.querySelector(".headline"), sub = slide.querySelector(".sub");
+        var k = slide.querySelector(".kicker"), c = slide.querySelector(".cta");
         if (h) rec.text = toSrc(h);
         if (sub) rec.sub = toSrc(sub);
         if (k) rec.kicker = toSrc(k);
         if (c) rec.cta = toSrc(c);
+        rec.status = approved ? (verdicts[i] === "change" ? "change" : "keep") : (verdicts[i] || "unreviewed");
+        var r = document.querySelector('.review[data-index="' + i + '"] textarea');
+        if (r && r.value.trim()) rec.note = r.value.trim();
         out.slides.push(rec);
       });
       var notes = document.getElementById("notes");
@@ -646,38 +884,103 @@
       return out;
     }
 
-    function download() {
-      var data = JSON.stringify(collectEdits(), null, 2);
+    function download(approved) {
+      var data = JSON.stringify(collectEdits(approved), null, 2);
       var a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([data], { type: "application/json" }));
       a.download = "edits.json";
       a.click();
-      toast("edits.json downloaded - tell the agent to apply it");
+      toast(approved ? "Approved - edits.json downloaded. Hand it back to the agent."
+                     : "edits.json downloaded - hand it back to the agent");
     }
 
     function toast(msg) {
       var t = document.getElementById("toast");
       if (!t) return;
       t.textContent = msg; t.classList.add("show");
-      setTimeout(function () { t.classList.remove("show"); }, 2600);
+      setTimeout(function () { t.classList.remove("show"); }, 2800);
+    }
+
+    /* --- play mode ------------------------------------------------------
+       The deck the way a viewer meets it: one slide at a time in a phone
+       frame, TikTok's interface on top, auto-advancing like photo mode.
+       Judge pacing here - a slide you cannot read before it moves on is
+       a slide with too many words.                                       */
+    var player = null;
+    function play(start) {
+      if (player) return;
+      var n = window.CAROUSEL.slides.length, idx = start || 0, paused = false, timer = null;
+      var dwell = (deck.play && deck.play.seconds ? deck.play.seconds : 3.5) * 1000;
+      var stage = el("div", "play");
+      stage.innerHTML =
+        '<div class="play-phone"><div class="play-bars"></div><div class="play-slot"></div></div>' +
+        '<div class="play-help">← → move · space pause · esc close</div>';
+      document.body.appendChild(stage);
+      var bars = stage.querySelector(".play-bars"), slot = stage.querySelector(".play-slot");
+      for (var b = 0; b < n; b++) bars.appendChild(el("i"));
+      var k = Math.min((window.innerHeight * 0.9) / H, (window.innerWidth * 0.9) / W);
+      stage.style.setProperty("--pk", k);
+
+      function show(i) {
+        idx = (i + n) % n;
+        slot.innerHTML = "";
+        var c = window.CAROUSEL.slides[idx].cloneNode(true);
+        c.dataset.chrome = "1"; c.dataset.xray = "0";
+        c.querySelectorAll("[contenteditable]").forEach(function (x) { x.removeAttribute("contenteditable"); });
+        slot.appendChild(c);
+        Array.prototype.forEach.call(bars.children, function (bar, j) {
+          bar.className = j < idx ? "done" : (j === idx ? "now" : "");
+        });
+        bars.style.setProperty("--dwell", dwell + "ms");
+        restart();
+      }
+      function restart() {
+        clearTimeout(timer);
+        bars.classList.toggle("paused", paused);
+        if (!paused) timer = setTimeout(function () { show(idx + 1); }, dwell);
+      }
+      function key(e) {
+        if (e.key === "Escape") return close();
+        if (e.key === "ArrowRight") { e.preventDefault(); show(idx + 1); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); }
+        if (e.key === " ") { e.preventDefault(); paused = !paused; restart(); }
+      }
+      function close() {
+        clearTimeout(timer);
+        document.removeEventListener("keydown", key, true);
+        stage.remove(); player = null;
+      }
+      stage.addEventListener("click", function (e) {
+        if (!e.target.closest(".play-phone")) return close();
+        var r = slot.getBoundingClientRect();
+        show(e.clientX < r.left + r.width / 3 ? idx - 1 : idx + 1);
+      });
+      document.addEventListener("keydown", key, true);
+      player = { close: close };
+      show(idx);
     }
 
     document.addEventListener("keydown", function (e) {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") { e.preventDefault(); download(); return; }
-      if (e.target.isContentEditable) return;
+      if (player) return;
+      if (e.ctrlKey && e.key.toLowerCase() === "s") { e.preventDefault(); download(false); return; }
+      if (e.target.isContentEditable || /TEXTAREA|INPUT/.test(e.target.tagName)) return;
       var k = e.key.toLowerCase();
       if (k === "x") { state.xray = !state.xray; apply(); }
       if (k === "c") { state.chrome = !state.chrome; apply(); }
-      if (k === "e") { state.edit = !state.edit; apply(); toast(state.edit ? "edit mode on - click any text" : "edit mode off"); }
+      if (k === "e") { state.edit = !state.edit; apply(); toast(state.edit ? "Edit mode on - click any text" : "Edit mode off"); }
       if (k === "v") { showReport(verify(deck)); }
+      if (k === "p") { play(0); }
     });
 
     window.CAROUSEL.toggle = function (key) {
-      if (key === "save") return download();
+      if (key === "save") return download(false);
+      if (key === "approve") return download(true);
       if (key === "verify") return showReport(verify(deck));
+      if (key === "play") return play(0);
       state[key] = !state[key]; apply();
     };
     window.CAROUSEL.collectEdits = collectEdits;
+    window.CAROUSEL.play = play;
 
     function showReport(rows) {
       var box = document.getElementById("report");

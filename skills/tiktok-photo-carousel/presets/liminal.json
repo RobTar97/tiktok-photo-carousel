@@ -1,0 +1,35 @@
+{
+  "name": "liminal",
+  "label": "Liminal",
+  "for": "dreamcore, liminal spaces, empty interiors, malls, pools, 90s nostalgia",
+  "signature": "Halation on the type, a warm light leak on the cover, seeded sparkles, rounded early-2000s lettering.",
+  "palette": { "glow": "#FFE3A3", "plum": "#2A2238", "night": "#1C1A26", "mist": "#EEE9F3" },
+  "theme": {
+    "googleFonts": ["Comfortaa:wght@500;700", "Zen Maru Gothic:wght@500;700", "Martian Mono:wght@400;700", "Klee One:wght@400;600"],
+    "display": "Comfortaa",
+    "text": "Zen Maru Gothic",
+    "mono": "Martian Mono",
+    "hand": "Klee One",
+    "displayWeight": 700,
+    "accent": "#FFE3A3",
+    "onAccent": "#2A2238",
+    "bg": "#1C1A26",
+    "block": "#2A2238",
+    "paper": "#EEE9F3",
+    "highlight": "underline",
+    "grain": 0.09,
+    "vignette": 0.46,
+    "aberration": true
+  },
+  "art": {
+    "cover": [
+      { "type": "lightleak", "count": 3, "opacity": 0.5, "blend": "screen" },
+      { "type": "sparkles", "count": 5 }
+    ],
+    "dreamcore-glow": [],
+    "end-card": [{ "type": "blobs", "colors": ["accent", "paper", "block"], "opacity": 0.5 }],
+    "*": [{ "type": "sparkles", "count": 4 }]
+  },
+  "templates": ["cover", "dreamcore-glow", "notes-card", "arch-window", "caption-bar", "quote-pull", "end-card"],
+  "css": ".slide[data-preset='liminal'] .headline{text-shadow:0 0 30px rgba(255,236,205,.42),0 3px 14px rgba(0,0,0,.4);--tracking:-0.01em}.slide[data-preset='liminal'][data-template='end-card']{background:var(--block);color:#fff}.slide[data-preset='liminal'][data-template='end-card'] .sub{color:#fff}"
+}

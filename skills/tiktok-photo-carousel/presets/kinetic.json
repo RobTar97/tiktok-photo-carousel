@@ -1,0 +1,50 @@
+{
+  "name": "kinetic",
+  "label": "Kinetic",
+  "for": "tips, listicles, myth-busting, anything optimised for reach",
+  "signature": "Type is the image: one heavy display face as large as the safe area allows, box highlights, position counters, a sunburst end card.",
+  "palette": {
+    "signal": "#F25C2A",
+    "carbon": "#111111",
+    "bone": "#F4F1EC"
+  },
+  "theme": {
+    "googleFonts": [
+      "Dela Gothic One",
+      "Hanken Grotesk:wght@400;500;600",
+      "Martian Mono:wght@400;700"
+    ],
+    "display": "Dela Gothic One",
+    "text": "Hanken Grotesk",
+    "mono": "Martian Mono",
+    "hand": "Hanken Grotesk",
+    "displayWeight": 400,
+    "accent": "#F25C2A",
+    "bg": "#111111",
+    "block": "#111111",
+    "paper": "#F4F1EC",
+    "highlight": "box",
+    "grain": 0.04,
+    "vignette": 0.3
+  },
+  "art": {
+    "end-card": [
+      {
+        "type": "rays",
+        "on": "slide",
+        "count": 28,
+        "color": "on-accent",
+        "opacity": 0.07
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "caption-bar",
+    "diagonal-split",
+    "editorial-split",
+    "frosted-card",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='kinetic'] .headline{--leading:1.14;--tracking:-0.02em}"
+}

@@ -1,0 +1,57 @@
+{
+  "name": "photodump",
+  "label": "Photo Dump",
+  "for": "weekly recaps, 'my week in', lifestyle, trips, events after the fact",
+  "signature": "The cover pixelated round the edges into colour tiles, with a sharp framed window in the middle where the title sits - then bento grids of frames.",
+  "palette": {
+    "note": "colours are taken from the photographs"
+  },
+  "theme": {
+    "googleFonts": [
+      "Syne:wght@600;700;800",
+      "Hanken Grotesk:wght@400;500;600",
+      "Martian Mono:wght@400;700",
+      "Gaegu:wght@700"
+    ],
+    "display": "Syne",
+    "text": "Hanken Grotesk",
+    "mono": "Martian Mono",
+    "hand": "Gaegu",
+    "displayWeight": 800,
+    "highlight": "box",
+    "grain": 0.05,
+    "vignette": 0.3,
+    "accent": "#FFD84A",
+    "onAccent": "#17140A"
+  },
+  "art": {
+    "cover": [
+      {
+        "type": "mosaic",
+        "cell": 60,
+        "gap": 5,
+        "radius": 9,
+        "ground": "bg",
+        "reveal": {
+          "at": [
+            0.5,
+            0.5
+          ],
+          "w": 0.8,
+          "h": 0.54
+        },
+        "frame": 8,
+        "frameRadius": 18
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "bento",
+    "polaroid-stack",
+    "caption-bar",
+    "full-bleed-hook",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='photodump'] .headline{--tracking:-0.045em;--leading:.98}"
+}

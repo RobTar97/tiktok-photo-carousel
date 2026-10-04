@@ -1,0 +1,99 @@
+{
+  "name": "washi",
+  "label": "Washi",
+  "for": "Japanese-language decks, places in Japan, craft, food, seasons",
+  "signature": "Kinari paper with long fibres, mincho headlines, and a vermilion hanko seal - the only place the red appears. Set theme.seal to the 1-4 characters it should bear.",
+  "palette": {
+    "sumi": "#211E1A",
+    "kinari": "#F1ECE2",
+    "shu": "#C8352A",
+    "ai-iro": "#2A3B55"
+  },
+  "theme": {
+    "googleFonts": [
+      "Shippori Mincho B1:wght@600;800",
+      "Zen Kaku Gothic New:wght@400;500;700",
+      "Klee One:wght@400;600"
+    ],
+    "display": "Shippori Mincho B1",
+    "text": "Zen Kaku Gothic New",
+    "mono": "Zen Kaku Gothic New",
+    "hand": "Klee One",
+    "displayWeight": 800,
+    "accent": "#C8352A",
+    "onAccent": "#FFFFFF",
+    "bg": "#211E1A",
+    "block": "#2A3B55",
+    "paper": "#F1ECE2",
+    "inkDark": "#211E1A",
+    "highlight": "underline",
+    "grain": 0.07,
+    "vignette": 0.28
+  },
+  "art": {
+    "cover": [
+      {
+        "type": "hanko",
+        "on": "slide",
+        "at": [
+          0.79,
+          0.755
+        ],
+        "text": "@seal",
+        "size": 172
+      }
+    ],
+    "end-card": [
+      {
+        "type": "fibres",
+        "on": "slide",
+        "count": 320,
+        "opacity": 0.18
+      },
+      {
+        "type": "hanko",
+        "on": "slide",
+        "at": [
+          0.78,
+          0.62
+        ],
+        "text": "@seal",
+        "size": 168
+      }
+    ],
+    "arch-window": [
+      {
+        "type": "fibres",
+        "on": "slide",
+        "count": 280,
+        "opacity": 0.16
+      }
+    ],
+    "polaroid-stack": [
+      {
+        "type": "fibres",
+        "on": "slide",
+        "count": 280,
+        "opacity": 0.16
+      }
+    ],
+    "torn-reveal": [
+      {
+        "type": "fibres",
+        "on": "slide",
+        "count": 220,
+        "opacity": 0.15
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "arch-window",
+    "quote-pull",
+    "index-card",
+    "polaroid-stack",
+    "torn-reveal",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='washi'] .headline{--tracking:.02em}.slide[data-preset='washi'][data-template='end-card']{background:var(--paper);color:var(--ink-dark)}.slide[data-preset='washi'][data-template='end-card'] .sub{color:var(--ink-dark);opacity:.72}.slide[data-preset='washi'][data-template='end-card'] .cta{border-color:var(--accent);color:var(--accent)}.slide[data-preset='washi']:is([data-template='arch-window'],[data-template='polaroid-stack'],[data-template='torn-reveal'],[data-template='end-card']) .kicker{color:#A52A1F}"
+}

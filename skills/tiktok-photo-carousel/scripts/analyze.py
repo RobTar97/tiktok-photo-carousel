@@ -8,6 +8,10 @@ For every photo this produces:
   bands     per text position: mean luminance, busyness, and the scrim
             opacity needed for white type to stay readable over it
   orient    portrait / landscape / square
+  grid      a small luminance grid and a smaller colour grid (base64), so the
+            engine can redraw the photo in code - contours, halftone, ASCII,
+            dither, mosaic - without the browser ever reading pixels, which
+            file:// pages are not allowed to do
 
 It can also write web-sized copies in the same pass. Do that: a 16 MP
 original in the page makes the studio crawl, and the slide is only 1080px
@@ -18,12 +22,13 @@ Usage:
     python scripts/analyze.py --photos ./photos --out ./work/analysis.json --resize ./work/photos
 """
 import argparse
+import base64
 import json
 import os
 import sys
 
 try:
-    from PIL import Image, ImageFilter, ImageStat
+    from PIL import Image, ImageFilter, ImageOps, ImageStat
 except ImportError:
     sys.exit("Pillow is required: pip install -r requirements.txt")
 
@@ -94,7 +99,7 @@ def focus_point(img, grid=16):
     """Centroid of the busiest cells - a cheap stand-in for a saliency map."""
     g = img.convert("L").resize((grid * 8, grid * 8))
     edges = g.filter(ImageFilter.FIND_EDGES).resize((grid, grid))
-    px = list(edges.getdata())
+    px = list(edges.tobytes())          # getdata() is deprecated in Pillow 12
     if not px:
         return [0.5, 0.5]
     thresh = sorted(px)[int(len(px) * 0.80)]
@@ -130,9 +135,38 @@ def band_stats(img, y1, y2):
     }
 
 
+def upright(im):
+    """Apply EXIF orientation. Phones store a portrait shot as landscape pixels
+    plus a rotate tag; browsers honour the tag, Pillow does not. Skipping this
+    measured the wrong axis, and --resize wrote sideways copies."""
+    return ImageOps.exif_transpose(im)
+
+
+def grids(img, lum_long=120, rgb_long=40):
+    """Luminance and colour grids with the photo's own aspect ratio.
+
+    The engine maps canvas points onto these using the same object-fit:cover
+    and focus maths the browser uses, so code-drawn art lines up with the
+    photo exactly. Values are raw bytes, base64 encoded."""
+    w, h = img.size
+    def size(long_side):
+        if w >= h:
+            return long_side, max(2, round(long_side * h / w))
+        return max(2, round(long_side * w / h)), long_side
+    lw, lh = size(lum_long)
+    cw, ch = size(rgb_long)
+    lum = img.convert("L").resize((lw, lh), Image.LANCZOS)
+    rgb = img.convert("RGB").resize((cw, ch), Image.LANCZOS)
+    return {
+        "lum": {"w": lw, "h": lh, "data": base64.b64encode(lum.tobytes()).decode()},
+        "rgb": {"w": cw, "h": ch, "data": base64.b64encode(rgb.tobytes()).decode()},
+    }
+
+
 def analyze(path):
-    with Image.open(path) as im:
-        im.load()
+    with Image.open(path) as raw:
+        raw.load()
+        im = upright(raw)
         w, h = im.size
         thumb = im.copy()
         thumb.thumbnail((560, 560))
@@ -144,6 +178,7 @@ def analyze(path):
             "duotone": duotone_pair(pal),
             "focus": focus_point(thumb),
             "bands": {k: band_stats(thumb, a, b) for k, (a, b) in BANDS.items()},
+            "grid": grids(thumb),
         }
 
 
@@ -173,7 +208,7 @@ def main():
             out[f] = analyze(src)
             if a.resize:
                 with Image.open(src) as im:
-                    im = im.convert("RGB")
+                    im = upright(im).convert("RGB")
                     im.thumbnail((a.max, a.max), Image.LANCZOS)
                     im.save(os.path.join(a.resize, f), "JPEG", quality=88, optimize=True)
             print("  %-46s %s  focus=%s" % (f[:46], out[f]["palette"][0], out[f]["focus"]))

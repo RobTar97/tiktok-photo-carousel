@@ -1,7 +1,7 @@
 # Templates
 
-Eighteen composition archetypes. A template decides the **layout** of a slide,
-not its font. Fonts and colour come from the theme, so every template in a
+Nineteen composition archetypes. A template decides the **layout** of a slide,
+not its font. Fonts, colour and code-drawn art come from the preset and theme, so every template in a
 deck still looks like one deck.
 
 Pick by the job the slide does, not by what looks nice on its own. A carousel
@@ -16,6 +16,7 @@ people by slide 3.
 | 2..n-1 | Carry one idea each | `editorial-split`, `index-card`, `caption-bar`, `arch-window`, `frosted-card`, `diagonal-split`, `notes-card`, `film-strip` |
 | any | A line worth hearing | `quote-pull` |
 | any | A real pairing | `compare` |
+| any | Several moments at once | `bento` |
 | n-1 | The payoff | `polaroid-stack`, `full-bleed-hook`, `sticker-chaos` |
 | n | One call to action | `end-card` |
 
@@ -64,8 +65,8 @@ whose colour is the point.
 The photo shows through a torn-paper tear; the headline sits on the paper
 above it. Zine energy, works well for a reveal or a secret.
 
-Fields: `photo`, `text`, `sub?`
-Note: the tear is an SVG `clipPath` in the page, so it is crisp at any size.
+Fields: `photo`, `text`, `sub?`, `tear?` (where it runs, default 0.47)
+The tear is generated from the seed for every slide, so no two in a deck match.
 
 ---
 
@@ -138,21 +139,25 @@ width fast.
 
 ## 10. `sticker-chaos`
 
-Hand-drawn SVG circle and arrow over the photo, plus optional stickers.
-Meme-adjacent, high energy, use once per deck at most.
+Hand-drawn pen marks over the photo, plus optional stickers. Meme-adjacent,
+high energy, use once per deck at most.
 
 Fields: `photo`, `text`, `circle?` (`false` to drop it), `arrow?`,
-`stickers?` — `[{text, x, y, rot}]` with `x`/`y` as 0..1 fractions.
+`stickers?` - `[{text, x, y, rot}]` with `x`/`y` as 0..1 fractions.
+The circle lands on the photo's focus point - the subject - and the arrow
+points at it, drawn fresh from the seed on every slide. Set `focus` to move
+them. For marks that circle a *word*, use `art` with a `target` ([art.md](art.md)).
 
 ---
 
 ## 11. `dreamcore-glow`
 
-Bloom, haze, sparkles, soft rounded type. The v1 `dreamcore` style rebuilt as
-a layout. Liminal-space content, 90s-mall nostalgia, empty interiors.
+Bloom, haze, sparkles, soft rounded type. Liminal-space content, 90s-mall
+nostalgia, empty interiors.
 
-Fields: `photo`, `text`, `sub?`; pairs with `aberration: true` and
-`scanlines: true` on the theme for a harder VHS read.
+Fields: `photo`, `text`, `sub?`. The sparkles are seeded and keep off the
+copy. The haze lightens the photo, so this template carries a higher scrim
+floor than the others.
 
 ---
 
@@ -232,6 +237,18 @@ of the same place. A split with nothing to compare is just a smaller photo.
 
 ---
 
+## 19. `bento`
+
+A photo dump: three to five frames in an asymmetric grid, headline above. The
+format people already use for "my week in", made tidy.
+
+Fields: `photos` (3-5, strongest first - it takes the big cell), `text`,
+`sub?`, `labels?` (one per frame)
+The grid changes shape with the count. Use it once per deck: it is a change
+of pace, and five small photos read slower than one big one.
+
+---
+
 ## Adding a template
 
 1. Add a block to `html/templates.css` keyed on
@@ -243,5 +260,10 @@ of the same place. A split with nothing to compare is just a smaller photo.
    follows `deck.safe` instead of a hard-coded fraction, and leave the
    lower right clear of the icon rail.
 4. If it needs extra DOM, add an entry to `ART` in `html/engine.js`.
-5. Rebuild and run the export — the verifier will tell you if the geometry
-   collides with TikTok's interface.
+5. If it needs art of its own, add a `TEMPLATE_ART` entry in `html/engine.js`
+   rather than drawing fixed shapes - art from `html/art.js` is seeded per
+   slide and can aim at the photo's subject or at the copy.
+6. Rebuild and export - the verifier tells you if the geometry collides with
+   TikTok's interface - then run `scripts/audit.py`.
+7. Add it to `scripts/selftest.js`, and put it on a concept board in every
+   preset. A template that only reads in one look is not finished.

@@ -12,7 +12,12 @@
  *   --quality  jpeg quality        (default 92)
  *   --scale    device scale factor (default 1 -> exactly 1080x1920)
  *   --no-contact   skip the contact sheet
+ *   --no-upload    skip the upload/ folder
  *   --strict       exit non-zero if any slide collides with TikTok's UI
+ *
+ * upload/ holds what you actually post: numbered JPEGs in posting order,
+ * 01.jpg first because the first image is the cover. JPEG because TikTok
+ * recompresses everything anyway and a PNG slide is 3-5x the size.
  *
  * The page is loaded twice: once with ?export=1 for clean slides, once
  * without for the contact sheet, which keeps the slide numbers and template
@@ -54,6 +59,7 @@ const format = String(argv("format", "png")).toLowerCase() === "jpg" ? "jpeg" : 
 const quality = parseInt(argv("quality", "92"), 10);
 const scale = parseFloat(argv("scale", "1"));
 const wantContact = argv("contact", true) !== false;
+const wantUpload = argv("upload", true) !== false;
 const strict = argv("strict", false) === true;
 
 const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
@@ -92,6 +98,21 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
     process.stdout.write("  " + name + "\n");
   }
 
+  /* upload/: the files you post, in the order you post them. */
+  if (wantUpload) {
+    const upDir = path.join(outDir, "upload");
+    fs.rmSync(upDir, { recursive: true, force: true });
+    fs.mkdirSync(upDir, { recursive: true });
+    for (let i = 0; i < slides.length; i++) {
+      await slides[i].screenshot({
+        path: path.join(upDir, String(i + 1).padStart(2, "0") + ".jpg"),
+        type: "jpeg", quality: 92,
+      });
+    }
+    const kb = fs.readdirSync(upDir).reduce((t, f) => t + fs.statSync(path.join(upDir, f)).size, 0) / 1024;
+    process.stdout.write("  upload/  (" + slides.length + " JPEGs, " + Math.round(kb) + " KB - post these, in order)\n");
+  }
+
   /* The cover is what people meet first, in the feed and again on the
      profile grid, so it gets its own file rather than being "the first
      one you happen to upload". */
@@ -112,7 +133,7 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
   await page.addStyleTag({
     content:
       ".headline,.headline mark,.sub,.kicker,.cta,.counter,.edge-label," +
-      ".swipe,.note-bar,.pair figcaption{" +
+      ".swipe,.note-bar,figcaption{" +
       "color:transparent!important;text-shadow:none!important;" +
       "-webkit-text-stroke-color:transparent!important}",
   });

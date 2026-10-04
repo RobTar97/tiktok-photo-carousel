@@ -15,6 +15,12 @@ intent. Writes _cover_grid.png - the cover as the profile grid will show it.
 
 Usage:
     python scripts/audit.py --out ./out
+    python scripts/audit.py --out ./out --fix work/deck.json
+
+--fix raises the scrim on every slide whose copy over a photograph falls
+short, writes the deck back (keeping deck.json.bak), and lists what moved.
+Rebuild and export, then audit again. It never touches copy, colour or
+layout - those are design decisions, and the report says which to make.
 """
 import argparse
 import json
@@ -82,7 +88,7 @@ def is_opaque(css):
     return c.startswith("rgb") or c.startswith("#")
 
 
-def background_under(bg_img, box, text_rgb, own_bg=False, holes=()):
+def background_under(bg_img, box, text_rgb, own_bg=False, holes=(), body=False):
     """Mean and worst-case background behind a line of type.
 
     Reads the background plate export.js rendered with the copy hidden, so
@@ -98,6 +104,11 @@ def background_under(bg_img, box, text_rgb, own_bg=False, holes=()):
     # Type is read against whatever touches it, so sample a little beyond the
     # box - unless the element paints its own chip, where going outside would
     # measure the photo next to the label instead of the label.
+    if body and not own_bg:
+        # A highlight's band is decoration under or behind the word; what
+        # has to read is the glyph body, the middle of the line box.
+        hgt = y2 - y1
+        y1, y2 = y1 + int(hgt * 0.24), y2 - int(hgt * 0.26)
     if own_bg:
         # Sample inside the chip or band. A marker band is inset from the top
         # and bottom of the line box, and those slivers hold no glyph - they
@@ -152,11 +163,65 @@ def audit_cover(out_dir, rep):
     return notes
 
 
+def fix_deck(deck_path, weak, out_dir):
+    """Raise the scrim where copy over a photo falls short.
+
+    Remembers the last round in out/_fix.json. A slide whose ratio barely
+    moved after its scrim went up is not a scrim problem - something above
+    the scrim is in the way (a highlight band, generated art) - so it is
+    reported instead of darkened again."""
+    import shutil
+    hist_path = os.path.join(out_dir, "_fix.json")
+    hist = json.load(open(hist_path, encoding="utf-8")) if os.path.exists(hist_path) else {}
+    deck = json.load(open(deck_path, encoding="utf-8"))
+    slides = deck.get("slides", [])
+    changed, manual = [], []
+    for n in sorted(weak):
+        ratio, scrim, has_photo = weak[n]
+        if n - 1 >= len(slides):
+            continue
+        s = slides[n - 1]
+        if not has_photo:
+            manual.append("slide %d (%.1f:1) has no photo behind the copy - change the colours" % (n, ratio))
+            continue
+        cur = s.get("scrim", scrim if scrim is not None else 0.45)
+        prev = hist.get(str(n))
+        if prev and prev["scrim"] < cur and ratio - prev["ratio"] < 0.4:
+            manual.append("slide %d stayed at %.1f:1 after its scrim went %.2f -> %.2f - the scrim is not "
+                          "the problem; something above it (a highlight band, generated art) sits behind the "
+                          "copy. Check it in the studio with X." % (n, ratio, prev["scrim"], cur))
+            continue
+        hist[str(n)] = {"ratio": round(ratio, 2), "scrim": cur}
+        # Bigger steps for worse ratios; past ~0.85 the photo is gone.
+        step = 0.2 if ratio < FLOOR else 0.12
+        new = round(min(0.86, cur + step), 2)
+        if new <= cur:
+            manual.append("slide %d (%.1f:1) is already at scrim %.2f - move the copy with pos, "
+                          "or use frosted-card / caption-bar" % (n, ratio, cur))
+            continue
+        s["scrim"] = new
+        changed.append("slide %d: scrim %.2f -> %.2f  (worst was %.1f:1)" % (n, cur, new, ratio))
+    with open(hist_path, "w", encoding="utf-8") as fh:
+        json.dump(hist, fh)
+    if changed:
+        shutil.copyfile(deck_path, deck_path + ".bak")
+        with open(deck_path, "w", encoding="utf-8") as fh:
+            json.dump(deck, fh, indent=2, ensure_ascii=False)
+    print("\nfix -> %s" % deck_path)
+    for c in changed:
+        print("  + " + c)
+    for m in manual:
+        print("  ? " + m)
+    if changed:
+        print("  rebuild, export and audit again.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default="./out", help="folder export.js wrote")
     ap.add_argument("--strict", action="store_true", help="exit non-zero on any fail")
+    ap.add_argument("--fix", metavar="DECK", help="raise the scrim on failing photo slides in this deck.json")
     a = ap.parse_args()
 
     rpath = os.path.join(a.out, "_report.json")
@@ -174,6 +239,7 @@ def main():
                  "version, which renders them." % a.out)
 
     imgs, fails, warns = {}, [], []
+    weak = {}                     # slide -> (worst ratio, effective scrim, has photo)
     print("%-3s %-11s %-7s %5s  %-7s %s" %
           ("#", "element", "size", "ratio", "worst", "text"))
     print("-" * 78)
@@ -186,7 +252,8 @@ def main():
         text_rgb = parse_css_color(b["color"])
         own = is_opaque(b.get("ownBg")) or bool(b.get("ownBgImage"))
         mean_bg, worst_bg = background_under(
-            imgs[plate], b["box"], text_rgb, own, b.get("holes") or ())
+            imgs[plate], b["box"], text_rgb, own, b.get("holes") or (),
+            body=b["el"] == "highlight")
         if mean_bg is None:
             continue
         c_mean = contrast(text_rgb, mean_bg)
@@ -194,6 +261,11 @@ def main():
 
         floor = MIN_HEADLINE if b["el"] in ("headline", "highlight") else MIN_BODY
         small = b["fontSize"] < floor
+
+        if c_worst < GOOD and b["el"] in ("headline", "sub", "highlight", "edge-label"):
+            prev = weak.get(b["slide"])
+            if prev is None or c_worst < prev[0]:
+                weak[b["slide"]] = (c_worst, b.get("scrim"), b.get("hasPhoto"))
 
         mark = " "
         if c_worst < FLOOR or small:
@@ -237,6 +309,11 @@ def main():
         print("\nAll copy clears %.1f:1 and the size floors." % GOOD)
 
     print("\nratio = mean background, worst = the single worst spot behind the line.")
+    if a.fix and weak:
+        fix_deck(a.fix, weak, a.out)
+    elif a.fix:
+        print("\nfix: nothing to raise - every line over a photo clears %.1f:1" % GOOD)
+
     if fails and a.strict:
         sys.exit(2)
 

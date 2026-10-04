@@ -1,0 +1,74 @@
+{
+  "name": "contour",
+  "label": "Contour",
+  "for": "travel, outdoors, architecture, coastlines, city guides",
+  "signature": "The photograph's own light, drawn over it as a topographic survey map - every fourth line an index contour.",
+  "palette": {
+    "survey": "#FF6B3D",
+    "slate": "#14181B",
+    "chart": "#E9E5DB"
+  },
+  "theme": {
+    "googleFonts": [
+      "Big Shoulders Display:wght@700;800;900",
+      "Newsreader:ital,wght@0,400;1,400;1,500",
+      "IBM Plex Mono:wght@400;600"
+    ],
+    "display": "Big Shoulders Display",
+    "text": "Newsreader",
+    "mono": "IBM Plex Mono",
+    "hand": "Newsreader",
+    "displayWeight": 800,
+    "accent": "#FF6B3D",
+    "onAccent": "#14181B",
+    "bg": "#14181B",
+    "block": "#14181B",
+    "paper": "#E9E5DB",
+    "highlight": "underline",
+    "grain": 0.05,
+    "vignette": 0.3
+  },
+  "art": {
+    "cover": [
+      {
+        "type": "contour",
+        "levels": 10,
+        "cell": 11,
+        "width": 2.2,
+        "opacity": 0.62,
+        "over": true
+      }
+    ],
+    "end-card": [
+      {
+        "type": "contour",
+        "source": "noise",
+        "on": "slide",
+        "levels": 16,
+        "width": 2,
+        "color": "on-accent",
+        "opacity": 0.2
+      }
+    ],
+    "*": [
+      {
+        "type": "contour",
+        "levels": 8,
+        "cell": 12,
+        "width": 2.3,
+        "opacity": 0.52,
+        "over": true
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "editorial-split",
+    "index-card",
+    "caption-bar",
+    "arch-window",
+    "compare",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='contour'] .headline{text-transform:uppercase;--leading:.94;--tracking:.004em}.slide[data-preset='contour'] .sub{font-style:italic}.slide[data-preset='contour'] .kicker{letter-spacing:.28em}"
+}

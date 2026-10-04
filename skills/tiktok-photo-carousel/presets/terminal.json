@@ -1,0 +1,33 @@
+{
+  "name": "terminal",
+  "label": "Terminal",
+  "for": "night, tech, gaming, internet culture, retro computing",
+  "signature": "Every photo re-rendered as amber-phosphor ASCII - the picture is made of characters - with scanlines and a blinking-cursor underscore.",
+  "palette": { "phosphor": "#FFB000", "tube": "#0E1210", "glow-cream": "#FFE9C2" },
+  "theme": {
+    "googleFonts": ["Martian Mono:wght@400;500;800"],
+    "display": "Martian Mono",
+    "text": "Martian Mono",
+    "mono": "Martian Mono",
+    "hand": "Martian Mono",
+    "displayWeight": 800,
+    "accent": "#FFB000",
+    "onAccent": "#0E1210",
+    "bg": "#0E1210",
+    "block": "#0E1210",
+    "paper": "#0E1210",
+    "ink": "#FFE9C2",
+    "muted": "rgba(255,233,194,.92)",
+    "highlight": "box",
+    "grain": 0.06,
+    "vignette": 0.52,
+    "scanlines": true
+  },
+  "art": {
+    "caption-bar": [{ "type": "dither", "replace": true, "ground": "bg", "color": "accent", "px": 7 }],
+    "end-card": [{ "type": "dither", "source": "noise", "on": "slide", "color": "on-accent", "opacity": 0.12, "px": 8, "scale": 0.002 }],
+    "*": [{ "type": "ascii", "replace": true, "ground": "bg", "color": "accent", "size": 17, "weight": 500 }]
+  },
+  "templates": ["cover", "full-bleed-hook", "caption-bar", "quote-pull", "compare", "end-card"],
+  "css": ".slide[data-preset='terminal'] .headline{--tracking:-0.035em;--leading:1.04}.slide[data-preset='terminal'] .headline::after{content:'_';color:var(--accent);margin-left:.05em}.slide[data-preset='terminal'][data-template='end-card'] .headline::after{color:var(--on-accent)}"
+}

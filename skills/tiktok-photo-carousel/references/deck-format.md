@@ -1,19 +1,23 @@
 # deck.json
 
 One file describes the whole carousel. The studio renders it, the exporter
-shoots it, and browser edits merge back into it. Nothing else holds state.
+shoots it, and the reviewer's edits merge back into it. Nothing else holds
+state.
 
 ```jsonc
 {
-  "title": "ATC Osaka - hidden spot",   // studio header only
-  "lang": "en",                          // "ja" sets the page language
-  "handle": "atc.osaka",                 // shown in the fake TikTok chrome
-  "caption": "...",                      // same, and a reminder of the caption
-  "photos": "./photos",                  // relative to THIS file
+  "title": "ATC - this isn't a render",   // studio header, and the default seed
+  "lang": "en",                            // "ja" turns on Japanese line breaking
+  "handle": "atc_osaka",                   // shown in the mock TikTok interface
+  "caption": "...",                        // same - a reminder of what covers the slide
+  "photos": "./photos",                    // relative to THIS file
+  "seed": "atc-oct",                       // optional - changes every code-drawn mark
 
-  "theme":  { ... },                     // see below
+  "theme":  { "preset": "contour", ... },  // see below
   "safe":   { "top": 0.085, "bottom": 0.15, "side": 0.07,
               "rail": 0.16, "railTop": 0.42 },   // optional override
+  "board":  false,                         // true for a concept board, see presets.md
+  "play":   { "seconds": 3.5 },            // play-mode dwell per slide
 
   "slides": [ { ... } ]
 }
@@ -21,80 +25,124 @@ shoots it, and browser edits merge back into it. Nothing else holds state.
 
 ## theme
 
-Every field is optional. Anything missing falls back to a sane default, and
-`palette` is taken from slide 1's photo if you do not set it.
+Every field is optional. `preset` loads a complete look; anything else here
+overrides it. Layering, lowest first: **preset < brand kit < theme < slide**.
 
 | Field | What it does |
 |---|---|
-| `display` | Headline family. A Google Fonts name is enough — `build.js` writes the `<link>`. |
-| `text` | Secondary family. Use a JP-capable face for Japanese decks. |
-| `hand` | Handwriting, for `polaroid-stack` and `sticker-chaos`. |
-| `mono` | Kickers and small caps. |
-| `displayWeight` | 400–900. |
-| `palette` | `[dark … light]` hex. Normally comes from the photos. |
-| `accent` | Highlights, kickers, rules, the end card. |
-| `bg`, `block`, `paper`, `muted` | Backgrounds and secondary ink. |
-| `highlight` | `plain` \| `box` \| `underline` \| `marker` — how `*word*` renders. |
-| `grain`, `vignette` | 0..1 texture strength. |
-| `sizeMax`, `sizeMin` | Autofit bounds in canvas px (defaults 132 / 48). |
-| `subRatio` | Sub size as a fraction of the headline (default 0.38). |
-| `aberration`, `scanlines` | Deck-wide VHS treatments. |
-| `fontSource` | `local` or `none` to skip the Google Fonts request. |
+| `preset` | One of the ten in `presets/` - see [presets.md](presets.md) |
+| `display`, `text`, `hand`, `mono` | Font families. A Google Fonts name is enough. |
+| `googleFonts` | Exact family specs, e.g. `"Fraunces:ital,wght@0,600;1,400"` |
+| `displayWeight` | 400-900 |
+| `palette` | `[dark ... light]` hex. Taken from slide 1's photo if unset. |
+| `accent` | Highlights, kicker labels, rules, the end card |
+| `onAccent` | Text on the accent. Computed for contrast if unset. |
+| `bg`, `block`, `paper` | Grounds. Palette-derived ones are deepened until text holds. |
+| `ink`, `inkDark`, `muted` | Text on photos, text on paper, secondary text |
+| `highlight` | `plain` / `box` / `underline` / `marker` - how `*word*` renders |
+| `grain`, `vignette` | 0..1 texture |
+| `aberration`, `scanlines` | VHS treatments |
+| `sizeMax`, `sizeMin` | Autofit bounds in px (default 132 / 48 - 48 is TikTok's floor) |
+| `subRatio` | Sub size as a fraction of the headline (floor 32px regardless) |
+| `seal`, `badge` | Words for presets that draw a seal or badge |
+| `fontSource` | `local` or `none` to skip the Google Fonts request |
 
 ## slides[]
 
 ```jsonc
 {
-  "role": "hook",                 // hook | build | payoff | cta - documentation
-  "template": "full-bleed-hook",  // see references/templates.md
-  "photo": "_MG_5485.JPG",        // filename inside the photos folder
-  "photos": ["a.jpg", "b.jpg"],   // film-strip and polaroid-stack only
+  "role": "cover",                // cover | build | payoff | cta
+  "template": "cover",            // see templates.md
+  "photo": "IMG_4472.jpeg",       // a file in the photos folder
+  "photos": ["a.jpg", "b.jpg"],   // film-strip, polaroid-stack, compare, bento
 
-  "text": "Osaka built a *rainbow* machine in 1994",
-  "sub":  "and almost nobody films it",
-  "kicker": "01",
-  "cta": "part 2?",               // end-card
+  "text": "This isn't a *render*",
+  "sub":  "it's a real building, and you can walk in",
+  "kicker": "look up",
+  "cta": "save",                  // end-card
 
   "pos": "upper",                 // top | upper | middle | lower
   "align": "left",                // left | center | right
-  "focus": [0.38, 0.45],          // crop centre, 0..1 - from analyze.py
-  "size": 118,                    // cap the autofit for this slide
-  "highlight": "marker",          // per-slide override
+  "focus": [0.38, 0.45],          // crop centre 0..1 - from analyze.py
+  "size": 118,                    // cap the autofit
+  "highlight": "marker",          // per-slide
   "vertical": true,               // vertical Japanese type
-  "rail": false,                  // this slide ignores the icon rail
-  "fit": "blur"                   // letterbox on a blurred copy of itself
+  "rail": false,                  // ignore the icon column on this slide
+  "fit": "blur",                  // letterbox on a blurred copy of itself
+
+  "preset": "atlas",              // this slide in a different preset (concept boards)
+  "group": "A - Atlas",           // studio heading (concept boards)
+  "art": [ { "type": "rough", "kind": "circle", "target": "mark" } ],  // see art.md
+  "accent": "#E8A838",            // per-slide colour overrides
+  "bg": "#0D2137",                // end-card ground
+  "block": "#14181B",
+  "fonts": { "display": "Bebas Neue", "weight": 400, "tracking": "0.01em" },
+
+  "swipe": "swipe",               // cover - the feed-only cue
+  "edgeLabel": "west side",       // index-card - the vertical tab
+  "labels": ["before", "after"],  // compare, bento
+  "noteLabel": "go at",           // notes-card
+  "counter": false,               // caption-bar - drop the 03 / 08 counter
+  "stickers": [{ "text": "here", "x": 0.6, "y": 0.5, "rot": -8 }],  // sticker-chaos
+  "tilt": -3.5,                   // polaroid-stack
+  "tear": 0.47,                   // torn-reveal - where the tear runs
+  "quoteMark": "“"           // quote-pull
 }
 ```
 
 ### Copy markup
 
-- `*word*` renders as a highlight. **One per slide, never more.**
-- ` // ` (spaces both sides) forces a line break.
+- `*word*` renders as a highlight. **One per slide.**
+- ` // ` (spaces both sides) forces a line break. Always use it in Japanese.
 - Everything else is escaped, so `<`, `&` and emoji in copy are safe.
 
 ### Fields you normally leave out
 
 `scrim`, `shadow`, `focus` and `duotone` are filled in by `build.js` from
-`analysis.json`. Set them by hand only to override what the analysis chose:
+`analysis.json`; `audit.py --fix` raises `scrim` where it has to.
 
 | Field | Range | Meaning |
 |---|---|---|
-| `scrim` | 0..1 | Darkening under the copy. Higher on bright photos. |
-| `scrimDir` | `top` `bottom` `full` `radial` `none` | Which way the ramp runs. |
-| `shadow` | bool | Text shadow. Off looks cleaner when the photo is dark. |
-| `duotone` | `[dark, light]` | `duotone-poster` ink pair. |
+| `scrim` | 0..1 | Darkening under the copy |
+| `scrimDir` | `top` `bottom` `full` `radial` `none` | Which way the ramp runs (follows the copy by default) |
+| `shadow` | bool | Text shadow |
+| `duotone` | `[dark, light]` | `duotone-poster` inks |
+
+## What build.js checks
+
+Errors fail `--strict`; warnings should be fixed before export.
+
+| Check | Level |
+|---|---|
+| more than 35 slides (TikTok's limit) | error |
+| hook over 12 words | error |
+| a slide over ~18 words | error |
+| fewer than 3 or more than 12 slides | warning |
+| slide 1 not `cover` | warning |
+| hook over 9 words; a slide over 14 words | warning |
+| more than one highlight on a slide; more than one CTA | warning |
+| the same template twice in a row; more than three loud templates | warning |
+| filler words, and words the brand kit forbids | warning |
+| superlatives and absolutes ("best", "only", "never") | note - fine if the user said it |
+
+A concept board (`"board": true`) skips the checks about the deck as a whole.
 
 ## edits.json
 
-What the studio downloads when you press Ctrl+S. Merge it into the deck by
-index and rebuild:
+What the studio's **Approve deck** (or **Save edits**, Ctrl+S) downloads:
 
 ```jsonc
 {
-  "slides": [ { "index": 0, "text": "...", "sub": "...", "kicker": "..." } ],
-  "notes": "slide 4 crop is cutting the ship - move it left"
+  "approved": true,
+  "slides": [
+    { "index": 0, "text": "...", "sub": "...", "status": "keep" },
+    { "index": 1, "text": "...", "status": "change",
+      "note": "crop is cutting the yellow beam - show more of it" }
+  ],
+  "notes": "deck-wide notes"
 }
 ```
 
-Only the copy fields come back. Layout stays in `deck.json`, which is why a
-round of text edits can never break the geometry.
+Merge it with `scripts/apply-edits.js`. Copy fields are written into the deck;
+`status` and `note` are reported for you to act on. Layout never comes back
+through this file, which is why a round of edits cannot break the geometry.

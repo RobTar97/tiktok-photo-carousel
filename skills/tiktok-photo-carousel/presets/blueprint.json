@@ -1,0 +1,75 @@
+{
+  "name": "blueprint",
+  "label": "Blueprint",
+  "for": "venues, architecture, buildings, spaces for hire, B2B, how a place works",
+  "signature": "Photos printed as blueprints - light lines on drafting navy - under a measured engineering grid.",
+  "palette": {
+    "drafting-navy": "#0B2545",
+    "line-cyan": "#8FC8FF",
+    "marker": "#F4C542"
+  },
+  "theme": {
+    "googleFonts": [
+      "Barlow Condensed:wght@500;700;800",
+      "IBM Plex Sans:wght@400;500;600",
+      "IBM Plex Mono:wght@400;600"
+    ],
+    "display": "Barlow Condensed",
+    "text": "IBM Plex Sans",
+    "mono": "IBM Plex Mono",
+    "hand": "IBM Plex Mono",
+    "displayWeight": 800,
+    "accent": "#F4C542",
+    "onAccent": "#0B2545",
+    "bg": "#0B2545",
+    "block": "#0B2545",
+    "paper": "#0B2545",
+    "ink": "#FFFFFF",
+    "highlight": "box",
+    "grain": 0.04,
+    "vignette": 0.25
+  },
+  "art": {
+    "cover": [
+      {
+        "type": "grid",
+        "on": "slide",
+        "cell": 36,
+        "major": 5,
+        "color": "#8FC8FF",
+        "opacity": 0.38,
+        "crosses": true
+      }
+    ],
+    "end-card": [
+      {
+        "type": "grid",
+        "on": "slide",
+        "cell": 36,
+        "major": 5,
+        "color": "#0B2545",
+        "opacity": 0.22
+      }
+    ],
+    "*": [
+      {
+        "type": "grid",
+        "on": "slide",
+        "cell": 36,
+        "major": 5,
+        "color": "#8FC8FF",
+        "opacity": 0.28
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "index-card",
+    "editorial-split",
+    "compare",
+    "caption-bar",
+    "diagonal-split",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='blueprint'] .layer-photo{background:#0B2545}.slide[data-preset='blueprint'] .layer-photo .photo{filter:grayscale(1) contrast(1.25) brightness(1.08);mix-blend-mode:screen;opacity:.66}.slide[data-preset='blueprint'] .headline{text-transform:uppercase;--leading:.95;--tracking:.012em}"
+}

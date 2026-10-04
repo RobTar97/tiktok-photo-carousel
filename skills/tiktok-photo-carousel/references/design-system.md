@@ -1,7 +1,8 @@
 # Design system
 
 What separates a carousel that looks designed from one that looks generated.
-Read this before choosing a theme.
+The ten presets ([presets.md](presets.md)) already follow everything here -
+read this to judge them, adjust them, or build your own.
 
 ## 1. Colour comes from the photographs
 
@@ -19,8 +20,9 @@ Rules:
   and colour blocks sit in the photos' shadow colour.
 - **Accent is for one job per slide** — a highlighted word, a kicker, a rule,
   or the end card. Not all four at once.
-- **Check the accent against what sits on it.** The engine computes
-  `--on-accent` from the accent's luminance, so an end card on a pale accent
+- **Check the accent against what sits on it.** The engine picks black or
+  white for `--on-accent` by real WCAG contrast (a luminance threshold got
+  orange wrong - white on `#F25C2A` is 3.0:1, black is 7:1), so an end card on a pale accent
   gets dark type automatically. Do not hand-set that colour.
 - Dominant colour plus one sharp accent beats four colours sharing the frame.
 
@@ -95,6 +97,20 @@ Two consequences worth knowing before you design:
   floor the slide is carrying two ideas. Split it.
 
 ## 5. Contrast is measured, not guessed
+
+Three rules the engine enforces on its own, each learned from a measured
+failure:
+
+- **Kickers over photos are labels.** Accent text set straight onto a photo is
+  a gamble on the photo - red on red steel measured 1.0:1. Over a photo the
+  kicker becomes a solid accent tag.
+- **A highlight band is exactly the word.** Inline backgrounds paint the
+  font's whole content area, which for a tall display face reaches into the
+  line above. `box` and `marker` marks are inline-blocks one line tall.
+- **Grounds taken from a photo are deepened.** A palette swatch can land
+  mid-grey, where nothing reads well; derived `bg` and `block` are pulled
+  down until text holds.
+
 
 The old renderer picked a shadow and hoped. This one measures:
 

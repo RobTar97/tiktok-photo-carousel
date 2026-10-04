@@ -41,12 +41,17 @@ body {
   border-bottom: 1px solid var(--ui-line);
 }
 #hud .title { font-weight: 650; letter-spacing: -0.01em; margin-right: 6px; }
-#hud .meta { color: var(--ui-dim); margin-right: auto; font-size: 13px; }
+#hud .meta {
+  color: var(--ui-dim); margin-right: auto; font-size: 13px;
+  flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#hud .title { white-space: nowrap; }
 #hud button {
   font: inherit; font-size: 13px;
   color: var(--ui); background: #26262c;
   border: 1px solid var(--ui-line); border-radius: 8px;
   padding: 7px 13px; cursor: pointer;
+  white-space: nowrap; flex: none;
 }
 #hud button:hover { background: #32323a; }
 #hud button.on { background: var(--ui); color: #111; border-color: var(--ui); }
@@ -78,6 +83,66 @@ body {
 }
 .frame-cap b { color: var(--ui); font-variant-numeric: tabular-nums; }
 .frame-cap i { margin-left: auto; font-style: normal; opacity: 0.6; }
+
+/* --- per-slide review --- */
+.review { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.review .verdict { display: flex; gap: 6px; }
+.review button {
+  flex: 1; font: inherit; font-size: 12px; cursor: pointer;
+  color: var(--ui-dim); background: transparent;
+  border: 1px solid var(--ui-line); border-radius: 7px; padding: 5px 0;
+}
+.review button:hover { color: var(--ui); border-color: var(--ui-dim); }
+.review[data-v="keep"] [data-v="keep"] { background: #1f6f43; border-color: #2c9a5d; color: #fff; }
+.review[data-v="change"] [data-v="change"] { background: #8a2a3a; border-color: #c2405a; color: #fff; }
+.review textarea {
+  font: inherit; font-size: 12px; color: var(--ui); background: var(--ui-panel);
+  border: 1px solid var(--ui-line); border-radius: 7px; padding: 6px 8px;
+  resize: vertical; display: none;
+}
+.review[data-v="change"] textarea, .review textarea:not(:placeholder-shown) { display: block; }
+#tally { font-size: 12px; color: var(--ui-dim); margin: 0 6px; font-variant-numeric: tabular-nums; white-space: nowrap; flex: none; }
+
+/* --- concept boards: one heading per direction --- */
+.group-head {
+  flex-basis: 100%; margin: 18px 0 -8px;
+  font-size: 15px; font-weight: 650; letter-spacing: 0.02em; color: var(--ui);
+}
+.group-head:first-child { margin-top: 0; }
+
+/* --- play mode: the deck as a viewer meets it --- */
+.play {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(8,8,10,0.94);
+  display: grid; place-items: center;
+}
+.play-phone {
+  position: relative; overflow: hidden; border-radius: 34px;
+  width: calc(1080px * var(--pk)); height: calc(1920px * var(--pk));
+  box-shadow: 0 0 0 10px #1d1d21, 0 40px 90px rgba(0,0,0,0.7);
+  cursor: pointer;
+}
+.play-slot > .slide { transform: scale(var(--pk)); transform-origin: top left; }
+.play-bars {
+  position: absolute; z-index: 20; left: 14px; right: 14px; top: 12px;
+  display: flex; gap: 5px;
+}
+.play-bars i {
+  flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,0.3);
+  position: relative; overflow: hidden;
+}
+.play-bars i.done { background: rgba(255,255,255,0.95); }
+.play-bars i.now::after {
+  content: ""; position: absolute; inset: 0; background: #fff;
+  transform-origin: left; animation: playfill var(--dwell, 3500ms) linear forwards;
+}
+.play-bars.paused i.now::after { animation-play-state: paused; }
+@keyframes playfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.play-help {
+  position: absolute; bottom: 18px; left: 0; right: 0; text-align: center;
+  font-size: 12px; color: var(--ui-dim); letter-spacing: 0.04em;
+}
+@media (prefers-reduced-motion: reduce) { .play-bars i.now::after { animation: none; transform: scaleX(1); } }
 
 /* --- edit mode --- */
 body[data-edit="1"] .headline,
@@ -122,7 +187,8 @@ body[data-edit="1"] .frame { overflow: visible; }
 
 /* --- export mode: nothing but the slides, at full size --- */
 body.export { padding: 0; background: #000; }
-body.export #hud, body.export #side, body.export #toast { display: none; }
+body.export #hud, body.export #side, body.export #toast,
+body.export .group-head, body.export .review { display: none; }
 body.export #deck { display: block; }
 body.export .layer-safe, body.export .layer-chrome { display: none !important; }
 body.export .overflow-flag { outline: none !important; }
@@ -137,7 +203,10 @@ body.export .overflow-flag { outline: none !important; }
   <button data-k="chrome" onclick="CAROUSEL.toggle('chrome')">TikTok UI<kbd>C</kbd></button>
   <button data-k="edit"   onclick="CAROUSEL.toggle('edit')">Edit text<kbd>E</kbd></button>
   <button onclick="CAROUSEL.toggle('verify')">Check<kbd>V</kbd></button>
-  <button class="primary" onclick="CAROUSEL.toggle('save')">Export edits<kbd>Ctrl+S</kbd></button>
+  <button onclick="CAROUSEL.toggle('play')">Play<kbd>P</kbd></button>
+  <span id="tally"></span>
+  <button onclick="CAROUSEL.toggle('save')">Save edits<kbd>Ctrl+S</kbd></button>
+  <button class="primary" onclick="CAROUSEL.toggle('approve')">Approve deck</button>
 </div>
 
 <div id="deck"></div>

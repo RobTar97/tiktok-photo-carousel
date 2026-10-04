@@ -1,0 +1,25 @@
+{
+  "name": "atlas",
+  "label": "Atlas",
+  "for": "premium travel, hotels, food, architecture, slow content",
+  "signature": "A rotating text badge on the cover, the highlighted word set in italic brass, a condensed high-contrast serif on the photographs' own dark.",
+  "palette": { "brass": "#C9A86A", "note": "ground and blocks are taken from the photographs" },
+  "theme": {
+    "googleFonts": ["Instrument Serif:ital@0;1", "Instrument Sans:wght@400;500;600", "Martian Mono:wght@400;700"],
+    "display": "Instrument Serif",
+    "text": "Instrument Sans",
+    "mono": "Martian Mono",
+    "hand": "Instrument Serif",
+    "displayWeight": 400,
+    "accent": "#C9A86A",
+    "onAccent": "#14130F",
+    "highlight": "plain",
+    "grain": 0.05,
+    "vignette": 0.36
+  },
+  "art": {
+    "cover": [{ "type": "badge", "on": "slide", "at": [0.79, 0.17], "r": 112, "text": "@badge|SAVE FOR LATER", "size": 24 }]
+  },
+  "templates": ["cover", "editorial-split", "index-card", "arch-window", "quote-pull", "end-card"],
+  "css": ".slide[data-preset='atlas'] .headline{--tracking:-0.018em;--leading:1.0}.slide[data-preset='atlas'] .headline mark{font-style:italic;color:var(--accent)}.slide[data-preset='atlas'] .kicker{letter-spacing:.32em}"
+}

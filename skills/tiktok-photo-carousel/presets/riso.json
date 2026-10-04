@@ -1,0 +1,69 @@
+{
+  "name": "riso",
+  "label": "Riso",
+  "for": "zines, events, gigs, markets, retro - anything that should feel printed",
+  "signature": "Every photo re-printed as two-ink halftone on newsprint, the pink screen slightly out of register.",
+  "palette": {
+    "riso-blue": "#2B4C9B",
+    "riso-pink": "#FF48B0",
+    "newsprint": "#EFEBE1",
+    "navy": "#1B2650"
+  },
+  "theme": {
+    "googleFonts": [
+      "League Gothic",
+      "Courier Prime:wght@400;700"
+    ],
+    "display": "League Gothic",
+    "text": "Courier Prime",
+    "mono": "Courier Prime",
+    "hand": "Courier Prime",
+    "displayWeight": 400,
+    "ink": "#2B4C9B",
+    "inkDark": "#2B4C9B",
+    "muted": "#2B4C9B",
+    "accent": "#FF48B0",
+    "onAccent": "#1B2650",
+    "bg": "#EFEBE1",
+    "block": "#EFEBE1",
+    "paper": "#EFEBE1",
+    "highlight": "box",
+    "grain": 0.13,
+    "vignette": 0
+  },
+  "art": {
+    "*": [
+      {
+        "type": "halftone",
+        "replace": true,
+        "ground": "paper",
+        "color": "#2B4C9B",
+        "cell": 12,
+        "angle": 15,
+        "gamma": 1.05
+      },
+      {
+        "type": "halftone",
+        "color": "#FF48B0",
+        "cell": 12,
+        "angle": 75,
+        "size": 0.36,
+        "offset": [
+          7,
+          5
+        ],
+        "blend": "multiply",
+        "opacity": 0.9
+      }
+    ]
+  },
+  "templates": [
+    "cover",
+    "full-bleed-hook",
+    "editorial-split",
+    "caption-bar",
+    "diagonal-split",
+    "end-card"
+  ],
+  "css": ".slide[data-preset='riso'] .layer-scrim{display:none}.slide[data-preset='riso'] .layer-texture::after{opacity:0}.slide[data-preset='riso'] .headline{text-transform:uppercase;--leading:.92;--tracking:.012em;text-shadow:none}.slide[data-preset='riso'] .kicker{color:var(--on-accent)}.slide[data-preset='riso'] .sub{color:var(--ink);text-shadow:none;font-weight:700}.slide[data-preset='riso'][data-template='cover'] .type-box,.slide[data-preset='riso'][data-template='full-bleed-hook'] .type-box{background:var(--paper);padding:calc(var(--fs)*.3) calc(var(--fs)*.36);box-shadow:14px 14px 0 var(--accent)}.slide[data-preset='riso'][data-template='full-bleed-hook'] .type-box{width:auto;align-self:flex-start;max-width:calc(100% - var(--W)*.13)}.slide[data-preset='riso'][data-template='editorial-split'] .layer-type,.slide[data-preset='riso'][data-template='caption-bar'] .layer-type{border-top-color:var(--ink)}.slide[data-preset='riso'] .cta{color:var(--on-accent)}"
+}

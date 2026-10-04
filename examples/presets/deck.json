@@ -1,0 +1,104 @@
+{
+  "title": "Presets",
+  "board": true,
+  "seed": "presets-demo",
+  "photos": "../photos",
+  "theme": {
+    "seal": "廊下",
+    "badge": "SAVE FOR LATER"
+  },
+  "slides": [
+    {
+      "group": "contour",
+      "preset": "contour",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
+    },
+    {
+      "group": "riso",
+      "preset": "riso",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "terminal",
+      "preset": "terminal",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "fieldnotes",
+      "preset": "fieldnotes",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "blueprint",
+      "preset": "blueprint",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "atlas",
+      "preset": "atlas",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
+    },
+    {
+      "group": "liminal",
+      "preset": "liminal",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "washi",
+      "preset": "washi",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "photodump",
+      "preset": "photodump",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    },
+    {
+      "group": "kinetic",
+      "preset": "kinetic",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way"
+    }
+  ]
+}

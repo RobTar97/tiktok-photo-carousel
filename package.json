@@ -1,6 +1,6 @@
 {
   "name": "tiktok-photo-carousel",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Build and export TikTok photo-mode carousels from HTML templates.",
   "license": "MIT",

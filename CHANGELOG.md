@@ -1,5 +1,86 @@
 # Changelog
 
+## 3.0.0
+
+Ready-made styles, imagery drawn in code from your own photos, video as a
+source, a hook method, and an approval loop you can actually run. Still no AI
+image generation - every image is something the user shot, or a drawing made
+from it.
+
+### Added
+- **Ten presets** (`presets/*.json`): `liminal`, `contour`, `riso`,
+  `fieldnotes`, `blueprint`, `washi`, `terminal`, `photodump`, `kinetic`,
+  `atlas`. Fonts with exact axes, palette, texture, per-template art and
+  scoped CSS, each built around one signature element. `theme.preset` picks
+  one for a deck; `slide.preset` puts one on a single slide, which is how the
+  concept board shows three looks side by side. Layering: preset < brand kit
+  < theme < slide.
+- **`html/art.js` - code-drawn imagery**, 21 seeded generators. Photo-derived:
+  `contour` (the photo's own light as a topographic map), `halftone`,
+  `ascii`, `dither`, `mosaic` - computed from grids `analyze.py` now exports,
+  aligned to the photo's crop with the browser's own object-fit maths, and
+  never reading pixels (which `file://` forbids). Procedural: `flowfield`,
+  `rings`, `rays`, `grid`, `dimension`, `rough`, `route`, `badge`, `hanko`,
+  `tape`, `sparkles`, `lightleak`, `blobs`, `fibres`.
+- **Art that aims at the copy.** Art is drawn after the type is fitted, so
+  `target: "mark"` circles the highlighted word wherever it landed, and
+  `fromTarget` starts an arrow at a line of copy. Sparkles, light leaks,
+  badges, seals and tape keep off the copy on their own.
+- **`scripts/frames.py`** - the best stills from video: sharpness and exposure
+  scoring, perceptual-hash dedupe, spread across the clip, HDR (HLG/PQ)
+  tone-mapped to SDR so phone clips do not come out grey.
+- **`bento` template** - a 3-5 photo dump. Nineteen templates.
+- **Studio review**: Keep / Change and a note on every slide, a review tally,
+  **Approve deck**, group headings for concept boards, and **Play** - the deck
+  in a phone frame with TikTok's interface, auto-advancing like photo mode.
+- **`scripts/apply-edits.js`** - merges the studio's `edits.json` into the
+  deck (keeping a `.bak`) and lists every change request for the agent.
+- **Copy linting in `build.js`**: TikTok's 35-slide limit, hook length, words
+  per slide against the 3-5 second auto-advance, highlights, CTAs, repeated
+  templates, filler, brand-forbidden words, unverifiable claims.
+  `--strict` fails on errors; `"board": true` skips deck-shape rules.
+- **`audit.py --fix`** raises the scrim on slides whose copy over a photo
+  falls short, and remembers rounds in `_fix.json` - when a raise did not
+  help, it says the scrim is not the problem instead of darkening again.
+- **`upload/`** in the export - numbered JPEGs in posting order.
+- **`references/hooks.md`** (eight mechanisms, a scoring rubric, rewrites,
+  Japanese patterns), `presets.md`, `art.md`, `video.md`.
+- **Self-test covers everything**: every template, preset and generator
+  rendered and audited, the studio driven like a reviewer, edits merged,
+  frames pulled from a generated clip.
+
+### Changed
+- **Torn edges, sparkles and sticker-chaos marks are generated per slide**
+  from the seed. `sticker-chaos` used to circle a fixed pixel whatever the
+  photo showed; it now circles the photo's focus point.
+- **Kickers over photos are solid labels.** Accent text set straight onto a
+  photograph measured 1.0:1 on red steel.
+- **Kickers on a block use a colour checked against that block.**
+- **`index-card` edge labels are solid tabs.**
+- **Highlight bands are exactly one line tall.** Inline backgrounds paint the
+  font's whole content area, which for a tall display face covered the line
+  above.
+- **Palette-derived grounds are deepened** until text holds on them.
+- **The SKILL.md workflow** is rebuilt around brief, source, hook, concept
+  board, studio approval, export and audit.
+
+### Fixed
+- **Photos with EXIF rotation were analysed on the wrong axis and resized
+  sideways.** Phones store a portrait shot as landscape pixels plus a rotate
+  tag; Pillow ignores the tag. `analyze.py` now applies it before measuring
+  and before writing copies.
+- **Black-or-white text on a colour was chosen by a luminance threshold**,
+  which put white on orange at 3.0:1. It now compares real WCAG contrast.
+- **`index-card` and `film-strip` put their scrim on the wrong side** - their
+  copy sits at the foot of the frame.
+- **Vertical Japanese type overrode the template's padding**, so in
+  `arch-window` the column ran over the photo in dark ink.
+- **The audit measured highlight bands as background**, and the plates kept
+  `bento` label glyphs; both reported failures that were not there.
+- Docs: several v2 documentation edits had silently not applied (the old
+  patches matched on hyphens where the files had em dashes). The review-loop
+  audit section and deck-format fields are now actually present.
+
 ## 2.1.0
 
 Six more templates, safe zones rebased on TikTok's published specs, a

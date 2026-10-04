@@ -12,3 +12,8 @@ package-lock.json
 skills/tiktok-photo-carousel/.selftest/
 examples/gallery*/carousel.html
 examples/output-templates*/_bg/
+examples/**/upload/
+examples/**/_fix.json
+examples/**/carousel.html
+examples/**/_bg/
+*.bak
