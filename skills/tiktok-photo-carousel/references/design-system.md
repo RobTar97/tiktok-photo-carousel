@@ -107,6 +107,10 @@ failure:
 - **A highlight band is exactly the word.** Inline backgrounds paint the
   font's whole content area, which for a tall display face reaches into the
   line above. `box` and `marker` marks are inline-blocks one line tall.
+- **Coloured-text highlights are checked against what they sit on.** Over a
+  photo a plain highlight takes a lifted tint of the accent (brass on a bright
+  window measured 1.8:1 at any scrim); on paper it takes the accent only where
+  the accent holds 4.5:1, ink otherwise.
 - **Grounds taken from a photo are deepened.** A palette swatch can land
   mid-grey, where nothing reads well; derived `bg` and `block` are pulled
   down until text holds.

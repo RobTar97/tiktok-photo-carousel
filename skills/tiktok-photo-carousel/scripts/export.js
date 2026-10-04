@@ -83,7 +83,7 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
   const boxes = await page.evaluate(() => window.CAROUSEL.measure());
   const isCover = await page.evaluate(() =>
     window.CAROUSEL.slides.map(
-      (s) => s.dataset.template === "cover" || s.dataset.role === "cover"
+      (s) => /^cover/.test(s.dataset.template) || s.dataset.role === "cover"
     )
   );
   const slides = await page.$$(".slide");

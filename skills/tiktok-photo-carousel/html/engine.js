@@ -151,6 +151,8 @@
     slide.querySelector(".layer-art").appendChild(sw);
   };
 
+  ART["cover-word"] = ART["cover-split"] = ART["cover-frame"] = ART["cover"];
+
   ART["index-card"] = function (slide, s) {
     var art = slide.querySelector(".layer-art");
     art.appendChild(el("div", "edge-rule"));
@@ -213,6 +215,20 @@
     return onLight >= onDark ? "#0e0e10" : "#ffffff";
   }
 
+  /* Lift a colour toward white until it holds against a dark, scrimmed
+     photo (relative luminance >= 0.5 clears 4.5:1 on anything below 0.06).
+     The hue survives: brass becomes champagne brass, not white. */
+  function lift(hex) {
+    var L = relLum(hex);
+    if (L < 0 || L >= 0.5) return hex;
+    var n = parseInt(hex.replace("#", ""), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    for (var k = 0.06; k <= 1; k += 0.06) {
+      var h = "#" + c.map(function (v) { return ("0" + Math.round(v + (255 - v) * k).toString(16)).slice(-2); }).join("");
+      if (relLum(h) >= 0.5) return h;
+    }
+    return "#ffffff";
+  }
+
   /* Pull a colour down until white text holds ~11:1 and a mid-tone accent
      on it still clears 4.5:1. Grounds and
      blocks taken from a photo's palette can land mid-grey, which no text
@@ -254,6 +270,15 @@
     if (la >= 0 && lb >= 0) {
       var ratio = (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
       slide.style.setProperty("--accent-on-block", ratio >= 4.5 ? acc : (lb < 0.3 ? "#ffffff" : "#0e0e10"));
+    }
+    // Coloured-text highlights over a photo: the same gamble as a kicker.
+    if (la >= 0) slide.style.setProperty("--accent-on-photo", lift(acc));
+    // Same check against the paper, for templates that set copy on it:
+    // atlas's brass highlight on cream measured 1.8:1.
+    var pap = s.paper || t.paper || "#efe9dd", lp = relLum(pap);
+    if (la >= 0 && lp >= 0) {
+      var r2 = (Math.max(la, lp) + 0.05) / (Math.min(la, lp) + 0.05);
+      slide.style.setProperty("--accent-on-paper", r2 >= 4.5 ? acc : (t.inkDark || "#16181d"));
     }
     slide.dataset.template = s.template || "full-bleed-hook";
     slide.dataset.role = s.role || "build";
@@ -319,7 +344,8 @@
     // The ramp has to start on the side the copy is on: index-card and
     // film-strip set their copy at the foot of the frame whatever pos says.
     var footCopy = { "index-card": 1, "film-strip": 1 };
-    scrim.dataset.dir = s.scrimDir || (s.pos === "lower" || footCopy[s.template] ? "bottom" : "top");
+    scrim.dataset.dir = s.scrimDir || (s.template === "cover-word" ? "full" :
+      (s.pos === "lower" || footCopy[s.template] ? "bottom" : "top"));
     slide.appendChild(scrim);
     if (s.scrim != null) slide.style.setProperty("--scrim", s.scrim);
 
@@ -342,7 +368,13 @@
       inner.appendChild(el("div", "note-bar", esc(s.noteLabel || "notes")));
     }
     if (s.kicker) inner.appendChild(el("div", "kicker", esc(s.kicker)));
-    if (s.text) inner.appendChild(el("h2", "headline", markup(s.text)));
+    if (s.text && slide.dataset.template === "cover-word") {
+      inner.appendChild(el("h2", "headline", posterLines(s.text).map(function (l) {
+        return '<span class="ln">' + markup(l) + "</span>";
+      }).join("")));
+    } else if (s.text) {
+      inner.appendChild(el("h2", "headline", markup(s.text)));
+    }
     if (s.sub) inner.appendChild(el("p", "sub", markup(s.sub)));
     if (s.cta) inner.appendChild(el("div", "cta", esc(s.cta)));
     if (inner !== box) box.appendChild(inner);
@@ -377,7 +409,74 @@
      Binary search the display size until the copy fits the padding box of
      .layer-type. Measuring the real rendered box beats estimating, which
      is why the HTML engine can run type far larger than the Pillow one.   */
+  /* Lines for cover-word: the author's own " // " breaks, otherwise one or
+     two words a line - the poster stack only works with short lines. */
+  function posterLines(text) {
+    if (text.indexOf(" // ") >= 0) return text.split(" // ");
+    var w = text.split(/\s+/).filter(Boolean), out = [];
+    if (w.length <= 3) return w;
+    for (var i = 0; i < w.length; i += 2) out.push(w.slice(i, i + 2).join(" "));
+    return out;
+  }
+
+  /* cover-word: every line set to the full width of the copy area, then the
+     stack scaled down together if it is taller than the 1:1 band allows. */
+  function fitPoster(slide) {
+    var type = slide.querySelector(".layer-type"), box = slide.querySelector(".type-box");
+    var lines = slide.querySelectorAll(".headline .ln");
+    if (!lines.length) return;
+    var cs = getComputedStyle(type), bs = getComputedStyle(box);
+    // Width of the box's content, so the icon-rail clearance on the box is
+    // respected - the giant words must not run under the like button.
+    var availW = box.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
+    var availH = type.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    var sizes = [];
+    lines.forEach(function (ln) {
+      ln.style.fontSize = "100px";
+      sizes.push(Math.min(440, Math.floor(100 * availW / Math.max(1, ln.scrollWidth))));
+    });
+    lines.forEach(function (ln, i) { ln.style.fontSize = sizes[i] + "px"; });
+    slide.style.setProperty("--fs", Math.min.apply(null, sizes) + "px");
+    var over = box.scrollHeight / availH;
+    if (over > 1) {
+      lines.forEach(function (ln, i) { ln.style.fontSize = Math.floor(sizes[i] / over / 1.02) + "px"; });
+      slide.style.setProperty("--fs", Math.floor(Math.min.apply(null, sizes) / over / 1.02) + "px");
+    }
+  }
+
+  /* How many lines a headline should take: a short hook on three lines reads
+     as "This / isn't a / render". Prefer a slightly smaller size that keeps
+     the words together. */
+  function targetLines(text) {
+    var n = plain(text).split(/\s+/).filter(Boolean).length;
+    return n <= 2 ? 1 : n <= 6 ? 2 : n <= 10 ? 3 : 4;
+  }
+  function lineCount(slide) {
+    var h = slide.querySelector(".headline");
+    if (!h) return 0;
+    var lh = parseFloat(getComputedStyle(h).lineHeight) || 1;
+    return Math.round(h.offsetHeight / lh);
+  }
+
   function autofit(slide, s, deck) {
+    if (s.template === "cover-word") return fitPoster(slide);
+    fitBox(slide, s, deck);
+    // Fewer, fuller lines: only for Latin copy the author did not break by
+    // hand, and never below 72% of the fitted size or the floor.
+    if (slide.dataset.vertical === "1" || !s.text || /\/\//.test(s.text) ||
+        /[\u3000-\u9fff]/.test(s.text)) return;
+    var want = targetLines(s.text);
+    if (lineCount(slide) <= want) return;
+    var fs = parseFloat(slide.style.getPropertyValue("--fs")) || 0;
+    var floor = Math.max(s.sizeMin || (deck.theme || {}).sizeMin || 48, fs * 0.72);
+    for (var px = fs * 0.96; px >= floor; px *= 0.96) {
+      slide.style.setProperty("--fs", Math.floor(px) + "px");
+      if (lineCount(slide) <= want) return;
+    }
+    slide.style.setProperty("--fs", Math.floor(fs) + "px");    // no gain: keep the big size
+  }
+
+  function fitBox(slide, s, deck) {
     var t = deck.theme || {};
     var type = slide.querySelector(".layer-type");
     var box = slide.querySelector(".type-box");
@@ -507,6 +606,14 @@
      where each piece of copy is, what colour it was asked to be, and how
      big it actually rendered. The audit then samples the exported pixels
      underneath and computes real contrast.                                */
+  function scrimOf(slide) {
+    var sc = slide.querySelector(".layer-scrim");
+    if (!sc) return null;
+    var cs = getComputedStyle(sc);
+    if (cs.display === "none" || sc.dataset.dir === "none") return null;
+    return Math.round(parseFloat(cs.opacity) * 100) / 100;
+  }
+
   function measure() {
     var out = [];
     window.CAROUSEL.slides.forEach(function (slide, i) {
@@ -554,7 +661,10 @@
             ownBgImage: cs.backgroundImage && cs.backgroundImage !== "none",
             fontSize: Math.round(parseFloat(cs.fontSize) / scale),
             // What audit.py --fix raises when a line over a photo is too faint.
-            scrim: parseFloat(getComputedStyle(slide).getPropertyValue("--scrim")) || null,
+            // The opacity actually rendered, not the deck value: a template
+            // floor (max(scrim, 0.52) on covers) can make the two differ, and
+            // raising a value that sits under the floor changes nothing.
+            scrim: scrimOf(slide),
             hasPhoto: !!slide.querySelector(".layer-photo .photo"),
             weight: cs.fontWeight,
             text: plain(node.textContent).slice(0, 60)
@@ -981,6 +1091,46 @@
     };
     window.CAROUSEL.collectEdits = collectEdits;
     window.CAROUSEL.play = play;
+    /* --- live reload (build.js --watch) ---------------------------------
+       Served over http by --watch, the page reloads itself on every rebuild
+       and keeps where you were: scroll position, verdicts and notes. */
+    var memKey = "carousel-review:" + (deck.title || "deck");
+    try {
+      var mem = JSON.parse(sessionStorage.getItem(memKey) || "null");
+      if (mem) {
+        Object.keys(mem.verdicts || {}).forEach(function (i) {
+          verdicts[i] = mem.verdicts[i];
+          var r = document.querySelector('.review[data-index="' + i + '"]');
+          if (r) r.dataset.v = verdicts[i];
+        });
+        Object.keys(mem.notes || {}).forEach(function (i) {
+          var t = document.querySelector('.review[data-index="' + i + '"] textarea');
+          if (t) t.value = mem.notes[i];
+        });
+        var g = document.getElementById("notes");
+        if (g && mem.deckNotes) g.value = mem.deckNotes;
+        if (mem.scroll) window.scrollTo(0, mem.scroll);
+        sessionStorage.removeItem(memKey);
+      }
+    } catch (err) { /* storage blocked: start clean */ }
+    if (/^https?:/.test(location.protocol) && window.EventSource) {
+      new EventSource("/__live").onmessage = function () {
+        try {
+          var notes = {};
+          document.querySelectorAll(".review").forEach(function (r) {
+            var v = r.querySelector("textarea").value;
+            if (v) notes[r.dataset.index] = v;
+          });
+          var g2 = document.getElementById("notes");
+          sessionStorage.setItem(memKey, JSON.stringify({
+            verdicts: verdicts, notes: notes, scroll: window.scrollY,
+            deckNotes: g2 ? g2.value : ""
+          }));
+        } catch (err) { /* reload anyway */ }
+        location.reload();
+      };
+    }
+
 
     function showReport(rows) {
       var box = document.getElementById("report");

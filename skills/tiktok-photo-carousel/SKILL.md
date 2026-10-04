@@ -1,10 +1,10 @@
 ---
 name: tiktok-photo-carousel
-description: Designs and renders TikTok photo-mode carousels from the user's own photos and video clips - never AI-generated images. Pulls the sharpest frames out of video (HDR tone-mapped), redraws photos in code (topographic contours of their own light, halftone, ASCII, dither, mosaic) and adds code-drawn art (pen marks aimed at the words, seals, badges, grids, light leaks). Ten ready-made style presets and nineteen layout templates, scored hooks, a browser studio with per-slide approval and a phone-frame play mode, then pixel-exact 1080x1920 export with an upload-ready folder, a safe-zone check against TikTok's interface, and a contrast audit of the shipped pixels that fixes its own scrims. Use when the user asks for a TikTok carousel, photo-mode post, slideshow, photo dump, text over photos, slide captions, a travel or tips carousel, or turning photos or clips into slides.
+description: Designs and renders TikTok photo-mode carousels from the user's own photos and video clips - never AI-generated images. Pulls the sharpest frames out of video (HDR tone-mapped), redraws photos in code (topographic contours of their own light, halftone, ASCII, dither, mosaic) and adds code-drawn art (pen marks aimed at the words, seals, badges, grids, light leaks). Ten ready-made style presets and twenty-two layout templates, including four covers built for the profile grid's 1:1 crop, scored hooks, a browser studio with per-slide approval and a phone-frame play mode, then pixel-exact 1080x1920 export with an upload-ready folder, a safe-zone check against TikTok's interface, and a contrast audit of the shipped pixels that fixes its own scrims. Use when the user asks for a TikTok carousel, photo-mode post, slideshow, photo dump, text over photos, slide captions, a travel or tips carousel, or turning photos or clips into slides.
 license: MIT
 compatibility: Node 18+ and Playwright (npm install, then npx playwright install chromium). Python 3.9+ and Pillow. ffmpeg for video frames. Works on Windows, macOS and Linux.
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 # TikTok Photo Carousel
@@ -100,14 +100,19 @@ settle a design conversation twenty questions will not.
 
 Write `deck.json` with `"theme": { "preset": "<chosen>" }` and a template per
 slide chosen by its job ([references/templates.md](references/templates.md)).
-**Slide 1 is `cover`**: the first image is the cover, and the profile grid
-crops it to 1:1. Schema: [references/deck-format.md](references/deck-format.md).
+**Slide 1 is a cover** - `cover`, `cover-word`, `cover-split` or
+`cover-frame`: the first image is the cover, and the profile grid crops it to
+1:1. Vary the cover across a user's posts, or their grid becomes one layout.
+Schema: [references/deck-format.md](references/deck-format.md).
 
 ```bash
 node scripts/build.js --deck work/<name>/deck.json --out work/<name>/carousel.html
 ```
 
-The build lints the copy against TikTok's limits - fix every error it prints.
+The build lints the copy - and `caption.md`, once you have written it -
+against TikTok's limits. Fix every error it prints. While the user reviews,
+build with `--watch`: the studio reloads itself on every change and keeps
+their verdicts and notes.
 Then open `carousel.html` and tell the user:
 
 - **P** plays the deck as a viewer sees it - phone frame, TikTok interface,
@@ -160,7 +165,7 @@ Do not post anything for the user.
 |---|---|
 | `scripts/frames.py` | clips -> best still frames (ffmpeg, HDR tone-mapped) |
 | `scripts/analyze.py` | photos -> palette, focus, contrast bands, grids for art; upright resized copies |
-| `scripts/build.js` | deck.json -> one self-contained carousel.html; lints the copy |
+| `scripts/build.js` | deck.json -> one self-contained carousel.html; lints copy and caption; `--watch` serves it with live reload |
 | `scripts/apply-edits.js` | merges the studio's edits.json into deck.json |
 | `scripts/export.js` | slides, `upload/`, cover, contact sheet, safe-zone report |
 | `scripts/audit.py` | contrast and size audit of the shipped pixels; `--fix` |

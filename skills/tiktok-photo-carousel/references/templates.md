@@ -1,6 +1,6 @@
 # Templates
 
-Nineteen composition archetypes. A template decides the **layout** of a slide,
+Twenty-two composition archetypes. A template decides the **layout** of a slide,
 not its font. Fonts, colour and code-drawn art come from the preset and theme, so every template in a
 deck still looks like one deck.
 
@@ -12,7 +12,7 @@ people by slide 3.
 
 | Slide | Job | Reach for |
 |---|---|---|
-| 1 | Stop the thumb, and survive the grid crop | **`cover`**, `full-bleed-hook`, `duotone-poster`, `torn-reveal` |
+| 1 | Stop the thumb, and survive the grid crop | **`cover`**, **`cover-word`**, **`cover-split`**, **`cover-frame`** |
 | 2..n-1 | Carry one idea each | `editorial-split`, `index-card`, `caption-bar`, `arch-window`, `frosted-card`, `diagonal-split`, `notes-card`, `film-strip` |
 | any | A line worth hearing | `quote-pull` |
 | any | A real pairing | `compare` |
@@ -95,7 +95,8 @@ photo loses its sides — check `focus`.
 
 ## 6. `frosted-card`
 
-A dark glass card over the blurred photo. The list / tips slide: the photo
+A dark glass card over the blurred photo, the full width of the frame - only
+its copy keeps clear of the icon column. The list / tips slide: the photo
 becomes atmosphere rather than subject.
 
 Fields: `photo`, `kicker?`, `text`, `sub?`
@@ -116,9 +117,9 @@ Note: `photos`, not `photo`. Frames are evenly split.
 
 ## 8. `notes-card`
 
-Photo on top, an iOS-notes style card below holding the line. The most
-native-feeling format on the app — it reads as something someone typed, not
-something a brand designed.
+The photo full bleed, an iOS-notes style card over its lower half holding the
+line. The most native-feeling format on the app — it reads as something
+someone typed, not something a brand designed.
 
 Fields: `photo`, `noteLabel?` (small caps tag, e.g. `go at`), `text`, `sub?`
 Best for a single concrete fact: a time, a price, an address, a warning.
@@ -229,7 +230,8 @@ there is on swipe-through. Keep it unless you have a reason.
 
 ## 18. `compare`
 
-Two frames, hard split, one label each.
+Two frames, hard split, full height, one label each; the headline sits on a
+gradient over the tops of both.
 
 Fields: `photos` (2), `labels` (2), `text`, `sub?`
 Only reach for it when the pairing is real - a before and an after, two sides
@@ -246,6 +248,43 @@ Fields: `photos` (3-5, strongest first - it takes the big cell), `text`,
 `sub?`, `labels?` (one per frame)
 The grid changes shape with the count. Use it once per deck: it is a change
 of pace, and five small photos read slower than one big one.
+
+---
+
+## Covers
+
+Slide 1 is the cover, and the profile grid crops it to the centre 1080x1080.
+Every cover keeps its title inside that square. Ten presets on one cover
+layout made a grid of posts look like one design in ten fonts - so there are
+four, and a feed of posts should rotate between them.
+
+| Cover | Reach for it when | Watch for |
+|---|---|---|
+| `cover` | the photo is the subject and the hook is a sentence | - |
+| `cover-word` | the hook is 2-5 short words and you want a poster | long words share the width and come out smaller; busy photos need a dark scrim |
+| `cover-split` | the photo is busy, or you want the title to own half the frame | the subject has to be in the photo's top half |
+| `cover-frame` | quiet, premium, editorial - hotels, food, architecture | the photo is small; it needs one clear subject |
+
+All four take `photo`, `text`, `sub?`, `kicker?` and `swipe?`.
+
+## 20. `cover-word`
+
+The poster stack: each line set to the full width of the copy area on its own,
+so short words get enormous, then the stack scaled to fit the square.
+
+Break lines yourself with ` // ` - `This isn't // a *render*`. Without breaks,
+words are paired two to a line. Two to four lines is the range that works.
+
+## 21. `cover-split`
+
+Half photograph, half solid block, the title on the block under an accent
+rule. The grid's square keeps exactly both halves. Most robust of the four on
+busy photos, because the copy never sits on the photograph.
+
+## 22. `cover-frame`
+
+The photograph as a framed print on the paper, with the title set beneath it
+in ink. Reads as a magazine cover in the grid.
 
 ---
 

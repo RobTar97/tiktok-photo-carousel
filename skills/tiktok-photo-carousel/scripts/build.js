@@ -12,6 +12,9 @@
  *   --brand     brand kit to merge under the deck's own theme
  *   --photos    photo folder, if deck.photos is not set
  *   --strict    exit non-zero when the copy lint finds an error
+ *   --caption   caption.md to lint (default: caption.md beside the deck)
+ *   --watch     serve the studio on localhost and rebuild on every change
+ *   --port      port for --watch (default 4173)
  *
  * Theme layering, lowest first: preset < brand kit < deck.theme < slide.
  *
@@ -193,7 +196,7 @@ function lintCopy() {
   else if (!board && n > 12) lint.push(["warn", `${n} slides - swipe-through drops off past ~10; cut or split into a part 2`]);
 
   const first = deck.slides[0] || {};
-  if (!board && first.template !== "cover") {
+  if (!board && !/^cover/.test(first.template || "")) {
     lint.push(["warn", `slide 1 is "${first.template}" - the first image is the cover and the profile grid crops it to 1:1; use the cover template`]);
   }
   const hook = words(first.text);
@@ -283,3 +286,106 @@ show("errors", errors.map((e) => "X " + e));
 show("warnings", warnings.map((w) => "! " + w));
 show("notes", lint.filter((l) => l[0] === "info").map((l) => "- " + l[1]));
 if (strict && errors.length) process.exit(2);
+
+/* --- caption lint ---------------------------------------------------------
+   caption.md next to the deck (or --caption) gets the same scrutiny as the
+   slides. Only the caption itself is checked - the part above the first
+   "---" - not the pinned comment or notes beneath it.                     */
+function lintCaption() {
+  const capArg = argv("caption");
+  const capPath = capArg && capArg !== true ? path.resolve(capArg) : path.join(deckDir, "caption.md");
+  if (!fs.existsSync(capPath)) return [];
+  const raw = fs.readFileSync(capPath, "utf8").replace(/^﻿/, "");
+  const body = raw.split(/\n-{3,}\s*\n/)[0]
+    .split("\n").filter((l) => !/^\s*#{1,6}\s/.test(l)).join("\n").trim();
+  const out = [];
+  const lines = body.split("\n").map((l) => l.trim()).filter(Boolean);
+  const first = lines[0] || "";
+  const tags = body.match(/(^|\s)#[^\s#]+/g) || [];
+  if (body.length > 4000) out.push(["error", `caption is ${body.length} characters - TikTok's limit is 4,000`]);
+  if (first.length > 100) out.push(["warn", `caption's first line is ${first.length} characters - most people only see the first line before "more"`]);
+  if (/#/.test(first)) out.push(["warn", "caption opens with a hashtag - lead with the hook and its search keyword"]);
+  if (tags.length && (tags.length < 3 || tags.length > 5)) out.push(["warn", `${tags.length} hashtags - 3-5 that match the photos beat a wall of them`]);
+  if (!tags.length) out.push(["info", "caption has no hashtags - 3-5 specific ones help search"]);
+  const ctas = (body.toLowerCase().match(/\b(save (this|it)|send (this|it)|follow|comment|share this|link in bio)\b/g) || []);
+  if (ctas.length > 1) out.push(["warn", `caption asks for ${ctas.length} things (${ctas.join(", ")}) - one call to action, the same as the last slide`]);
+  const never = ((deck.brandRules && deck.brandRules.never) || []).map((w) => w.toLowerCase());
+  FILLER.concat(never).forEach((w) => {
+    if (w && body.toLowerCase().indexOf(w) >= 0) out.push(["warn", `caption: "${w}" - filler or a word the brand avoids`]);
+  });
+  return out;
+}
+lintCaption().forEach(([lvl, msg]) => {
+  if (lvl === "error") { errors.push(msg); console.log("  X " + msg); }
+  else if (lvl === "warn") { warnings.push(msg); console.log("  ! " + msg); }
+  else console.log("  - " + msg);
+});
+if (strict && errors.length) process.exit(2);
+
+/* --- live reload -----------------------------------------------------------
+   --watch serves the studio on localhost and rebuilds whenever the deck, a
+   preset or the engine changes; the open page reloads itself and keeps its
+   scroll position, verdicts and notes. Bound to 127.0.0.1, read-only, and
+   only the folder holding both the page and the photos is served.          */
+if (argv("watch", false) !== false) {
+  const http = require("http");
+  const { spawn } = require("child_process");
+  const portArg = argv("port");
+  const port = portArg && portArg !== true ? parseInt(portArg, 10) : 4173;
+
+  const a = path.dirname(outPath).split(path.sep), b = photosDir.split(path.sep);
+  let i = 0;
+  while (i < a.length && i < b.length && a[i].toLowerCase() === b[i].toLowerCase()) i++;
+  const root = a.slice(0, i).join(path.sep) + path.sep;
+  const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css",
+    ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+    ".webp": "image/webp", ".svg": "image/svg+xml", ".gif": "image/gif" };
+  const clients = new Set();
+
+  http.createServer((req, res) => {
+    const url = decodeURIComponent((req.url || "/").split("?")[0]);
+    if (url === "/__live") {
+      res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
+      res.write("retry: 1000" + String.fromCharCode(10, 10));
+      clients.add(res);
+      req.on("close", () => clients.delete(res));
+      return;
+    }
+    const file = path.normalize(path.join(root, url));
+    if (!file.toLowerCase().startsWith(root.toLowerCase()) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+      res.writeHead(404); res.end("not found"); return;
+    }
+    res.writeHead(200, { "Content-Type": TYPES[path.extname(file).toLowerCase()] || "application/octet-stream", "Cache-Control": "no-store" });
+    fs.createReadStream(file).pipe(res);
+  }).listen(port, "127.0.0.1", () => {
+    const rel = path.relative(root, outPath).split(path.sep).map(encodeURIComponent).join("/");
+    console.log("\nlive  http://localhost:" + port + "/" + rel);
+    console.log("      rebuilding on changes to the deck, presets and engine - Ctrl+C to stop");
+  });
+
+  const rebuildArgs = process.argv.slice(2).filter((x, k, all) =>
+    x !== "--watch" && x !== "--port" && all[k - 1] !== "--port");
+  let timer = null, busy = false;
+  const rebuild = (why) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (busy) return rebuild(why);
+      busy = true;
+      const p = spawn(process.execPath, [__filename].concat(rebuildArgs), { stdio: ["ignore", "pipe", "pipe"] });
+      let log = "";
+      p.stdout.on("data", (d) => (log += d)); p.stderr.on("data", (d) => (log += d));
+      p.on("close", (code) => {
+        busy = false;
+        const issues = log.split(String.fromCharCode(10)).filter((l) => /^\s+[X!]/.test(l));
+        console.log("rebuilt (" + why + ")" + (code ? "  - FAILED" : "") + (issues.length ? "  " + issues.length + " lint issue(s)" : ""));
+        issues.forEach((l) => console.log(l));
+        clients.forEach((c) => c.write("data: reload" + String.fromCharCode(10, 10)));
+      });
+    }, 150);
+  };
+  const watchList = [[deckPath, "deck"], [path.join(HERE, "presets"), "preset"], [path.join(HERE, "html"), "engine"]];
+  if (brandArg && brandArg !== true) watchList.push([path.resolve(brandArg), "brand kit"]);
+  watchList.forEach(([target, why]) => {
+    try { fs.watch(target, () => rebuild(why)); } catch (e) { /* missing folder: nothing to watch */ }
+  });
+}

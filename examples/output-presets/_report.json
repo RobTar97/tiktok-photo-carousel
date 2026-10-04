@@ -108,7 +108,7 @@
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
       "fontSize": 132,
-      "scrim": 0.74,
+      "scrim": null,
       "hasPhoto": true,
       "weight": "400",
       "text": "This hallway never ends"
@@ -129,7 +129,7 @@
       "ownBg": "rgb(255, 72, 176)",
       "ownBgImage": false,
       "fontSize": 132,
-      "scrim": 0.74,
+      "scrim": null,
       "hasPhoto": true,
       "weight": "400",
       "text": "never"
@@ -150,7 +150,7 @@
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
       "fontSize": 50,
-      "scrim": 0.74,
+      "scrim": null,
       "hasPhoto": true,
       "weight": "700",
       "text": "or it just feels that way"
@@ -265,7 +265,7 @@
         552,
         1025
       ],
-      "color": "rgb(255, 255, 255)",
+      "color": "rgb(241, 181, 189)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
       "fontSize": 132,
@@ -298,10 +298,10 @@
     {
       "holes": [
         [
-          215,
-          961,
-          581,
-          1114
+          230,
+          901,
+          579,
+          1047
         ]
       ],
       "slide": 5,
@@ -310,14 +310,14 @@
       "template": "cover",
       "box": [
         184,
-        710,
+        782,
         896,
-        1114
+        1047
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 126,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "800",
@@ -330,15 +330,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        215,
-        961,
-        581,
-        1114
+        230,
+        901,
+        579,
+        1047
       ],
       "color": "rgb(11, 37, 69)",
       "ownBg": "rgb(244, 197, 66)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 126,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "800",
@@ -351,15 +351,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        277,
-        1143,
-        803,
-        1210
+        289,
+        1075,
+        791,
+        1138
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 50,
+      "fontSize": 48,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "500",
@@ -405,7 +405,7 @@
         556,
         1064
       ],
-      "color": "rgb(201, 168, 106)",
+      "color": "rgb(214, 189, 142)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
       "fontSize": 132,
@@ -438,10 +438,10 @@
     {
       "holes": [
         [
-          351,
-          904,
-          729,
-          1051
+          223,
+          913,
+          544,
+          1038
         ]
       ],
       "slide": 7,
@@ -450,14 +450,14 @@
       "template": "cover",
       "box": [
         184,
-        648,
+        808,
         896,
-        1176
+        1032
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 112,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "700",
@@ -470,15 +470,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        351,
-        904,
-        729,
-        1051
+        223,
+        913,
+        544,
+        1038
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 112,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "700",
@@ -491,15 +491,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        282,
-        1205,
-        798,
-        1272
+        321,
+        1056,
+        759,
+        1112
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 50,
+      "fontSize": 43,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "500",
@@ -508,10 +508,10 @@
     {
       "holes": [
         [
-          348,
-          882,
-          732,
-          1073
+          251,
+          900,
+          550,
+          1049
         ]
       ],
       "slide": 8,
@@ -520,14 +520,14 @@
       "template": "cover",
       "box": [
         184,
-        648,
+        820,
         896,
-        1176
+        1026
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 103,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "800",
@@ -540,15 +540,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        348,
-        882,
-        732,
-        1073
+        251,
+        900,
+        550,
+        1049
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 103,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "800",
@@ -561,15 +561,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        282,
-        1205,
-        798,
-        1272
+        339,
+        1049,
+        741,
+        1100
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 50,
+      "fontSize": 39,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "500",
@@ -648,10 +648,10 @@
     {
       "holes": [
         [
-          306,
-          911,
-          774,
-          1064
+          218,
+          923,
+          569,
+          1038
         ]
       ],
       "slide": 10,
@@ -660,14 +660,14 @@
       "template": "cover",
       "box": [
         184,
-        610,
+        810,
         896,
-        1215
+        1038
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 99,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "400",
@@ -680,15 +680,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        306,
-        911,
-        774,
-        1064
+        218,
+        923,
+        569,
+        1038
       ],
       "color": "rgb(14, 14, 16)",
       "ownBg": "rgb(242, 92, 42)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 99,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "400",
@@ -701,15 +701,15 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        281,
-        1244,
-        800,
-        1310
+        345,
+        1060,
+        735,
+        1110
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 50,
+      "fontSize": 38,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "500",

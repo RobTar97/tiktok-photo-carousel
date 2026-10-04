@@ -59,6 +59,9 @@ const node = (script, args) => run(process.execPath, [path.join(HERE, "scripts",
 /* --- every template, with the fields it actually needs --------------- */
 const TEMPLATES = [
   { template: "cover", role: "cover", photo: "a.png", kicker: "osaka", text: "The *cover* slide", sub: "survives the grid crop" },
+  { template: "cover-word", role: "cover", photo: "b.png", kicker: "osaka", text: "This isn't a *render*", sub: "poster stack" },
+  { template: "cover-split", role: "cover", photo: "c.png", kicker: "osaka", text: "Half photo, *half* block", sub: "the square keeps both" },
+  { template: "cover-frame", role: "cover", photo: "a.png", kicker: "osaka", text: "A framed *print*", sub: "on the paper" },
   { template: "full-bleed-hook", photo: "b.png", kicker: "look up", text: "A hook that fits", sub: "and a second line" },
   { template: "duotone-poster", photo: "c.png", text: "Goes vertical", pos: "top" },
   { template: "torn-reveal", photo: "a.png", text: "Torn open", sub: "paper over photo" },

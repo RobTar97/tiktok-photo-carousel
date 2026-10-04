@@ -130,9 +130,21 @@
                    block: "--block", "on-accent": "--on-accent", muted: "--muted" };
     return tokens[c] ? "var(" + tokens[c] + ")" : c;
   }
-  /* Field sampled on a lattice: the photo's light, or seeded terrain. */
-  function field(ctx, opt) {
-    if (ctx.photo && opt.source !== "noise") return function (x, y) { return ctx.photo.lum(x, y); };
+  /* Field sampled on a lattice: the photo's light, or seeded terrain.
+     norm stretches the photo's own range to 0..1 first: a bright photo
+     otherwise screens to tiny dots and riso's halftone all but vanished. */
+  function field(ctx, opt, norm) {
+    if (ctx.photo && opt.source !== "noise") {
+      if (!norm || opt.normalize === false) return function (x, y) { return ctx.photo.lum(x, y); };
+      var vals = [];
+      for (var sy = 0; sy < 60; sy++) for (var sx = 0; sx < 34; sx++) {
+        vals.push(ctx.photo.lum((sx + 0.5) * ctx.w / 34, (sy + 0.5) * ctx.h / 60));
+      }
+      vals.sort(function (a, b) { return a - b; });
+      var lo = vals[Math.floor(vals.length * 0.04)], hi = vals[Math.floor(vals.length * 0.96)];
+      var span = Math.max(0.08, hi - lo);
+      return function (x, y) { return Math.max(0, Math.min(1, (ctx.photo.lum(x, y) - lo) / span)); };
+    }
     var sc = opt.scale || 0.0028;
     return function (x, y) { return fbm(ctx.noise, x * sc, y * sc, 4) * 0.5 + 0.5; };
   }
@@ -227,7 +239,7 @@
   /* halftone - the photo re-screened as dots, on a rotated screen the way
      print does it. Dark areas take big dots unless invert is set.         */
   GEN.halftone = function (ctx, o) {
-    var f = field(ctx, o), cell = o.cell || 15;
+    var f = field(ctx, o, true), cell = o.cell || 15;
     var ang = (o.angle != null ? o.angle : 15) * Math.PI / 180;
     var ca = Math.cos(ang), sa = Math.sin(ang), gamma = o.gamma || 1.15;
     var R = Math.hypot(ctx.w, ctx.h), cx = ctx.w / 2, cy = ctx.h / 2;
@@ -249,7 +261,7 @@
   /* ascii - the photo as characters. textLength pins every row to the
      exact width, so the grid holds whatever monospace face loads.         */
   GEN.ascii = function (ctx, o) {
-    var f = field(ctx, o), size = o.size || 22, cw = size * 0.6, lh = size * 1.02;
+    var f = field(ctx, o, true), size = o.size || 22, cw = size * 0.6, lh = size * 1.02;
     var ramp = o.ramp || " .`:-=+*cs#%@";
     if (o.invert) ramp = ramp.split("").reverse().join("");
     var cols = Math.floor(ctx.w / cw), rows = Math.floor(ctx.h / lh), out = "";
@@ -272,7 +284,7 @@
     60,28,52,20,62,30,54,22,3,35,11,43,1,33,9,41,51,19,59,27,49,17,57,25,15,47,7,
     39,13,45,5,37,63,31,55,23,61,29,53,21];
   GEN.dither = function (ctx, o) {
-    var f = field(ctx, o), px = o.px || 7, d = "";
+    var f = field(ctx, o, true), px = o.px || 7, d = "";
     var bias = o.bias || 0, cols = Math.ceil(ctx.w / px), rows = Math.ceil(ctx.h / px);
     for (var y = 0; y < rows; y++) {
       var run = -1;

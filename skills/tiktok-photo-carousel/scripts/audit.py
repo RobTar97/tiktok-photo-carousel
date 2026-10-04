@@ -184,7 +184,13 @@ def fix_deck(deck_path, weak, out_dir):
         if not has_photo:
             manual.append("slide %d (%.1f:1) has no photo behind the copy - change the colours" % (n, ratio))
             continue
-        cur = s.get("scrim", scrim if scrim is not None else 0.45)
+        if scrim is None:
+            manual.append("slide %d (%.1f:1) has no scrim behind its copy (the template sets the copy on a "
+                          "block or paper) - change the colours or the template" % (n, ratio))
+            continue
+        # Start from what was rendered: a template floor can sit above the
+        # deck's own value, and raising under the floor changes nothing.
+        cur = max(scrim, s.get("scrim", 0) or 0)
         prev = hist.get(str(n))
         if prev and prev["scrim"] < cur and ratio - prev["ratio"] < 0.4:
             manual.append("slide %d stayed at %.1f:1 after its scrim went %.2f -> %.2f - the scrim is not "

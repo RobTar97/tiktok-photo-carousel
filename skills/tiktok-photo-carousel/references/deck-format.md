@@ -127,6 +127,18 @@ Errors fail `--strict`; warnings should be fixed before export.
 
 A concept board (`"board": true`) skips the checks about the deck as a whole.
 
+`caption.md` beside the deck (or `--caption <file>`) is linted too - only the
+caption itself, above the first `---`:
+
+| Check | Level |
+|---|---|
+| over 4,000 characters (TikTok's limit) | error |
+| first line over 100 characters - most people only see the first line | warning |
+| opens with a hashtag instead of the hook | warning |
+| fewer than 3 or more than 5 hashtags | warning |
+| more than one call to action | warning |
+| filler, or a word the brand forbids | warning |
+
 ## edits.json
 
 What the studio's **Approve deck** (or **Save edits**, Ctrl+S) downloads:

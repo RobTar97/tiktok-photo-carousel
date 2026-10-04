@@ -22,7 +22,8 @@
       "kicker": "osaka",
       "text": "The harbour at 16:40",
       "sub": "nobody films it",
-      "swipe": "swipe"
+      "swipe": "swipe",
+      "scrim": 0.64
     },
     {
       "role": "build",
@@ -81,6 +82,31 @@
         "fri"
       ],
       "text": "One week, // four frames"
+    },
+    {
+      "role": "cover",
+      "template": "cover-word",
+      "photo": "hallway.jpg",
+      "kicker": "osaka",
+      "text": "This hallway // never *ends*",
+      "sub": "one of four covers",
+      "scrim": 0.86
+    },
+    {
+      "role": "cover",
+      "template": "cover-split",
+      "photo": "sunset.jpg",
+      "kicker": "osaka",
+      "text": "The harbour at *16:40*",
+      "sub": "one of four covers"
+    },
+    {
+      "role": "cover",
+      "template": "cover-frame",
+      "photo": "sea.jpg",
+      "kicker": "osaka",
+      "text": "A window on the *bay*",
+      "sub": "one of four covers"
     }
   ]
 }

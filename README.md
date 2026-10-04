@@ -46,7 +46,7 @@ The agent works in gates, so you steer before anything is final:
 2. **Source** - pulls the sharpest frames from your clips, analyses every photo, picks and orders them.
 3. **Hook** - writes 8-10 candidates across different mechanisms, scores them, and offers you the best three.
 4. **Concept board** - the same opening slides in three presets, side by side. You pick a look, or mix two.
-5. **Studio** - the full deck in your browser. Press **P** to watch it as a viewer would, mark each slide **Keep** or **Change** with a note, edit any text in place, then **Approve deck**.
+5. **Studio** - the full deck in your browser, reloading itself as the agent edits (`--watch`). Press **P** to watch it as a viewer would, mark each slide **Keep** or **Change** with a note, edit any text in place, then **Approve deck**.
 6. **Export and audit** - slides, an `upload/` folder, and a contrast audit that fixes its own scrims.
 
 ```text
@@ -95,20 +95,20 @@ python3 scripts/audit.py    --out ./out --fix work/deck.json             # repea
 
 **Ready styles**
 - **10 presets** - `liminal`, `contour`, `riso`, `fieldnotes`, `blueprint`, `washi`, `terminal`, `photodump`, `kinetic`, `atlas`. Fonts, palette, texture and art in one word, each with a single signature element. [Presets](skills/tiktok-photo-carousel/references/presets.md)
-- **19 templates** - cover, full-bleed hook, editorial split, index card, caption bar, quote pull, diagonal split, bento, compare, film strip, notes card, arch window, polaroid stack, frosted card, torn reveal, duotone poster, sticker chaos, dreamcore glow, end card. [Templates](skills/tiktok-photo-carousel/references/templates.md)
+- **22 templates, four of them covers** - `cover`, `cover-word` (a poster stack, each line set to full width), `cover-split` (half photo, half block), `cover-frame` (a framed print). All four keep the title inside the square the profile grid keeps; rotate them so a grid of posts is not one layout in ten fonts. The rest: full-bleed hook, editorial split, index card, caption bar, quote pull, diagonal split, bento, compare, film strip, notes card, arch window, polaroid stack, frosted card, torn reveal, duotone poster, sticker chaos, dreamcore glow, end card. [Templates](skills/tiktok-photo-carousel/references/templates.md)
 - **Brand kits** layer over a preset: your fonts and colours, the preset's art. [Brand kits](skills/tiktok-photo-carousel/references/brand-kit.md)
 
 **Built for TikTok**
 - **Safe zones from the published specs** - ~150px top, ~250-270px bottom, the icon column. One set of fractions drives both the layout and the check. [Safe zones](skills/tiktok-photo-carousel/references/safe-zones.md)
 - **A cover that survives the grid** - the first image is the cover, and the profile grid crops it to 1:1. The `cover` template keeps the title in the square that survives.
-- **Copy linting** - the build flags hooks over 9 words, slides over ~14 words (photo mode moves on after 3-5 seconds), more than one highlight or CTA, filler, and unverifiable claims.
+- **Copy linting** - the build flags hooks over 9 words, slides over ~14 words (photo mode moves on after 3-5 seconds), more than one highlight or CTA, filler, and unverifiable claims - and lints `caption.md` the same way: first-line length, 3-5 hashtags, one call to action.
 - **Hooks with a method** - eight mechanisms, a scoring rubric, bad-to-better rewrites, Japanese patterns. [Hooks](skills/tiktok-photo-carousel/references/hooks.md)
 
 **Checked, not eyeballed**
 - **A readability audit of the shipped pixels** - real WCAG contrast for every line against what is actually behind it, measured on background plates rendered with the glyphs made transparent. 48px / 32px size floors. `--fix` raises the scrim where needed and knows when the scrim is not the problem. [Review loop](skills/tiktok-photo-carousel/references/review-loop.md)
 - **A self-test of everything** - every template, preset and generator rendered and audited, the studio driven like a reviewer, edits merged, frames pulled from a clip.
 
-![Nineteen templates](examples/output-templates/_gallery.png)
+![Twenty-two templates](examples/output-templates/_gallery.png)
 
 ## Layout
 
@@ -116,7 +116,7 @@ python3 scripts/audit.py    --out ./out --fix work/deck.json             # repea
 skills/tiktok-photo-carousel/
   SKILL.md                 the workflow (the only file always loaded)
   html/
-    templates.css          19 templates, the layer system, legibility rules
+    templates.css          22 templates, the layer system, legibility rules
     engine.js              rendering, autofit, presets, verifier, studio, play mode
     art.js                 the code-drawn imagery
     shell.html             the studio page

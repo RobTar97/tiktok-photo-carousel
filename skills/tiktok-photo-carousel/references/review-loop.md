@@ -45,6 +45,18 @@ Change on its own. The tally in the toolbar says how much is reviewed.
 **Tell the user to press P first.** A slide they cannot read before it moves
 on is a slide with too many words - nothing else shows that as plainly.
 
+### Live reload
+
+```bash
+node scripts/build.js --deck work/deck.json --out work/carousel.html --watch
+```
+
+Serves the studio on `http://localhost:4173/...` and rebuilds whenever the
+deck, a preset or the engine changes. The open page reloads itself and keeps
+its scroll position, Keep/Change verdicts and notes - so you can edit
+`deck.json` while the user reviews, without asking them to refresh or losing
+what they marked. It serves read-only, on 127.0.0.1 only.
+
 ### Applying what comes back
 
 ```bash

@@ -6,7 +6,10 @@
     "04.jpg",
     "05.jpg",
     "06.jpg",
-    "07.jpg"
+    "07.jpg",
+    "08.jpg",
+    "09.jpg",
+    "10.jpg"
   ],
   "cover": "cover.jpg",
   "coverSlide": 1,
@@ -19,16 +22,16 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        433,
-        658,
-        647,
-        742
+        435,
+        742,
+        645,
+        822
       ],
-      "color": "rgb(242, 183, 5)",
-      "ownBg": "rgba(0, 0, 0, 0)",
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgb(242, 183, 5)",
       "ownBgImage": false,
       "fontSize": 32,
-      "scrim": 0.49,
+      "scrim": 0.64,
       "hasPhoto": true,
       "weight": "400",
       "text": "osaka"
@@ -41,15 +44,15 @@
       "template": "cover",
       "box": [
         184,
-        771,
+        849,
         896,
-        1167
+        1091
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
-      "scrim": 0.49,
+      "fontSize": 121,
+      "scrim": 0.64,
       "hasPhoto": true,
       "weight": "800",
       "text": "The harbour at 16:40"
@@ -61,16 +64,16 @@
       "role": "cover",
       "template": "cover",
       "box": [
-        366,
-        1196,
-        714,
-        1262
+        381,
+        1117,
+        699,
+        1178
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 50,
-      "scrim": 0.49,
+      "fontSize": 46,
+      "scrim": 0.64,
       "hasPhoto": true,
       "weight": "500",
       "text": "nobody films it"
@@ -104,14 +107,14 @@
       "template": "index-card",
       "box": [
         205,
-        993,
+        1217,
         864,
-        1413
+        1444
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 132,
+      "fontSize": 107,
       "scrim": 0.66,
       "hasPhoto": true,
       "weight": "800",
@@ -125,14 +128,14 @@
       "template": "index-card",
       "box": [
         205,
-        1442,
+        1467,
         772,
         1574
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 50,
+      "fontSize": 41,
       "scrim": 0.66,
       "hasPhoto": true,
       "weight": "500",
@@ -146,14 +149,14 @@
       "template": "quote-pull",
       "box": [
         76,
-        503,
+        702,
         864,
-        1441
+        1253
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 126,
+      "fontSize": 111,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "500",
@@ -167,14 +170,14 @@
       "template": "quote-pull",
       "box": [
         76,
-        1469,
+        1277,
         754,
-        1532
+        1333
       ],
       "color": "rgba(255, 255, 255, 0.93)",
       "ownBg": "rgba(0, 0, 0, 0)",
       "ownBgImage": false,
-      "fontSize": 48,
+      "fontSize": 42,
       "scrim": 0.74,
       "hasPhoto": true,
       "weight": "500",
@@ -241,7 +244,7 @@
       "scrim": 0.66,
       "hasPhoto": true,
       "weight": "400",
-      "text": "05 / 07"
+      "text": "05 / 10"
     },
     {
       "holes": [],
@@ -272,9 +275,9 @@
       "template": "compare",
       "box": [
         0,
-        1552,
+        1534,
         214,
-        1632
+        1614
       ],
       "color": "rgb(14, 14, 16)",
       "ownBg": "rgb(242, 183, 5)",
@@ -293,9 +296,9 @@
       "template": "compare",
       "box": [
         542,
-        1552,
+        1534,
         730,
-        1632
+        1614
       ],
       "color": "rgb(14, 14, 16)",
       "ownBg": "rgb(242, 183, 5)",
@@ -314,9 +317,9 @@
       "template": "compare",
       "box": [
         76,
-        239,
+        315,
         864,
-        518
+        595
       ],
       "color": "rgb(255, 255, 255)",
       "ownBg": "rgba(0, 0, 0, 0)",
@@ -389,6 +392,279 @@
       "hasPhoto": false,
       "weight": "800",
       "text": "One week,four frames"
+    },
+    {
+      "holes": [],
+      "slide": 8,
+      "el": "kicker",
+      "role": "cover",
+      "template": "cover-word",
+      "box": [
+        76,
+        760,
+        286,
+        840
+      ],
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgb(242, 183, 5)",
+      "ownBgImage": false,
+      "fontSize": 32,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "osaka"
+    },
+    {
+      "holes": [
+        [
+          507,
+          971,
+          868,
+          1099
+        ]
+      ],
+      "slide": 8,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover-word",
+      "box": [
+        76,
+        856,
+        864,
+        1099
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 115,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "This hallwaynever ends"
+    },
+    {
+      "holes": [],
+      "slide": 8,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover-word",
+      "box": [
+        507,
+        971,
+        868,
+        1099
+      ],
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": true,
+      "fontSize": 123,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "ends"
+    },
+    {
+      "holes": [],
+      "slide": 8,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover-word",
+      "box": [
+        76,
+        1115,
+        691,
+        1160
+      ],
+      "color": "rgba(255, 255, 255, 0.93)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 35,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "one of four covers"
+    },
+    {
+      "holes": [],
+      "slide": 9,
+      "el": "kicker",
+      "role": "cover",
+      "template": "cover-split",
+      "box": [
+        76,
+        1035,
+        864,
+        1083
+      ],
+      "color": "rgb(242, 183, 5)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 32,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "osaka"
+    },
+    {
+      "holes": [
+        [
+          225,
+          1244,
+          581,
+          1381
+        ]
+      ],
+      "slide": 9,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover-split",
+      "box": [
+        76,
+        1112,
+        864,
+        1381
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "The harbour at 16:40"
+    },
+    {
+      "holes": [],
+      "slide": 9,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover-split",
+      "box": [
+        225,
+        1244,
+        581,
+        1381
+      ],
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": true,
+      "fontSize": 132,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "16:40"
+    },
+    {
+      "holes": [],
+      "slide": 9,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover-split",
+      "box": [
+        76,
+        1411,
+        754,
+        1477
+      ],
+      "color": "rgba(255, 255, 255, 0.93)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 50,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "one of four covers"
+    },
+    {
+      "holes": [],
+      "slide": 10,
+      "el": "kicker",
+      "role": "cover",
+      "template": "cover-frame",
+      "box": [
+        464,
+        1123,
+        616,
+        1171
+      ],
+      "color": "rgb(22, 24, 29)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 32,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "osaka"
+    },
+    {
+      "holes": [
+        [
+          600,
+          1301,
+          812,
+          1411
+        ]
+      ],
+      "slide": 10,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover-frame",
+      "box": [
+        184,
+        1194,
+        896,
+        1411
+      ],
+      "color": "rgb(22, 24, 29)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 105,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "A window on the bay"
+    },
+    {
+      "holes": [],
+      "slide": 10,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover-frame",
+      "box": [
+        600,
+        1301,
+        812,
+        1411
+      ],
+      "color": "rgb(14, 14, 16)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": true,
+      "fontSize": 105,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "bay"
+    },
+    {
+      "holes": [],
+      "slide": 10,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover-frame",
+      "box": [
+        373,
+        1434,
+        707,
+        1486
+      ],
+      "color": "rgb(22, 24, 29)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": null,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "one of four covers"
     }
   ],
   "pageErrors": []

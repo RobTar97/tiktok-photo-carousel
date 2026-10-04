@@ -1,5 +1,46 @@
 # Changelog
 
+## 3.1.0
+
+Covers, brush-ups to the weakest templates, and two workflow additions.
+
+### Added
+- **Three more covers**: `cover-word` (a poster stack - every line set to the
+  full width on its own), `cover-split` (half photo, half block), and
+  `cover-frame` (the photo as a framed print, title in ink beneath). All keep
+  the title inside the 1080x1080 band the profile grid keeps. Ten presets on
+  one centred cover made a grid of posts read as one layout in ten fonts.
+- **Live reload**: `build.js --watch` serves the studio on localhost and
+  rebuilds on every change to the deck, a preset or the engine; the page
+  reloads itself and keeps its scroll, verdicts and notes. Read-only, bound
+  to 127.0.0.1, serving only the folder that holds the page and the photos.
+- **Caption lint**: `caption.md` is checked like the slides - TikTok's
+  4,000-character limit, a first line short enough to show before "more",
+  3-5 hashtags, one call to action, filler and brand-forbidden words.
+
+### Changed
+- **Line-aware fitting.** A short hook fitted to the largest size could wrap
+  to three lines - "This / isn't a / render". Autofit now prefers a slightly
+  smaller size (never under 72%) that keeps the words together.
+- **notes-card** runs its photo full bleed under the card; it used to end
+  above a dark band.
+- **compare** fills the frame, with the headline on a gradient over both
+  photos instead of above them on an empty band.
+- **frosted-card** spans the width; only its copy keeps clear of the icon
+  column. It sat small and to the left.
+- **halftone, dither and ascii stretch the photo's own tonal range first** -
+  riso's dots all but vanished on bright photos.
+- **Kickers on covers are filled labels** (an outlined pill measured 1.2:1),
+  and frosted-card kickers too.
+- **Coloured-text highlights are checked**: over a photo they take a lifted
+  tint of the accent; on paper, the accent only where it holds 4.5:1.
+
+### Fixed
+- `audit.py --fix` raised the deck's scrim value even when a template floor
+  sat above it, so nothing changed on screen. It now reads the opacity that
+  was actually rendered and starts from that, and reports slides with no
+  scrim at all as a colour decision.
+
 ## 3.0.0
 
 Ready-made styles, imagery drawn in code from your own photos, video as a

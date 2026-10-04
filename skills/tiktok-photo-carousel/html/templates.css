@@ -226,7 +226,8 @@
 .slide[data-template="dreamcore-glow"] .kicker,
 .slide[data-template="duotone-poster"] .kicker,
 .slide[data-template="sticker-chaos"] .kicker,
-.slide[data-template="quote-pull"] .kicker {
+.slide[data-template="quote-pull"] .kicker,
+.slide[data-template="frosted-card"] .kicker {
   align-self: flex-start;
   background: var(--accent); color: var(--on-accent);
   padding: 0.32em 0.6em 0.28em; border-radius: 6px;
@@ -551,11 +552,15 @@
 }
 .slide[data-template="cover"] .type-box { align-items: center; padding-right: 0; }
 .slide[data-template="cover"] .headline { --leading: 1.0; --tracking: -0.035em; }
-.slide[data-template="cover"] .kicker {
+.slide[data-template="cover"] .kicker,
+.slide[data-template="cover-word"] .kicker {
+  /* Filled, not outlined: an outlined pill over a photo measured 1.2:1. */
   align-self: center;
-  border: 2px solid currentColor; border-radius: 999px;
-  padding: 0.5em 1.1em; letter-spacing: 0.26em;
+  background: var(--accent); color: var(--on-accent);
+  border-radius: 999px; padding: 0.5em 1.1em; letter-spacing: 0.26em;
+  text-shadow: none;
 }
+.slide[data-template="cover-word"] .kicker { align-self: flex-start; }
 .slide[data-template="cover"] .swipe {
   position: absolute; left: 0; right: 0;
   bottom: calc(var(--safe-b) + var(--H) * 0.015);
@@ -763,6 +768,139 @@
   inset: 0 0 auto 0; height: calc(var(--H) * 0.30);
   justify-content: flex-end;
   padding: var(--safe-t) var(--safe-x) calc(var(--H) * 0.025);
+}
+
+
+/* ============================================================================
+   COVER VARIANTS
+   Ten presets on one centred cover made a profile grid look like one layout
+   in ten fonts. Three more covers, all keeping the title inside the
+   1080x1080 band the grid keeps (y 420-1500).
+   ========================================================================= */
+
+/* --- 20. cover-word -----------------------------------------------------
+   The poster stack: each line set to the full width on its own, so short
+   words get huge. Signature: lines of different sizes locked to one edge. */
+.slide[data-template="cover-word"] .layer-type {
+  justify-content: center;
+  padding: calc(var(--H) * 0.235) var(--safe-x) calc(var(--H) * 0.235);
+}
+.slide[data-template="cover-word"] .type-box { gap: calc(var(--fs) * 0.14); }
+.slide[data-template="cover-word"] .headline {
+  text-transform: uppercase; --tracking: -0.025em; text-wrap: nowrap;
+}
+.slide[data-template="cover-word"] .headline .ln {
+  /* 1.0, not tighter: tall display faces overflow a tighter line box and
+     collide with the kicker above. */
+  display: block; width: max-content; white-space: nowrap; line-height: 1.0;
+}
+.slide[data-template="cover-word"] .sub {
+  /* The lines are huge; the sub stays a caption, not a second headline. */
+  font-size: max(32px, min(46px, calc(var(--fs) * 0.3)));
+  max-width: 78%;
+}
+.slide[data-template="cover-word"] .layer-scrim { opacity: max(var(--scrim, 0.45), 0.62); }
+
+/* --- 21. cover-split ----------------------------------------------------
+   Half photograph, half solid block, the title on the block. The grid's
+   square keeps exactly both halves.                                        */
+.slide[data-template="cover-split"] { background: var(--block, #141414); }
+.slide[data-template="cover-split"] .layer-photo,
+.slide[data-template="cover-split"] .layer-texture { inset: 0 0 50% 0; }
+.slide[data-template="cover-split"] .layer-scrim { display: none; }
+.slide[data-template="cover-split"] .layer-type {
+  inset: 50% 0 0 0;
+  justify-content: flex-start;
+  padding: calc(var(--H) * 0.035) var(--safe-x) calc(var(--H) * 0.23);
+  border-top: 8px solid var(--accent, #f2b705);
+}
+.slide[data-template="cover-split"] .headline { --leading: 1.0; --tracking: -0.03em; }
+.slide[data-template="cover-split"] .kicker { color: var(--accent-on-block, var(--accent)); }
+
+/* --- 22. cover-frame ----------------------------------------------------
+   The photograph as a framed print on the paper, the title set beneath it
+   in ink. Quiet and premium; reads as a magazine cover in the grid.       */
+.slide[data-template="cover-frame"] { background: var(--paper, #efe9dd); color: var(--ink-dark, #16181d); }
+.slide[data-template="cover-frame"] .layer-photo {
+  inset: calc(var(--H) * 0.225) calc(var(--W) * 0.09) calc(var(--H) * 0.45);
+  box-shadow: 0 0 0 12px var(--paper, #efe9dd), 0 0 0 18px var(--accent, #f2b705),
+              0 26px 50px rgba(0,0,0,0.28);
+}
+.slide[data-template="cover-frame"] .layer-scrim,
+.slide[data-template="cover-frame"] .layer-texture::after { display: none; }
+.slide[data-template="cover-frame"] .layer-type {
+  justify-content: flex-start; align-items: center; text-align: center;
+  /* 17% each side keeps a centred title clear of the icon column. */
+  padding: calc(var(--H) * 0.585) calc(var(--W) * 0.17) calc(var(--H) * 0.225);
+}
+.slide[data-template="cover-frame"] .type-box { align-items: center; padding-right: 0; }
+.slide[data-template="cover-frame"] .headline { text-shadow: none; --leading: 1.02; --tracking: -0.025em; }
+.slide[data-template="cover-frame"] .sub { color: var(--ink-dark, #16181d); opacity: 0.72; text-shadow: none; }
+.slide[data-template="cover-frame"] .kicker { color: var(--ink-dark, #16181d); }
+.slide[data-template="cover-frame"] .swipe { color: var(--ink-dark, #16181d); text-shadow: none; }
+.slide[data-template="cover-split"] .swipe,
+.slide[data-template="cover-word"] .swipe,
+.slide[data-template="cover-frame"] .swipe {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-b) + var(--H) * 0.015);
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  font-family: var(--font-mono); font-size: 32px;
+  letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.82;
+}
+.slide[data-template="cover-split"] .swipe, .slide[data-template="cover-word"] .swipe {
+  color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+}
+.slide:is([data-template="cover-split"],[data-template="cover-word"],[data-template="cover-frame"]) .swipe i {
+  display: block; width: 46px; height: 2px; background: currentColor; position: relative;
+}
+.slide:is([data-template="cover-split"],[data-template="cover-word"],[data-template="cover-frame"]) .swipe i::after {
+  content: ""; position: absolute; right: 0; top: -5px; width: 12px; height: 12px;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg);
+}
+
+/* A plain highlight is coloured text: on a paper ground it takes the
+   accent only where the accent reads on that paper. Specific enough to
+   win over a preset's own mark colour. */
+.slide[data-hl="plain"]:is([data-template="cover-frame"],[data-template="arch-window"],
+  [data-template="polaroid-stack"],[data-template="torn-reveal"]) .headline mark {
+  color: var(--accent-on-paper, var(--accent));
+}
+
+/* ...and over a photo it takes a lifted tint of the accent: brass on a
+   bright patch of photo measured 1.8:1 however dark the scrim went. */
+.slide[data-hl="plain"]:not(:is([data-template="cover-frame"],[data-template="arch-window"],
+  [data-template="polaroid-stack"],[data-template="torn-reveal"],[data-template="cover-split"],
+  [data-template="editorial-split"],[data-template="caption-bar"],[data-template="end-card"],
+  [data-template="notes-card"])) .headline mark {
+  color: var(--accent-on-photo, var(--accent));
+}
+
+/* ============================================================================
+   BRUSH-UPS (3.1)
+   ========================================================================= */
+
+/* notes-card: the photo runs full bleed under the card. A dark band under
+   a cropped photo read as a mistake. */
+.slide[data-template="notes-card"] .layer-photo,
+.slide[data-template="notes-card"] .layer-texture { inset: 0; }
+.slide[data-template="notes-card"] .layer-scrim { inset: 0; }
+
+/* compare: the pair fills the frame and the headline sits on a gradient
+   over the tops of both photos, instead of on an empty band above them. */
+.slide[data-template="compare"] .pair { top: 0; bottom: 0; }
+.slide[data-template="compare"] .pair::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 44%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.62) 55%, rgba(0,0,0,0));
+  pointer-events: none;
+}
+.slide[data-template="compare"] .pair figcaption { bottom: calc(var(--safe-b) + 18px); }
+.slide[data-template="compare"] .layer-type { height: calc(var(--H) * 0.34); }
+
+/* frosted-card: the card takes the full width; only its copy keeps clear of
+   the icon column. It sat small and left before. */
+.slide[data-template="frosted-card"] .type-box { padding-right: 0; }
+.slide[data-template="frosted-card"] .card {
+  padding-right: max(calc(var(--fs) * 0.62), calc(var(--W) * 0.12));
 }
 
 /* === VERTICAL JAPANESE TYPE ============================================
