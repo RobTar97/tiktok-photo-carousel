@@ -29,9 +29,9 @@ jobs:
         run: node skills/tiktok-photo-carousel/scripts/selftest.js
       - name: Build the example gallery
         run: |
-          python skills/tiktok-photo-carousel/scripts/analyze.py --photos examples/photos --out examples/gallery/analysis.json
-          node skills/tiktok-photo-carousel/scripts/build.js --deck examples/gallery/deck.json --out examples/gallery/carousel.html
-          node skills/tiktok-photo-carousel/scripts/export.js --html examples/gallery/carousel.html --out out/gallery --no-contact --strict
+          python skills/tiktok-photo-carousel/scripts/analyze.py --photos examples/photos --out examples/decks/analysis.json
+          node skills/tiktok-photo-carousel/scripts/build.js --deck examples/decks/templates-1.json --out out/templates-1.html
+          node skills/tiktok-photo-carousel/scripts/export.js --html out/templates-1.html --out out/gallery --no-contact --strict
       - name: Readability audit of the exported slides
         run: python skills/tiktok-photo-carousel/scripts/audit.py --out out/gallery --strict
 
@@ -52,4 +52,4 @@ jobs:
       - name: Analyse the example photos
         run: python skills/tiktok-photo-carousel/scripts/analyze.py --photos examples/photos --out out/analysis.json
       - name: Render the legacy example
-        run: python skills/tiktok-photo-carousel/scripts/carousel.py --photos examples/photos --script examples/demo-script.json --out out --style editorial
+        run: python skills/tiktok-photo-carousel/scripts/carousel.py --photos examples/photos --script examples/legacy/demo-script.json --out out --style editorial

@@ -1,0 +1,38 @@
+name: Real-phone test results
+description: Screenshots of a carousel on a real phone - the evidence the roadmap is asking for
+labels: ["phone-test"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The safe zones were measured on one phone (iPhone 16e). Results from other phones, the profile grid and long captions are the most valuable contribution there is. See the [roadmap](https://github.com/RobTar97/tiktok-photo-carousel/blob/main/docs/roadmap.md).
+
+        Post privately ("Only me"), screenshot, then delete the post.
+  - type: input
+    id: phone
+    attributes:
+      label: Phone model and OS
+      placeholder: "Pixel 8, Android 15"
+    validations:
+      required: true
+  - type: checkboxes
+    id: shots
+    attributes:
+      label: What the screenshots show
+      options:
+        - label: Slides in the feed, with TikTok's interface
+        - label: The profile grid with the post's tile (settles the 1:1 vs 3:4 question)
+        - label: The caption collapsed, before "more"
+        - label: A fine-detail preset (riso, terminal, contour) after TikTok's compression
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag them in. Originals are best - chat apps recompress.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: What you noticed
+      description: Anything covered, cropped, soft or odd. How long each slide stayed up before advancing.

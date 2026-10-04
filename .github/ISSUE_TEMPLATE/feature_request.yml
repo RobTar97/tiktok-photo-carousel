@@ -1,0 +1,34 @@
+name: Feature or idea
+description: A preset, template, generator, workflow change or anything else
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you are trying to do
+      description: The carousel you want to make, and where the skill gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: What would help. Sketches, references and screenshots of carousels you like are welcome.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - New preset
+        - New template
+        - New drawing generator
+        - Niche playbook or hook pattern
+        - Studio / review workflow
+        - Something else
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Fits the project
+      options:
+        - label: It needs no AI image generation and no stock imagery
+          required: true

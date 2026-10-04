@@ -2,10 +2,35 @@
   "name": "tiktok-photo-carousel",
   "version": "3.1.1",
   "private": true,
-  "description": "Build and export TikTok photo-mode carousels from HTML templates.",
+  "description": "Agent skill that turns your own photos and video clips into TikTok photo-mode carousels - ten style presets, 22 templates, code-drawn art, a review studio, and a readability audit. No AI image generation.",
+  "keywords": [
+    "tiktok",
+    "carousel",
+    "photo-mode",
+    "agent-skills",
+    "claude-code",
+    "skills-sh",
+    "playwright",
+    "generative-art",
+    "typography",
+    "social-media"
+  ],
+  "homepage": "https://github.com/RobTar97/tiktok-photo-carousel#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobTar97/tiktok-photo-carousel.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RobTar97/tiktok-photo-carousel/issues"
+  },
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "selftest": "node skills/tiktok-photo-carousel/scripts/selftest.js"
+    "test": "node skills/tiktok-photo-carousel/scripts/selftest.js",
+    "selftest": "node skills/tiktok-photo-carousel/scripts/selftest.js",
+    "examples": "python examples/render.py"
   },
   "devDependencies": {
     "playwright": "^1.49.0"

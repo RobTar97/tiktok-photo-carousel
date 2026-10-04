@@ -1,0 +1,56 @@
+name: Bug report
+description: Something renders wrong, a check fails, or a script errors
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. A screenshot - from the studio, an exported slide, or a real phone - is the single most useful thing you can add.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The command you ran, and the relevant part of your deck.json if there is one.
+      render: shell
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Paste the build, export or audit output, or the self-test's FAIL line.
+      render: text
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options:
+        - Rendering - a template or preset
+        - Code-drawn art
+        - Safe zones / verifier
+        - Readability audit
+        - Studio (review, play mode, live reload)
+        - Video frames
+        - Photo analysis
+        - Install / self-test
+        - Legacy Pillow renderer
+        - Docs
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: From SKILL.md (metadata.version) or CHANGELOG.md
+      placeholder: "3.1.1"
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Node and Python versions; your phone model if it is about how a post looks
+      placeholder: "Windows 11, Node 20, Python 3.12, iPhone 16e"
