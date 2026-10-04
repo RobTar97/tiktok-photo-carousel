@@ -559,6 +559,10 @@
         { name: "side margin", x1: 0, y1: 0, x2: zones.side * W, y2: H },
         { name: "side margin", x1: (1 - zones.side) * W, y1: 0, x2: W, y2: H }
       ];
+      // TikTok's own "5 / 8" photo counter, top right, measured on an
+      // iPhone 16e at roughly 8.5-12% down and the right 16%.
+      bands.push({ name: "photo counter", x1: (1 - zones.rail) * W, y1: zones.top * H,
+                   x2: W, y2: (zones.counter || 0.12) * H });
       if (slide.dataset.rail === "1") {
         // The like/comment/share column is a block in the lower right, not
         // the whole right edge - checking the whole edge flags type that is

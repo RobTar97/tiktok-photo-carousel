@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.1.1
+
+First real-phone test (iPhone 16e, posted as a draft).
+
+### Fixed
+- **Dark copy on a card or paper carried a dark drop shadow.** The shadow
+  that helps white type over a photo was applied to every slide with a
+  photo, so on notes-card, arch-window and other solid-ground templates dark
+  letters got a grey halo. On the phone it read as an odd, smudged font.
+  Copy on a card, paper or block now has no shadow - including a preset's
+  own glow.
+
+### Added
+- The verifier checks TikTok's own photo counter ("5 / 8"), which sits at
+  the top right and was not in the published specs.
+- `safe-zones.md` records what was measured on the phone against what the
+  skill reserves. Every reservation was a little more generous than reality;
+  nothing in the test deck touched the interface.
+
 ## 3.1.0
 
 Covers, brush-ups to the weakest templates, and two workflow additions.

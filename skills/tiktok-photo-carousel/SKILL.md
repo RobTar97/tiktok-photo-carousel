@@ -4,7 +4,7 @@ description: Designs and renders TikTok photo-mode carousels from the user's own
 license: MIT
 compatibility: Node 18+ and Playwright (npm install, then npx playwright install chromium). Python 3.9+ and Pillow. ffmpeg for video frames. Works on Windows, macOS and Linux.
 metadata:
-  version: "3.1.0"
+  version: "3.1.1"
 ---
 
 # TikTok Photo Carousel

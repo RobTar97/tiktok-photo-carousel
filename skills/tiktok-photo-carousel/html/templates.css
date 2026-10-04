@@ -875,6 +875,19 @@
   color: var(--accent-on-photo, var(--accent));
 }
 
+/* Copy on a solid ground - a card, paper, a block - carries no shadow.
+   The photo-slide shadow exists so white type reads over a picture; on a
+   cream card it put a grey halo round dark letters, which on a real phone
+   (iPhone 16e) read as a smudged, misprinted font. Specific enough to beat
+   a preset's own glow too. */
+.slide[data-template]:is([data-template="notes-card"],[data-template="arch-window"],
+  [data-template="polaroid-stack"],[data-template="torn-reveal"],
+  [data-template="editorial-split"],[data-template="caption-bar"],
+  [data-template="cover-split"],[data-template="cover-frame"],
+  [data-template="end-card"],[data-template="diagonal-split"]) :is(.headline, .sub, .kicker) {
+  text-shadow: none;
+}
+
 /* ============================================================================
    BRUSH-UPS (3.1)
    ========================================================================= */

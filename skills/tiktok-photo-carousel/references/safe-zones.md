@@ -20,6 +20,27 @@ Earlier versions of this skill reserved 12% and 25%. That is safe but throws
 away about 300px of usable canvas, and on a 9:16 frame that is the difference
 between a headline at 96px and one at 132px.
 
+## Checked on a real phone
+
+A deck posted privately and screenshotted on an iPhone 16e (19.5:9). The full
+9:16 slide shows between the status bar and the bottom navigation, uncropped,
+and TikTok draws over it:
+
+| | Measured | Reserved here |
+|---|---|---|
+| "Following / For You" header | top ~6.5% | 8.5% |
+| Photo counter ("5 / 8") | top right, ~8.5-12% down, right ~13% | checked by the verifier |
+| Avatar and like / comment / save / share | from ~47% to ~86% down, right ~13% | from 42%, right 16% |
+| Dots, caption line, username | bottom ~9-14% | 15% |
+
+Every reservation here is a little more generous than what was measured,
+which is the right direction: the caption grows upward when it is longer,
+and other phones place things slightly differently. Nothing in the test deck
+touched the interface.
+
+Not yet measured: the profile grid crop (drafts and "Only me" posts do not
+always show on the grid) and the caption's collapsed length.
+
 ## One source of truth
 
 `deck.safe` drives both the CSS clearances and the verifier, so the layout and
