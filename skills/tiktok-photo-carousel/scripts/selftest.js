@@ -206,8 +206,13 @@ const ART = [
   await page.evaluate(() => document.activeElement && document.activeElement.blur());
   await page.keyboard.press("p");
   await page.waitForSelector(".play .play-slot .slide", { timeout: 5000 }).catch(() => fail("play mode did not open"));
+  // Pause first: play mode auto-advances every few seconds, and on a slow CI
+  // runner the timer fired between opening and checking - one slide too far.
+  await page.keyboard.press(" ");
+  const start = await page.evaluate(() => [].indexOf.call(document.querySelectorAll(".play-bars i"), document.querySelector(".play-bars i.now")));
+  const paused = await page.evaluate(() => document.querySelector(".play-bars").classList.contains("paused"));
   await page.keyboard.press("ArrowRight");
-  const now = await page.evaluate(() => [].indexOf.call(document.querySelectorAll(".play-bars i"), document.querySelector(".play-bars i.now")));
+  const now = await page.evaluate(() => [].indexOf.call(document.querySelectorAll(".play-bars i"), document.querySelector(".play-bars i.now"))) - start;
   await page.keyboard.press("Escape");
   const closed = await page.evaluate(() => !document.querySelector(".play"));
   await b2.close();
@@ -216,6 +221,7 @@ const ART = [
       edits.slides[1].note !== "selftest note" || edits.slides[2].text !== "Goes *sideways*") {
     fail("studio edits came back wrong: " + JSON.stringify(edits.slides.slice(0, 3)));
   }
+  if (!paused) fail("play mode did not pause on space");
   if (now !== 1 || !closed) fail("play mode did not advance or close");
   step("studio: verdicts, notes, inline edit, approve, play mode");
 
