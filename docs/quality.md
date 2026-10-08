@@ -99,6 +99,7 @@ A selection, because they show what each check is for:
 | audit | accent-coloured kickers on photos at 1.0:1, on blocks at 1.5:1 |
 | audit | black-or-white text chosen by a luminance threshold - white on orange at 3.0:1 |
 | self-test | vertical Japanese type running over the photo in dark ink |
+| audit and geometry check | Liminal sparkles landing behind Dew annotation text |
 | analysis | phone photos with EXIF rotation resized sideways |
 | `--fix` history | the fixer raising a scrim that sat under a template floor |
 | real phone | dark text on cards carrying a drop shadow |

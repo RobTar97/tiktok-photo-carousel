@@ -246,6 +246,14 @@ const ART = [
   await page.goto("file:///" + html.replace(/\\/g, "/"));
   await page.waitForSelector('body[data-ready="1"]');
   await page.waitForFunction(() => window.CAROUSEL && window.CAROUSEL.toggle);
+  const sparkleCollisions = await page.evaluate(() => window.CAROUSEL.slides.flatMap((slide, i) => {
+    const labels = [...slide.querySelectorAll('.annotation:not([hidden])')].map(n => n.getBoundingClientRect());
+    return [...slide.querySelectorAll('.gen-sparkles path')].filter(n => {
+      const r = n.getBoundingClientRect();
+      return labels.some(b => r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top);
+    }).map(() => i + 1);
+  }));
+  if (sparkleCollisions.length) fail('sparkles overlap annotations on slides ' + sparkleCollisions.join(', '));
   // Full-height editorial boxes must fit identically in the scaled studio.
   // Subpixel rounding once shrank one preview title to the minimum size.
   const editorialSizes = await page.evaluate(() => window.CAROUSEL.slides.map((s, i) => ({

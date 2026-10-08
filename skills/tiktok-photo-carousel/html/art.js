@@ -552,12 +552,14 @@
   /* sparkles - four-point stars, scattered by the seed and kept out of
      the band where the copy usually sits.                                 */
   GEN.sparkles = function (ctx, o) {
-    var n = o.count || 7, out = "", c = ctx.copy, placed = 0, tries = 0;
+    var n = o.count || 7, out = "", protectedBoxes = [ctx.copy].concat(ctx.annotations || []).filter(Boolean), placed = 0, tries = 0;
     while (placed < n && tries++ < n * 30) {
       var x = ctx.rand() * ctx.w * 0.86 + ctx.w * 0.07, y = ctx.rand() * ctx.h * 0.7 + ctx.h * 0.08;
       // Keep out of the copy, with a margin - a sparkle behind a letter is
       // a sparkle that costs contrast.
-      if (c && x > c.x - 60 && x < c.x + c.w + 60 && y > c.y - 60 && y < c.y + c.h + 60) continue;
+      if (protectedBoxes.some(function (c) {
+        return x > c.x - 60 && x < c.x + c.w + 60 && y > c.y - 60 && y < c.y + c.h + 60;
+      })) continue;
       placed++;
       var s = (o.size || 54) * (0.45 + ctx.rand() * 0.75);
       out += '<path transform="translate(' + r1(x) + " " + r1(y) + ") scale(" + r1(s / 100) + ')" ' +
@@ -659,6 +661,11 @@
         focus: onPhoto ? opts.focus : [opts.focus[0], opts.focus[1]],
         // Where the copy sits, so decoration can keep out of its way.
         copy: opts.copy ? { x: opts.copy.x - box.x, y: opts.copy.y - box.y, w: opts.copy.w, h: opts.copy.h } : null,
+        annotations: Array.from(slide.querySelectorAll('.annotation:not([hidden])'), function (n) {
+          var r = n.getBoundingClientRect();
+          return { x: (r.left - sr.left) / scale - box.x, y: (r.top - sr.top) / scale - box.y,
+            w: r.width / scale, h: r.height / scale };
+        }),
         uid: "g" + hash(seedBase + k).toString(36)
       };
       if (PHOTO_GEN[spec.type] && !ctx.photo && spec.source !== "noise" && spec.type !== "contour" &&

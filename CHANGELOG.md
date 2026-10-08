@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Keep generated sparkles clear of annotation labels, including when Liminal
+  is paired with Dew layouts. Add a geometry regression check.
+
 Five reference-led families add 15 layouts, bringing the library to **15
 presets, 37 templates and 9 covers**. Includes runnable decks, refreshed
 full-library galleries, reference breakdowns and a style selection guide.
