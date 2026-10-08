@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+Five reference-led families add 15 layouts, bringing the library to **15
+presets, 37 templates and 9 covers**. Includes runnable decks, refreshed
+full-library galleries, reference breakdowns and a style selection guide.
+
+- Add Dew: paired routine photos, rounded sans type and positioned annotations. Include label copy in studio editing, edits merging, copy lint, safe zones and pixel contrast auditing.
+
+- Add Weekender: small white mono captions, a centered cover, low location captions and a two-photo stack with independent lower cropping. Accept consecutive diary-note entries.
+
+- Add Harvest: cream brush type, individually audited typewriter labels, and two offset photo collage layouts with independent inset cropping. Keep both photos below the contrast scrim.
+
+- Add Together, a reference-led editorial preset with italic cover, numbered activity and quiet closing layouts. Allow consecutive numbered entries and retain editable copy and safe-zone auditing.
+
+- Add the reference-led Sunlit preset and three ribbon layouts: cream serif titles, warm photos, yellow italic labels and editable copy with vector edge linework.
+- Measure ribbon labels individually against their own background for accurate readability auditing.
+- Extend Riso's paper backing to the ribbon family so blue text stays readable over its halftone art.
+- Document reference provenance and adaptation; test ribbon layouts across every preset.
+
 ## 3.1.1
 
 First real-phone test (iPhone 16e, posted as a draft).

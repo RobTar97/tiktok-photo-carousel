@@ -1,0 +1,32 @@
+{
+  "title": "Sunlit — reference-led travel layouts",
+  "photos": "../photos",
+  "theme": {
+    "preset": "sunlit"
+  },
+  "slides": [
+    {
+      "template": "cover-ribbon",
+      "role": "cover",
+      "photo": "sea.jpg",
+      "kicker": "Things I noticed // along the shore",
+      "text": "Slow days.",
+      "scrim": 0.62
+    },
+    {
+      "template": "ribbon-destination",
+      "photo": "sunset.jpg",
+      "kicker": "One more stop",
+      "text": "Evening // light.",
+      "scrim": 0.64
+    },
+    {
+      "template": "ribbon-tip",
+      "role": "cta",
+      "photo": "sea.jpg",
+      "text": "Save this",
+      "kicker": "for a slower day",
+      "scrim": 0.62
+    }
+  ]
+}

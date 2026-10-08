@@ -482,7 +482,7 @@
       "scrim": 0.86,
       "hasPhoto": true,
       "weight": "500",
-      "text": "one of four covers"
+      "text": "one of nine covers"
     },
     {
       "holes": [],
@@ -573,7 +573,7 @@
       "scrim": null,
       "hasPhoto": true,
       "weight": "500",
-      "text": "one of four covers"
+      "text": "one of nine covers"
     },
     {
       "holes": [],
@@ -652,9 +652,9 @@
       "role": "cover",
       "template": "cover-frame",
       "box": [
-        373,
+        371,
         1434,
-        707,
+        709,
         1486
       ],
       "color": "rgb(22, 24, 29)",
@@ -664,7 +664,7 @@
       "scrim": null,
       "hasPhoto": true,
       "weight": "500",
-      "text": "one of four covers"
+      "text": "one of nine covers"
     }
   ],
   "pageErrors": []

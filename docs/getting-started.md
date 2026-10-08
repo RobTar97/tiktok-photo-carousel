@@ -50,7 +50,7 @@ contrast, drives the review studio like a reviewer, and - if ffmpeg is present
 - pulls frames from a generated clip. It ends with:
 
 ```
-OK - 65 slides, 24 template cases, 10 presets, 21 generators
+OK - 315 slides, 39 template cases, 15 presets, 21 generators
 ```
 
 ## 4. Make a carousel
@@ -71,6 +71,23 @@ The short version:
    text in place, then **Approve deck**.
 5. It exports, audits readability, fixes what it can, and hands you
    `upload/`.
+
+### Choose one of the new reference-led styles
+
+Name the style in your request, for example: “Use Weekender for my camping
+photos, with a two-photo slide.”
+
+| Style | Best fit | Signature |
+|---|---|---|
+| `sunlit` | Travel guides and food diaries | Cream serif, yellow ribbons and loose linework |
+| `together` | Date ideas and activity lists | Butter italic titles, numbers and quiet captions |
+| `harvest` | Markets, makers and products | Brush lettering, typewriter labels and offset photos |
+| `weekender` | Candid trips and outdoor diaries | Small mono captions and stacked photos |
+| `dew` | Routines and annotated product stories | Rounded white type and translucent labels |
+
+Each family has three layouts. See the [style gallery](../README.md#templates),
+[runnable decks](../examples/README.md) and
+[reference breakdowns](../skills/tiktok-photo-carousel/references/reference-styles.md).
 
 ## 5. Post it
 

@@ -133,7 +133,7 @@ const fileUrl = "file:///" + htmlPath.replace(/\\/g, "/");
   await page.addStyleTag({
     content:
       ".headline,.headline mark,.sub,.kicker,.cta,.counter,.edge-label," +
-      ".swipe,.note-bar,figcaption{" +
+      ".swipe,.note-bar,figcaption,.annotation{" +
       "color:transparent!important;text-shadow:none!important;" +
       "-webkit-text-stroke-color:transparent!important}",
   });

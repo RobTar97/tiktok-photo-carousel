@@ -30,7 +30,7 @@ overrides it. Layering, lowest first: **preset < brand kit < theme < slide**.
 
 | Field | What it does |
 |---|---|
-| `preset` | One of the ten in `presets/` - see [presets.md](presets.md) |
+| `preset` | One of the presets in `presets/` - see [presets.md](presets.md) |
 | `display`, `text`, `hand`, `mono` | Font families. A Google Fonts name is enough. |
 | `googleFonts` | Exact family specs, e.g. `"Fraunces:ital,wght@0,600;1,400"` |
 | `displayWeight` | 400-900 |
@@ -63,6 +63,8 @@ overrides it. Layering, lowest first: **preset < brand kit < theme < slide**.
 
   "pos": "upper",                 // top | upper | middle | lower
   "align": "left",                // left | center | right
+  "secondFocus": [0.5, 0.5],      // diary-stack / routine pairs: lower photo crop
+  "insetFocus": [0.5, 0.5],       // collage-right / collage-foot: secondary photo crop
   "focus": [0.38, 0.45],          // crop centre 0..1 - from analyze.py
   "size": 118,                    // cap the autofit
   "highlight": "marker",          // per-slide
@@ -82,6 +84,7 @@ overrides it. Layering, lowest first: **preset < brand kit < theme < slide**.
   "edgeLabel": "west side",       // index-card - the vertical tab
   "labels": ["before", "after"],  // compare, bento
   "noteLabel": "go at",           // notes-card
+  "doodles": false,               // ribbon family - omit decorative edge linework
   "counter": false,               // caption-bar - drop the 03 / 08 counter
   "stickers": [{ "text": "here", "x": 0.6, "y": 0.5, "rot": -8 }],  // sticker-chaos
   "tilt": -3.5,                   // polaroid-stack
@@ -94,6 +97,8 @@ overrides it. Layering, lowest first: **preset < brand kit < theme < slide**.
 
 - `*word*` renders as a highlight. **One per slide.**
 - ` // ` (spaces both sides) forces a line break. Always use it in Japanese.
+- Brush/collage templates use plain-text `sub` labels with ` // ` breaks; asterisks stay literal.
+- Ribbon templates also support ` // ` in `kicker` for separate italic labels.
 - Everything else is escaped, so `<`, `&` and emoji in copy are safe.
 
 ### Fields you normally leave out
@@ -158,3 +163,22 @@ What the studio's **Approve deck** (or **Save edits**, Ctrl+S) downloads:
 Merge it with `scripts/apply-edits.js`. Copy fields are written into the deck;
 `status` and `note` are reported for you to act on. Layout never comes back
 through this file, which is why a round of edits cannot break the geometry.
+
+
+### Positioned annotations
+
+For annotated routines (or another layout that has room), add:
+
+```json
+"annotations": [
+  { "text": "small // details", "x": 0.12, "y": 0.3, "w": 0.28, "surface": "glass" }
+]
+```
+
+Coordinates and maximum width are fractions of the whole slide. Default
+position is (0.12, 0.3), width 0.28; `surface` is `glass` or `plain`. Text is
+40px, supports ` // ` breaks, and is escaped. Use 2–5 words per label.
+Annotations participate in copy limits, safe-zone checks and the pixel audit.
+The studio exports `annotations` as an array of edited strings in the same
+order; apply-edits merges those strings into the existing objects while
+retaining geometry. Empty strings hide labels after rebuild.

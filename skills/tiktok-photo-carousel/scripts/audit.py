@@ -268,7 +268,7 @@ def main():
         floor = MIN_HEADLINE if b["el"] in ("headline", "highlight") else MIN_BODY
         small = b["fontSize"] < floor
 
-        if c_worst < GOOD and b["el"] in ("headline", "sub", "highlight", "edge-label"):
+        if c_worst < GOOD and b["el"] in ("headline", "sub", "highlight", "edge-label", "annotation"):
             prev = weak.get(b["slide"])
             if prev is None or c_worst < prev[0]:
                 weak[b["slide"]] = (c_worst, b.get("scrim"), b.get("hasPhoto"))

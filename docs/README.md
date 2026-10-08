@@ -32,10 +32,16 @@ Two kinds of document live in this repo:
 
 ## Style
 
+The library includes **15 presets and 37 layouts**, with five reference-led
+families: **Sunlit, Together, Harvest, Weekender and Dew**. Browse the
+[visual gallery](../README.md#templates) or start from a
+[demo deck](../examples/README.md).
+
 | | |
 |---|---|
-| [Presets](../skills/tiktok-photo-carousel/references/presets.md) | The ten ready-made looks, how to choose, how to make one |
-| [Templates](../skills/tiktok-photo-carousel/references/templates.md) | All 22 layouts, the four covers, how to add one |
+| [Presets](../skills/tiktok-photo-carousel/references/presets.md) | The fifteen ready-made looks, how to choose, how to make one |
+| [Reference-led styles](../skills/tiktok-photo-carousel/references/reference-styles.md) | Sunlit, Together, Harvest, Weekender and Dew: references, typography and layout rules |
+| [Templates](../skills/tiktok-photo-carousel/references/templates.md) | All 37 layouts, the nine covers, how to add one |
 | [Code-drawn art](../skills/tiktok-photo-carousel/references/art.md) | The 21 generators, placement, aiming art at the copy |
 | [Design system](../skills/tiktok-photo-carousel/references/design-system.md) | Colour, type, texture, legibility - the rules behind every preset |
 | [Brand kits](../skills/tiktok-photo-carousel/references/brand-kit.md) | Your fonts, colours and copy rules over any preset |

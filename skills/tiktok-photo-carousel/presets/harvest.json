@@ -1,0 +1,36 @@
+{
+  "name": "harvest",
+  "label": "Harvest",
+  "for": "markets, makers, food stories, natural products, local shopping guides",
+  "signature": "Cream hand-painted capitals and tight typewriter paper labels over warm full-bleed and offset photo collages. Inspired by supplied Bohol maker references.",
+  "theme": {
+    "googleFonts": [
+      "Caveat Brush",
+      "Roboto Mono:wght@400"
+    ],
+    "display": "Caveat Brush, cursive",
+    "text": "Roboto Mono, monospace",
+    "mono": "Roboto Mono, monospace",
+    "hand": "Caveat Brush, cursive",
+    "displayWeight": 400,
+    "sizeMax": 176,
+    "ink": "#FFF3CC",
+    "muted": "#FFF3CC",
+    "paper": "#FFF3CC",
+    "inkDark": "#302C24",
+    "accent": "#E8AD48",
+    "onAccent": "#302C24",
+    "bg": "#352018",
+    "block": "#352018",
+    "grain": 0.025,
+    "vignette": 0.1,
+    "highlight": "plain"
+  },
+  "art": {},
+  "templates": [
+    "cover-brush",
+    "collage-right",
+    "collage-foot"
+  ],
+  "css": ".slide[data-preset='harvest'] .layer-photo img{filter:sepia(.12) saturate(.92) contrast(1.02)}.slide[data-preset='harvest'] .headline{font-style:normal;text-shadow:none;--leading:.98;--tracking:.005em}.slide[data-preset='harvest'] .sub{font-style:normal}"
+}

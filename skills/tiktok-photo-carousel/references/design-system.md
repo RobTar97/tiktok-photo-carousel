@@ -1,7 +1,7 @@
 # Design system
 
 What separates a carousel that looks designed from one that looks generated.
-The ten presets ([presets.md](presets.md)) already follow everything here -
+The presets ([presets.md](presets.md)) already follow everything here -
 read this to judge them, adjust them, or build your own.
 
 ## 1. Colour comes from the photographs

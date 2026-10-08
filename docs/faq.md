@@ -61,8 +61,8 @@ describe what you want - the concept board is cheap to rebuild.
 ### Can I edit the text myself?
 
 Yes: press **E** in the studio and click any text. Your edits come back in
-`edits.json` and are merged into the deck. Layout changes go in a note on the
-slide.
+`edits.json` and are merged into the deck. This includes Dew's individual labels; their positions stay fixed when copy is
+merged. Layout changes go in a note on the slide.
 
 ### How do I know it is readable?
 

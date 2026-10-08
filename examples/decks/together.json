@@ -1,0 +1,11 @@
+{
+  "title": "Together — quiet editorial layouts",
+  "photos": "../photos",
+  "theme": { "preset": "together" },
+  "slides": [
+    { "template": "cover-italic", "role": "cover", "photo": "sea.jpg", "text": "slow // weekends", "sub": "(A LITTLE TIME TOGETHER)", "scrim": 0.68 },
+    { "template": "numbered-moment", "photo": "sunset.jpg", "kicker": "01", "text": "evening // walk", "sub": "take the long way // by the water", "scrim": 0.68 },
+    { "template": "numbered-moment", "photo": "hallway.jpg", "kicker": "02", "text": "photo // wander", "sub": "look for small details // you usually pass", "scrim": 0.68 },
+    { "template": "soft-close", "role": "cta", "photo": "sea.jpg", "text": "(send this to someone // you want to go with)", "scrim": 0.68 }
+  ]
+}

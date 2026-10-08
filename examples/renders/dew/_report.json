@@ -1,0 +1,266 @@
+{
+  "slides": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg"
+  ],
+  "cover": "cover.jpg",
+  "coverSlide": 1,
+  "issues": [],
+  "boxes": [
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover-routine",
+      "box": [
+        317,
+        858,
+        763,
+        1062
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 100,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "a slowerafternoon"
+    },
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "annotation",
+      "role": "cover",
+      "template": "cover-routine",
+      "box": [
+        140,
+        557,
+        273,
+        601
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "outside"
+    },
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "annotation",
+      "role": "cover",
+      "template": "cover-routine",
+      "box": [
+        659,
+        672,
+        814,
+        716
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "together"
+    },
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "annotation",
+      "role": "cover",
+      "template": "cover-routine",
+      "box": [
+        130,
+        1306,
+        247,
+        1350
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "sea air"
+    },
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "annotation",
+      "role": "cover",
+      "template": "cover-routine",
+      "box": [
+        616,
+        1421,
+        778,
+        1465
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "late light"
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "annotation",
+      "role": "build",
+      "template": "routine-pair",
+      "box": [
+        130,
+        346,
+        332,
+        454
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "start bythe water"
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "annotation",
+      "role": "build",
+      "template": "routine-pair",
+      "box": [
+        529,
+        710,
+        780,
+        818
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "watch thelight change"
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "annotation",
+      "role": "build",
+      "template": "routine-pair",
+      "box": [
+        130,
+        1229,
+        323,
+        1337
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "take thelong way"
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "annotation",
+      "role": "build",
+      "template": "routine-pair",
+      "box": [
+        378,
+        518,
+        633,
+        582
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "a closer look"
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "annotation",
+      "role": "build",
+      "template": "routine-pair",
+      "box": [
+        130,
+        1190,
+        388,
+        1298
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "notice thesmall details"
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "annotation",
+      "role": "build",
+      "template": "routine-pair",
+      "box": [
+        529,
+        1459,
+        815,
+        1523
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "take your time"
+    },
+    {
+      "holes": [],
+      "slide": 4,
+      "el": "annotation",
+      "role": "cta",
+      "template": "routine-note",
+      "box": [
+        216,
+        922,
+        473,
+        1030
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(235, 233, 219, 0.13)",
+      "ownBgImage": false,
+      "fontSize": 40,
+      "scrim": 0.66,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "save this fora slower day"
+    }
+  ],
+  "pageErrors": []
+}

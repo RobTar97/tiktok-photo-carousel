@@ -99,6 +99,56 @@
       "photo": "hallway.jpg",
       "text": "This hallway *never* ends",
       "sub": "or it just feels that way"
+    },
+    {
+      "group": "sunlit",
+      "preset": "sunlit",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
+    },
+    {
+      "group": "together",
+      "preset": "together",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
+    },
+    {
+      "group": "harvest",
+      "preset": "harvest",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
+    },
+    {
+      "group": "weekender",
+      "preset": "weekender",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
+    },
+    {
+      "group": "dew",
+      "preset": "dew",
+      "role": "cover",
+      "template": "cover",
+      "photo": "hallway.jpg",
+      "text": "This hallway *never* ends",
+      "sub": "or it just feels that way",
+      "scrim": 0.86
     }
   ]
 }

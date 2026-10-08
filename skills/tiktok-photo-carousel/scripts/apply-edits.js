@@ -50,6 +50,15 @@ rows.forEach((r) => {
     if (now.trim()) s[f] = now; else delete s[f];
     changed.push(`  slide ${r.index + 1} ${f}: ${show(was)} -> ${show(now)}`);
   });
+  // Only annotation copy is editable here; retain the authored placement.
+  if (Array.isArray(r.annotations) && Array.isArray(s.annotations)) {
+    r.annotations.forEach((text, i) => {
+      if (!s.annotations[i] || typeof text !== "string") return;
+      if (s.annotations[i].text === text) return;
+      s.annotations[i].text = text;
+      changed.push(`  slide ${r.index + 1} annotation ${i + 1}: ${show(text)}`);
+    });
+  }
   if (r.status === "change" || (r.note && r.status !== "keep")) {
     asked.push(`  slide ${r.index + 1} [${s.template || "?"}]: ${r.note || "(marked Change, no note)"}`);
   } else if (!r.status || r.status === "unreviewed") {

@@ -9,10 +9,10 @@ deck is styled - the only decisions left are photos, copy and template order.
 ```
 
 Every preset spends its boldness on **one signature element** and keeps the
-rest quiet. Every preset passes the readability audit on the ATC test photos
-at its default settings.
+rest quiet. Run the readability audit on the actual photos: crop, scrim and
+copy placement can need adjustment even when a preset passes the demo checks.
 
-## The ten
+## The fifteen
 
 | Preset | For | Signature |
 |---|---|---|
@@ -25,6 +25,11 @@ at its default settings.
 | `terminal` | night, tech, internet culture | **photos re-rendered as amber ASCII**, scanlines, a cursor after the headline |
 | `photodump` | weekly recaps, "my week in", trips | the cover tiled into colour blocks round a sharp framed window; bento grids |
 | `kinetic` | tips, listicles, reach | type as the image - one heavy face, box highlights, counters, a sunburst end card |
+| `dew` | routines, beauty editorial, annotated products | white rounded sans type, touching photo halves and independently editable translucent labels; [reference](reference-styles.md#dew--annotated-skincare-reference) |
+| `weekender` | candid dates, camping, outings, photo diaries | small white mono captions, restrained inline emoji, low location lines and a two-photo stack; [reference](reference-styles.md#weekender--outdoor-date-diary-reference) |
+| `harvest` | markets, makers, natural products, local finds | cream brush capitals, square typewriter labels, offset rectangular photo collages; [reference](reference-styles.md#harvest--bohol-market-reference) |
+| `together` | dates, shared activities, slow weekends | pale butter-yellow italic titles, small sans-serif numbering, low captions and a parenthetical close; [reference](reference-styles.md#together--date-ideas-reference) |
+| `sunlit` | warm travel diaries, island guides, food | cream serif titles, yellow italic ribbons and wandering edge lines; [reference and layouts](reference-styles.md) |
 | `atlas` | premium travel, hotels, food | a rotating text badge, the highlighted word in italic brass, a condensed serif |
 
 ## Choosing
@@ -34,6 +39,11 @@ Start from the niche, then let the photos decide between two:
 | Niche ([niches.md](niches.md)) | First choice | Second |
 |---|---|---|
 | Dreamcore / liminal | `liminal` | `terminal` |
+| Routines / annotated products | `dew` | `fieldnotes` |
+| Candid outings / camping | `weekender` | `photodump` |
+| Markets / makers | `harvest` | `riso` |
+| Dates / shared activities | `together` | `atlas` |
+| Warm travel / food diary | `sunlit` | `atlas` |
 | Travel guide | `contour` | `fieldnotes` |
 | Romantic / soft | `atlas` | `liminal` |
 | POV / story | `kinetic` | `fieldnotes` |

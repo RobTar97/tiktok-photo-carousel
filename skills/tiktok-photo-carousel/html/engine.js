@@ -153,11 +153,50 @@
 
   ART["cover-word"] = ART["cover-split"] = ART["cover-frame"] = ART["cover"];
 
+  // Reference-led travel layouts: flowing edge lines leave the copy clear.
+  // These are decorative, not arrows asserting a location in the photograph.
+  function sunlitArt(slide, s) {
+    if (s.doodles === false) return;
+    var variant = slide.dataset.template;
+    var paths = variant === "cover-ribbon"
+      ? '<path d="M40 1930 C60 1550 280 1760 410 1770 S810 1310 1110 1230"/><circle cx="170" cy="1490" r="94"/>'
+      : variant === "ribbon-destination"
+      ? '<path d="M-30 220 C270 270 205 610 560 570 S970 390 1110 180 M660 1950 C620 1580 780 1850 820 1620 S920 1510 1120 1560"/><circle cx="933" cy="1320" r="84"/>'
+      : '<path d="M690 -30 C760 90 550 170 740 255 S1070 330 1100 550 M-30 1220 C340 1200 470 1800 770 1720 S1010 1710 1080 1950"/><circle cx="930" cy="1470" r="83"/>';
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 1080 1920");
+    svg.setAttribute("class", "sunlit-lines");
+    svg.setAttribute("aria-hidden", "true");
+    svg.innerHTML = paths;
+    slide.querySelector(".layer-art").appendChild(svg);
+  }
+  ART["cover-ribbon"] = ART["ribbon-destination"] = ART["ribbon-tip"] = sunlitArt;
+
+  ART["collage-right"] = ART["collage-foot"] = function (slide, s, deck) {
+    var inset = el("img", "collage-photo");
+    // Both photographs sit below the scrim, so its audit fixes affect both.
+    inset.src = src(deck, (s.photos && s.photos[1]) || s.photo);
+    inset.alt = "";
+    var focus = s.insetFocus || [0.5, 0.5];
+    inset.style.objectPosition = (focus[0] * 100) + "% " + (focus[1] * 100) + "%";
+    slide.querySelector(".layer-photo").appendChild(inset);
+  };
+
   ART["index-card"] = function (slide, s) {
     var art = slide.querySelector(".layer-art");
     art.appendChild(el("div", "edge-rule"));
     if (s.edgeLabel) art.appendChild(el("div", "edge-label", esc(s.edgeLabel)));
   };
+
+  ART["diary-stack"] = function (slide, s, deck) {
+    var second = el("img", "diary-second");
+    second.src = src(deck, (s.photos && s.photos[1]) || s.photo);
+    second.alt = "";
+    var focus = s.secondFocus || [0.5, 0.5];
+    second.style.objectPosition = (focus[0] * 100) + "% " + (focus[1] * 100) + "%";
+    slide.querySelector(".layer-photo").appendChild(second);
+  };
+  ART["cover-routine"] = ART["routine-pair"] = ART["diary-stack"];
 
   ART["quote-pull"] = function (slide, s) {
     slide.querySelector(".layer-art")
@@ -276,6 +315,9 @@
     // Same check against the paper, for templates that set copy on it:
     // atlas's brass highlight on cream measured 1.8:1.
     var pap = s.paper || t.paper || "#efe9dd", lp = relLum(pap);
+    var paperInk = t.inkDark || "#16181d", lpi = relLum(paperInk);
+    slide.style.setProperty("--paper-label-ink", lp >= 0 && lpi >= 0 &&
+      (Math.max(lp, lpi) + 0.05) / (Math.min(lp, lpi) + 0.05) >= 4.5 ? paperInk : onColor(pap));
     if (la >= 0 && lp >= 0) {
       var r2 = (Math.max(la, lp) + 0.05) / (Math.min(la, lp) + 0.05);
       slide.style.setProperty("--accent-on-paper", r2 >= 4.5 ? acc : (t.inkDark || "#16181d"));
@@ -367,7 +409,10 @@
     if (slide.dataset.template === "notes-card") {
       inner.appendChild(el("div", "note-bar", esc(s.noteLabel || "notes")));
     }
-    if (s.kicker) inner.appendChild(el("div", "kicker", esc(s.kicker)));
+    if (s.kicker) inner.appendChild(el("div", "kicker",
+      /^(cover-ribbon|ribbon-destination|ribbon-tip)$/.test(slide.dataset.template)
+        ? s.kicker.split(" // ").map(function (line) { return '<span class="ribbon-label">' + esc(line) + '</span>'; }).join("<br>")
+        : esc(s.kicker)));
     if (s.text && slide.dataset.template === "cover-word") {
       inner.appendChild(el("h2", "headline", posterLines(s.text).map(function (l) {
         return '<span class="ln">' + markup(l) + "</span>";
@@ -375,11 +420,24 @@
     } else if (s.text) {
       inner.appendChild(el("h2", "headline", markup(s.text)));
     }
-    if (s.sub) inner.appendChild(el("p", "sub", markup(s.sub)));
+    if (s.sub) inner.appendChild(el("p", "sub",
+      /^(cover-brush|collage-right|collage-foot)$/.test(slide.dataset.template)
+        ? String(s.sub).split(" // ").map(function (line) { return '<span class="paper-label">' + esc(line) + '</span>'; }).join("<br>")
+        : markup(s.sub)));
     if (s.cta) inner.appendChild(el("div", "cta", esc(s.cta)));
     if (inner !== box) box.appendChild(inner);
 
     type.appendChild(box);
+    (s.annotations || []).forEach(function (a, index) {
+      var note = el("div", "annotation", esc(a.text || "").split(" // ").join("<br>"));
+      note.hidden = !String(a.text || "").trim();
+      note.dataset.annotation = index;
+      note.dataset.surface = a.surface === "plain" ? "plain" : "glass";
+      note.style.left = ((a.x == null ? 0.12 : a.x) * 100) + "%";
+      note.style.top = ((a.y == null ? 0.3 : a.y) * 100) + "%";
+      note.style.maxWidth = ((a.w == null ? 0.28 : a.w) * 100) + "%";
+      type.appendChild(note);
+    });
     slide.appendChild(type);
 
     /* --- overlays (studio only, stripped on export) --- */
@@ -572,13 +630,17 @@
           x2: W, y2: (1 - zones.bottom) * H
         });
       }
-      slide.querySelectorAll(".headline, .sub, .kicker, .cta, .card").forEach(function (node) {
+      slide.querySelectorAll(".headline, .sub, .kicker, .cta, .card, .annotation").forEach(function (node) {
+        if (node.hidden) return;
         if (node.classList.contains("card")) return;      // the card's children are checked
         var r = node.getBoundingClientRect();
         var b = {
           x1: (r.left - sr.left) / scale, y1: (r.top - sr.top) / scale,
           x2: (r.right - sr.left) / scale, y2: (r.bottom - sr.top) / scale
         };
+        if (node.classList.contains("annotation") && (b.x1 < 0 || b.y1 < 0 || b.x2 > W || b.y2 > H || node.scrollWidth > node.clientWidth + 1)) {
+          out.push({ index: i, slide: i + 1, el: "annotation", reason: "annotation leaves its box or the canvas", overlap: "-", text: plain(node.textContent).slice(0, 48) });
+        }
         bands.forEach(function (z) {
           var ow = Math.min(b.x2, z.x2) - Math.max(b.x1, z.x1);
           var oh = Math.min(b.y2, z.y2) - Math.max(b.y1, z.y1);
@@ -632,8 +694,12 @@
         ];
       };
       slide.querySelectorAll(
-        ".headline, .headline mark, .sub, .kicker, .cta, .counter, .edge-label, figcaption"
+        ".headline, .headline mark, .sub, .kicker, .ribbon-label, .paper-label, .annotation, .cta, .counter, .edge-label, figcaption"
       ).forEach(function (node) {
+          // Each ribbon has its own solid ground; the parent includes gaps
+          // exposing the photo and would report false contrast failures.
+          if (node.classList.contains("kicker") && node.querySelector(".ribbon-label")) return;
+          if (node.classList.contains("sub") && node.querySelector(".paper-label")) return;
           var r = node.getBoundingClientRect();
           if (!r.width || !r.height) return;
           var cs = getComputedStyle(node);
@@ -652,7 +718,7 @@
             slide: i + 1,
             el: node.tagName === "MARK"
               ? "highlight"
-              : (node.className.split(" ")[0] || node.tagName.toLowerCase()),
+              : (node.classList.contains("ribbon-label") ? "kicker" : node.classList.contains("paper-label") ? "sub" : (node.className.split(" ")[0] || node.tagName.toLowerCase())),
             role: slide.dataset.role,
             template: slide.dataset.template,
             // canvas pixels, so the audit can index straight into the PNG
@@ -928,7 +994,7 @@
         s.dataset.chrome = state.chrome ? "1" : "0";
       });
       document.body.dataset.edit = state.edit ? "1" : "0";
-      document.querySelectorAll("#deck .headline, #deck .sub, #deck .kicker, #deck .cta").forEach(function (n) {
+      document.querySelectorAll("#deck .headline, #deck .sub, #deck .kicker, #deck .cta, #deck .annotation").forEach(function (n) {
         n.contentEditable = state.edit ? "true" : "false";
       });
       var bar = document.getElementById("hud");
@@ -988,6 +1054,7 @@
         if (sub) rec.sub = toSrc(sub);
         if (k) rec.kicker = toSrc(k);
         if (c) rec.cta = toSrc(c);
+        if (slide.querySelector(".annotation")) rec.annotations = Array.from(slide.querySelectorAll(".annotation"), function (n) { return toSrc(n); });
         rec.status = approved ? (verdicts[i] === "change" ? "change" : "keep") : (verdicts[i] || "unreviewed");
         var r = document.querySelector('.review[data-index="' + i + '"] textarea');
         if (r && r.value.trim()) rec.note = r.value.trim();

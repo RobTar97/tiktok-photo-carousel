@@ -47,7 +47,7 @@ Each slide is a fixed 1080x1920 element built from layers:
 ```text
 layer-chrome    mock TikTok interface        studio only
 layer-safe      safe-zone x-ray              studio only
-layer-type      the copy (one .type-box)     autofitted
+layer-type      the copy + annotations      title autofitted
 layer-gen       code-drawn art               generated after fitting
 layer-art       template furniture           tape, strips, bento grid...
 layer-texture   grain + vignette
@@ -59,6 +59,11 @@ A template is mostly CSS that rearranges these layers. Clearances are written
 in terms of `--safe-t` and `--safe-b`, which come from one set of fractions in
 `deck.safe` - the same numbers the verifier checks, so the layout and the
 check cannot disagree.
+
+Dew annotations sit independently in `layer-type`, using fractional canvas
+coordinates. They stay editable and retain their positions when edits are
+merged. Paired layouts keep both photos below the scrim so the contrast audit
+can adjust readability across both halves.
 
 ## Fitting the type
 
@@ -124,7 +129,7 @@ about 1.1:1. Details in [Quality and testing](quality.md).
 
 | | |
 |---|---|
-| `html/templates.css` | the layer system, 22 templates, legibility rules |
+| `html/templates.css` | the layer system, 37 templates, legibility rules |
 | `html/engine.js` | building slides, themes and presets, autofit, verifier, measurements, studio, play mode |
 | `html/art.js` | seeded noise, the photo sampler, 21 generators |
 | `html/shell.html` | the studio page |

@@ -34,7 +34,7 @@ none of it reaches the export.
 | `P` | Play | The deck as a viewer meets it: phone frame, TikTok interface, auto-advancing. Arrows move, space pauses, Esc closes. |
 | `X` | Safe zones | Shades what TikTok covers, and the 1:1 crop the profile grid keeps |
 | `C` | TikTok UI | Draws the interface over every slide in the grid |
-| `E` | Edit text | Every headline, sub, kicker and CTA editable in place |
+| `E` | Edit text | Every headline, sub, kicker, CTA and annotation editable in place |
 | `V` | Check | Runs the safe-zone verifier |
 | `Ctrl+S` | Save edits | Downloads `edits.json`, not yet approved |
 | | **Approve deck** | Downloads `edits.json` marked approved |

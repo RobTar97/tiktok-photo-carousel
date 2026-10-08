@@ -916,6 +916,164 @@
   padding-right: max(calc(var(--fs) * 0.62), calc(var(--W) * 0.12));
 }
 
+/* --- 23-25. ribbon travel family ----------------------------------------
+   Short serif copy, individually fitted labels, and edge-only linework.
+   Symmetric rail clearance keeps the composition centred on the photo. */
+.slide:is([data-template="cover-ribbon"], [data-template="ribbon-destination"], [data-template="ribbon-tip"]) .layer-type {
+  justify-content: flex-start; align-items: center; text-align: center;
+  padding: max(440px, var(--safe-t)) max(var(--safe-x), calc(var(--rail) + 28px)) max(440px, var(--safe-b));
+}
+.slide:is([data-template="cover-ribbon"], [data-template="ribbon-destination"], [data-template="ribbon-tip"]) .type-box {
+  align-items: center; padding-right: 0; gap: 42px;
+}
+.slide[data-template="ribbon-destination"] .layer-type { justify-content: center; }
+.slide[data-template="ribbon-tip"] .layer-type {
+  justify-content: center;
+  padding-top: max(600px, var(--safe-t)); padding-bottom: max(480px, var(--safe-b));
+}
+.slide:is([data-template="cover-ribbon"], [data-template="ribbon-destination"], [data-template="ribbon-tip"]) .headline {
+  --leading: 1.08; --tracking: -0.025em; text-transform: none;
+}
+.slide:is([data-template="cover-ribbon"], [data-template="ribbon-destination"], [data-template="ribbon-tip"]) .kicker {
+  font-family: var(--font-hand, Georgia, serif); font-style: italic; font-weight: 400;
+  font-size: max(32px, min(58px, calc(var(--fs) * 0.44)));
+  line-height: 1.45; letter-spacing: -0.015em; text-transform: none;
+  color: var(--on-accent); text-shadow: none; max-width: 100%;
+}
+.ribbon-label {
+  display: inline-block; max-width: 100%; line-height: 1.15;
+  background: var(--accent); border-radius: 16px;
+  padding: 0.09em 0.42em 0.13em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.slide[data-template="ribbon-tip"] .kicker { order: 2; }
+.slide[data-template="ribbon-tip"] .sub { order: 3; }
+.slide[data-template="ribbon-tip"] .cta { order: 4; }
+.sunlit-lines {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  fill: none; stroke: var(--accent); stroke-width: 8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* --- 26-28. quiet editorial family --------------------------------------
+   Open space between the idea and its caption preserves the photograph.
+   min-height (not fixed height) lets autofit detect excessive copy. */
+.slide:is([data-template="cover-italic"], [data-template="numbered-moment"], [data-template="soft-close"]) .layer-type {
+  justify-content: flex-start; align-items: center; text-align: center;
+  padding: max(440px, var(--safe-t)) max(var(--safe-x), calc(var(--rail) + 28px)) max(360px, var(--safe-b));
+}
+.slide:is([data-template="cover-italic"], [data-template="numbered-moment"], [data-template="soft-close"]) .type-box {
+  align-items: center; padding-right: 0; gap: 20px; flex-shrink: 0;
+}
+.slide:is([data-template="cover-italic"], [data-template="numbered-moment"]) .type-box {
+  /* Leave 2px for rounding when the review studio scales a slide. */
+  min-height: calc(100% - 2px);
+}
+.slide[data-template="cover-italic"] .layer-type { padding-bottom: max(440px, var(--safe-b)); }
+.slide[data-template="cover-italic"] .headline { margin-top: auto; margin-bottom: auto; }
+.slide[data-template="numbered-moment"] .layer-type { padding-top: max(280px, var(--safe-t)); }
+.slide[data-template="numbered-moment"] .headline { font-size: min(var(--fs), 120px); }
+.slide[data-template="numbered-moment"] .sub { margin-top: auto; }
+.slide:is([data-template="cover-italic"], [data-template="numbered-moment"], [data-template="soft-close"]) .headline {
+  --leading: 0.94; --tracking: -0.035em; text-transform: none;
+}
+.slide:is([data-template="cover-italic"], [data-template="numbered-moment"], [data-template="soft-close"]) .kicker {
+  font-family: var(--font-text); font-size: 38px; font-weight: 400;
+  line-height: 1.15; letter-spacing: -0.025em; color: var(--ink);
+  text-transform: none; text-shadow: none;
+}
+.slide:is([data-template="cover-italic"], [data-template="numbered-moment"]) .sub {
+  font-size: 42px; line-height: 1.12; font-weight: 400;
+  letter-spacing: -0.045em; max-width: 100%;
+}
+.slide[data-template="soft-close"] .layer-type {
+  justify-content: center; padding-top: max(440px, var(--safe-t)); padding-bottom: max(440px, var(--safe-b));
+}
+.slide[data-template="soft-close"] .headline { font-size: min(var(--fs), 68px); --leading: 1.08; }
+
+/* --- 29-31. brush market family ----------------------------------------- */
+.slide:is([data-template="cover-brush"], [data-template="collage-right"], [data-template="collage-foot"]) .layer-type {
+  justify-content: flex-start; align-items: center; text-align: center;
+  padding: max(440px, var(--safe-t)) max(var(--safe-x), calc(var(--rail) + 28px)) max(440px, var(--safe-b));
+}
+.slide:is([data-template="cover-brush"], [data-template="collage-right"], [data-template="collage-foot"]) .type-box {
+  align-items: center; padding-right: 0; gap: 40px;
+}
+.slide:is([data-template="cover-brush"], [data-template="collage-right"], [data-template="collage-foot"]) .headline {
+  --leading: .98; --tracking: .005em; text-transform: uppercase;
+}
+.slide:is([data-template="cover-brush"], [data-template="collage-right"], [data-template="collage-foot"]) .sub {
+  font-family: var(--font-mono); font-size: 34px; font-weight: 400;
+  line-height: 1.18; letter-spacing: -.045em; text-transform: uppercase;
+  max-width: 100%; color: var(--paper-label-ink); text-shadow: none; font-style: normal;
+}
+.paper-label {
+  display: inline-block; max-width: 100%; padding: .06em .28em;
+  line-height: 1.08; background: var(--paper); border-radius: 0;
+}
+.collage-photo {
+  position: absolute; top: 9%; bottom: 9%; left: 7%; width: 65%; height: 82%;
+  object-fit: cover; display: block;
+}
+.slide[data-template="collage-right"] .layer-type {
+  padding-top: max(620px, var(--safe-t)); padding-left: max(270px, var(--safe-x));
+  align-items: flex-end; text-align: right;
+}
+.slide[data-template="collage-right"] .type-box { align-items: flex-end; }
+.slide[data-template="collage-foot"] .collage-photo { left: 29%; width: 64%; top: 7%; height: 84%; }
+.slide[data-template="collage-foot"] .layer-type {
+  justify-content: flex-end; align-items: flex-start; text-align: left;
+  padding-left: max(105px, var(--safe-x)); padding-bottom: max(420px, var(--safe-b));
+}
+.slide[data-template="collage-foot"] .type-box { align-items: flex-start; }
+
+/* --- 32-34. candid photo diary ------------------------------------------ */
+.slide:is([data-template="cover-diary"], [data-template="diary-note"], [data-template="diary-stack"]) .layer-type {
+  align-items: center; text-align: center; justify-content: flex-start;
+  padding: max(400px, var(--safe-t)) max(var(--safe-x), calc(var(--rail) + 28px)) max(360px, var(--safe-b));
+}
+.slide:is([data-template="cover-diary"], [data-template="diary-note"], [data-template="diary-stack"]) .type-box {
+  align-items: center; padding-right: 0; gap: 24px; flex-shrink: 0;
+}
+.slide:is([data-template="cover-diary"], [data-template="diary-note"], [data-template="diary-stack"]) .headline {
+  font-size: min(var(--fs), 56px); --leading: 1.2; --tracking: -.035em;
+  text-transform: none;
+}
+.slide:is([data-template="cover-diary"], [data-template="diary-note"], [data-template="diary-stack"]) .sub {
+  font-size: 48px; line-height: 1.2; letter-spacing: -.035em; max-width: 100%;
+}
+.slide[data-template="cover-diary"] .layer-type {
+  justify-content: center; padding-top: max(440px, var(--safe-t)); padding-bottom: max(440px, var(--safe-b));
+}
+.slide:is([data-template="diary-note"], [data-template="diary-stack"]) .type-box { min-height: calc(100% - 2px); }
+.slide:is([data-template="diary-note"], [data-template="diary-stack"]) .sub { margin-top: auto; }
+.slide[data-template="diary-stack"] .layer-photo > .photo { height: 50%; }
+.diary-second { position: absolute; left: 0; top: 50%; width: 100%; height: 50%; object-fit: cover; }
+.slide[data-template="diary-stack"] .layer-type { padding-top: max(810px, var(--safe-t)); }
+
+/* --- 35-37. soft annotated routine -------------------------------------- */
+.slide:is([data-template="cover-routine"], [data-template="routine-pair"]) .layer-photo > .photo { height: 50%; }
+.slide:is([data-template="cover-routine"], [data-template="routine-pair"], [data-template="routine-note"]) .layer-type {
+  justify-content: center; align-items: center; text-align: center;
+  padding: max(440px, var(--safe-t)) max(var(--safe-x), calc(var(--rail) + 28px)) max(440px, var(--safe-b));
+}
+.slide:is([data-template="cover-routine"], [data-template="routine-pair"], [data-template="routine-note"]) .type-box { align-items: center; padding-right: 0; gap: 20px; }
+.slide[data-template="cover-routine"] .headline { font-size: min(var(--fs), 100px); --leading: 1.02; --tracking: -.02em; }
+.slide:is([data-template="routine-pair"], [data-template="routine-note"]) .headline { font-size: min(var(--fs), 48px); --leading: 1.1; }
+/* Scattered copy needs coverage at every height, including below the title. */
+.slide:is([data-template="cover-routine"], [data-template="routine-pair"], [data-template="routine-note"]) .layer-scrim {
+  background: #000; opacity: var(--scrim, .45);
+}
+.annotation {
+  position: absolute; z-index: 1; width: max-content;
+  font-family: var(--font-text); font-size: 40px; font-weight: 700;
+  line-height: 1.1; letter-spacing: -.015em; text-align: center;
+  color: #fff; background: rgba(235,233,219,.13);
+  padding: 10px 14px; border-radius: 18px;
+  text-shadow: 0 1px 5px rgba(0,0,0,.15);
+}
+.annotation[data-surface="plain"] { background: none; padding: 0; border-radius: 0; }
+
 /* === VERTICAL JAPANESE TYPE ============================================
    Opt in per slide with "vertical": true. Only for JP/CJK copy.           */
 .slide[data-vertical="1"] .layer-type {

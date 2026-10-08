@@ -1,0 +1,41 @@
+{
+  "title": "Weekender — candid photo diary",
+  "photos": "../photos",
+  "theme": {
+    "preset": "weekender"
+  },
+  "slides": [
+    {
+      "template": "cover-diary",
+      "role": "cover",
+      "photo": "sea.jpg",
+      "text": "a little time // outside 💌",
+      "scrim": 0.68
+    },
+    {
+      "template": "diary-note",
+      "photo": "sunset.jpg",
+      "text": "an evening walk",
+      "sub": "by the water",
+      "scrim": 0.68
+    },
+    {
+      "template": "diary-stack",
+      "photo": "sea.jpg",
+      "photos": [
+        "sea.jpg",
+        "sunset.jpg"
+      ],
+      "text": "two views, one day",
+      "sub": "along the shore",
+      "scrim": 0.68
+    },
+    {
+      "template": "diary-note",
+      "role": "cta",
+      "photo": "hallway.jpg",
+      "text": "save this for // a slower day",
+      "scrim": 0.68
+    }
+  ]
+}

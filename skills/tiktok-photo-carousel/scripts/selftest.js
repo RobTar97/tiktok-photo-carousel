@@ -62,6 +62,21 @@ const TEMPLATES = [
   { template: "cover-word", role: "cover", photo: "b.png", kicker: "osaka", text: "This isn't a *render*", sub: "poster stack" },
   { template: "cover-split", role: "cover", photo: "c.png", kicker: "osaka", text: "Half photo, *half* block", sub: "the square keeps both" },
   { template: "cover-frame", role: "cover", photo: "a.png", kicker: "osaka", text: "A framed *print*", sub: "on the paper" },
+  { template: "cover-ribbon", role: "cover", photo: "a.png", kicker: "Things I noticed // along the shore", text: "Slow days." },
+  { template: "ribbon-destination", photo: "b.png", kicker: "One more stop", text: "Evening // light." },
+  { template: "ribbon-tip", photo: "c.png", kicker: "for a slower day", text: "Save this" },
+  { template: "cover-italic", role: "cover", photo: "a.png", text: "slow // weekends", sub: "(A LITTLE TIME TOGETHER)" },
+  { template: "numbered-moment", photo: "b.png", kicker: "01", text: "evening // walk", sub: "take the long way // by the water" },
+  { template: "soft-close", photo: "c.png", text: "(send this to someone // you want to go with)" },
+  { template: "cover-brush", role: "cover", photo: "a.png", text: "A day // outside", sub: "TAKE THE SLOW ROUTE" },
+  { template: "collage-right", photo: "a.png", photos: ["a.png", "b.png"], text: "By the // water", sub: "SEA AIR // AND TIME" },
+  { template: "collage-foot", photo: "c.png", photos: ["c.png", "b.png"], text: "Look closer", sub: "SAVE THESE VIEWS" },
+  { template: "cover-diary", role: "cover", photo: "a.png", text: "a little time // outside" },
+  { template: "diary-note", photo: "b.png", text: "evening walk", sub: "by the water" },
+  { template: "diary-stack", photo: "a.png", photos: ["a.png", "b.png"], text: "two views", sub: "along the shore", secondFocus: [0.3, 0.7] },
+  { template: "cover-routine", role: "cover", photo: "a.png", photos: ["a.png", "b.png"], text: "a slower day", annotations: [{ text: "outside", x: .14, y: .3, w: .3 }] },
+  { template: "routine-pair", photo: "a.png", photos: ["a.png", "b.png"], annotations: [{ text: "small details", x: .14, y: .2, w: .3 }] },
+  { template: "routine-note", photo: "c.png", annotations: [{ text: "take your time", x: .2, y: .48, w: .4 }] },
   { template: "full-bleed-hook", photo: "b.png", kicker: "look up", text: "A hook that fits", sub: "and a second line" },
   { template: "duotone-poster", photo: "c.png", text: "Goes vertical", pos: "top" },
   { template: "torn-reveal", photo: "a.png", text: "Torn open", sub: "paper over photo" },
@@ -134,6 +149,41 @@ const ART = [
   PRESETS.forEach((p) => {
     slides.push({ group: "presets", preset: p, template: "cover", photo: "a.png", text: "Preset *" + p + "*", sub: "cover in this look" });
     slides.push({ group: "presets", preset: p, template: "editorial-split", photo: "b.png", kicker: "look", text: "A build slide", sub: "in " + p });
+    ["cover-ribbon", "ribbon-destination", "ribbon-tip"].forEach((template, i) => {
+      slides.push({ group: "ribbon compatibility", preset: p, template,
+        role: i === 0 ? "cover" : "build", photo: ["a.png", "b.png", "c.png"][i],
+        kicker: i === 0 ? "Things I noticed // along the shore" : "for a slower day",
+        text: i === 1 ? "Evening // light." : "Slow days." });
+    });
+    ["cover-italic", "numbered-moment", "soft-close"].forEach((template, i) => {
+      slides.push({ group: "quiet editorial compatibility", preset: p, template,
+        role: i === 0 ? "cover" : "build", photo: ["a.png", "b.png", "c.png"][i],
+        kicker: i === 1 ? "01" : undefined,
+        text: i === 2 ? "(send this to someone // you want to go with)" : "slow // weekends",
+        sub: i < 2 ? "a little time together" : undefined });
+    });
+  });
+  PRESETS.forEach((p) => {
+    ["cover-brush", "collage-right", "collage-foot"].forEach((template, i) => {
+      slides.push({ group: "brush collage compatibility", preset: p, template,
+        role: i === 0 ? "cover" : "build", photo: "a.png", photos: ["a.png", "b.png"],
+        text: "Look // closer", sub: "A LITTLE TIME // BY THE WATER" });
+    });
+  });
+  PRESETS.forEach((p) => {
+    ["cover-diary", "diary-note", "diary-stack"].forEach((template, i) => {
+      slides.push({ group: "photo diary compatibility", preset: p, template,
+        role: i === 0 ? "cover" : "build", photo: "a.png", photos: ["a.png", "b.png"],
+        text: "a slower day", sub: i ? "by the water" : undefined });
+    });
+  });
+  PRESETS.forEach((p) => {
+    ["cover-routine", "routine-pair", "routine-note"].forEach((template, i) => {
+      slides.push({ group: "annotated routine compatibility", preset: p, template,
+        role: i === 0 ? "cover" : "build", photo: "a.png", photos: ["a.png", "b.png"],
+        text: i === 0 ? "a slower day" : undefined,
+        annotations: [{ text: "small details", x: .14, y: .3, w: .3 }, { text: "take your time", x: .42, y: .7, w: .34 }] });
+    });
   });
   ART.forEach((a) => slides.push({
     // A pen mark crosses the letters it annotates, so it has to be a colour
@@ -196,11 +246,23 @@ const ART = [
   await page.goto("file:///" + html.replace(/\\/g, "/"));
   await page.waitForSelector('body[data-ready="1"]');
   await page.waitForFunction(() => window.CAROUSEL && window.CAROUSEL.toggle);
+  // Full-height editorial boxes must fit identically in the scaled studio.
+  // Subpixel rounding once shrank one preview title to the minimum size.
+  const editorialSizes = await page.evaluate(() => window.CAROUSEL.slides.map((s, i) => ({
+    slide: i + 1, template: s.dataset.template,
+    size: s.querySelector(".headline") ? parseFloat(getComputedStyle(s.querySelector(".headline")).fontSize) : null
+  })).filter((s) => ["cover-italic", "numbered-moment", "soft-close", "cover-brush", "collage-right", "collage-foot", "cover-diary", "diary-note", "diary-stack", "cover-routine", "routine-pair", "routine-note"].includes(s.template) && s.size !== null));
+  editorialSizes.forEach((s) => {
+    const exported = report.boxes.find((b) => b.slide === s.slide && b.el === "headline");
+    if (!exported || Math.abs(exported.fontSize - s.size) > 1) fail("studio/export type size differs on slide " + s.slide);
+  });
   await page.click('.review[data-index="0"] [data-v="keep"]');
   await page.click('.review[data-index="1"] [data-v="change"]');
   await page.fill('.review[data-index="1"] textarea', "selftest note");
   await page.evaluate(() => {
     window.CAROUSEL.slides[2].querySelector(".headline").innerHTML = "Goes <mark>sideways</mark>";
+    const annotated = window.CAROUSEL.slides.find((s) => s.querySelector('.annotation'));
+    annotated.querySelector('.annotation').textContent = 'edited label';
   });
   const edits = await page.evaluate(() => window.CAROUSEL.collectEdits(true));
   await page.evaluate(() => document.activeElement && document.activeElement.blur());
@@ -231,6 +293,13 @@ const ART = [
   const outText = node("apply-edits.js", ["--deck", deckPath, "--edits", editsPath]);
   const merged = JSON.parse(fs.readFileSync(deckPath, "utf8"));
   if (merged.slides[2].text !== "Goes *sideways*") fail("apply-edits did not write the edited copy");
+  const annotationIndex = slides.findIndex((s) => s.annotations && s.annotations.length);
+  const originalAnnotation = slides[annotationIndex].annotations[0];
+  const mergedAnnotation = merged.slides[annotationIndex].annotations[0];
+  if (mergedAnnotation.text !== "edited label" ||
+      ['x', 'y', 'w', 'surface'].some((k) => mergedAnnotation[k] !== originalAnnotation[k])) {
+    fail("apply-edits did not preserve annotation text and placement");
+  }
   if (!/APPROVED/.test(outText) || !/selftest note/.test(outText)) fail("apply-edits summary is missing the verdict or the note");
   step("apply-edits merged the copy and reported the request");
 

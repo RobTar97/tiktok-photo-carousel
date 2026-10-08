@@ -44,11 +44,16 @@ node skills/tiktok-photo-carousel/scripts/selftest.js
 | Render | every template, preset and generator, 1080x1920, safe zones clear, `upload/` written |
 | Audit | contrast >= 3:1 everywhere after `--fix`, size floors held |
 | Studio | Keep / Change, a note, an inline edit with its highlight, Approve, play mode pauses and steps |
-| apply-edits | the copy lands in the deck and the request is reported |
+| apply-edits | the copy lands in the deck, annotation placement is retained, and the request is reported |
 | Video | frames pulled from a generated clip, if ffmpeg is installed |
 
 Steps that need a missing tool are skipped **and named**, never passed
 silently.
+
+The suite covers 315 slides: 39 template cases, all 15 presets, the five new
+layout families across every preset, and 21 art generators. The additional
+template cases exercise alternate content arrangements. Dew annotation text
+is included in editing, copy linting, safe zones and contrast checks.
 
 ## CI
 

@@ -9,7 +9,12 @@
     "07.jpg",
     "08.jpg",
     "09.jpg",
-    "10.jpg"
+    "10.jpg",
+    "11.jpg",
+    "12.jpg",
+    "13.jpg",
+    "14.jpg",
+    "15.jpg"
   ],
   "cover": "cover.jpg",
   "coverSlide": 1,
@@ -711,6 +716,356 @@
       "ownBgImage": false,
       "fontSize": 38,
       "scrim": 0.74,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "or it just feels that way"
+    },
+    {
+      "holes": [
+        [
+          279,
+          903,
+          550,
+          1063
+        ]
+      ],
+      "slide": 11,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        184,
+        770,
+        896,
+        1055
+      ],
+      "color": "rgb(255, 248, 227)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "This hallway never ends"
+    },
+    {
+      "holes": [],
+      "slide": 11,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        279,
+        903,
+        550,
+        1063
+      ],
+      "color": "rgb(255, 222, 0)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "never"
+    },
+    {
+      "holes": [],
+      "slide": 11,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        331,
+        1084,
+        749,
+        1150
+      ],
+      "color": "rgb(255, 248, 227)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 50,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "or it just feels that way"
+    },
+    {
+      "holes": [
+        [
+          318,
+          894,
+          549,
+          1054
+        ]
+      ],
+      "slide": 12,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        184,
+        788,
+        896,
+        1036
+      ],
+      "color": "rgb(245, 240, 184)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "600",
+      "text": "This hallway never ends"
+    },
+    {
+      "holes": [],
+      "slide": 12,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        318,
+        894,
+        549,
+        1054
+      ],
+      "color": "rgb(245, 240, 184)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "600",
+      "text": "never"
+    },
+    {
+      "holes": [],
+      "slide": 12,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        270,
+        1065,
+        810,
+        1132
+      ],
+      "color": "rgb(245, 240, 184)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 50,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "or it just feels that way"
+    },
+    {
+      "holes": [
+        [
+          290,
+          860,
+          548,
+          1027
+        ]
+      ],
+      "slide": 13,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        184,
+        750,
+        896,
+        1009
+      ],
+      "color": "rgb(255, 243, 204)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "This hallway never ends"
+    },
+    {
+      "holes": [],
+      "slide": 13,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        290,
+        860,
+        548,
+        1027
+      ],
+      "color": "rgb(235, 183, 94)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 132,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "never"
+    },
+    {
+      "holes": [],
+      "slide": 13,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        233,
+        1038,
+        847,
+        1170
+      ],
+      "color": "rgb(255, 243, 204)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 50,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "or it just feels that way"
+    },
+    {
+      "holes": [
+        [
+          249,
+          916,
+          540,
+          1052
+        ]
+      ],
+      "slide": 14,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        184,
+        799,
+        896,
+        1046
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 103,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "This hallway never ends"
+    },
+    {
+      "holes": [],
+      "slide": 14,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        249,
+        916,
+        540,
+        1052
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 103,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "never"
+    },
+    {
+      "holes": [],
+      "slide": 14,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        244,
+        1069,
+        836,
+        1121
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 39,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "or it just feels that way"
+    },
+    {
+      "holes": [
+        [
+          241,
+          895,
+          546,
+          1060
+        ]
+      ],
+      "slide": 15,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        184,
+        793,
+        896,
+        1040
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 121,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "This hallway never ends"
+    },
+    {
+      "holes": [],
+      "slide": 15,
+      "el": "highlight",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        241,
+        895,
+        546,
+        1060
+      ],
+      "color": "rgb(224, 227, 212)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 121,
+      "scrim": 0.86,
+      "hasPhoto": true,
+      "weight": "800",
+      "text": "never"
+    },
+    {
+      "holes": [],
+      "slide": 15,
+      "el": "sub",
+      "role": "cover",
+      "template": "cover",
+      "box": [
+        291,
+        1066,
+        789,
+        1127
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 46,
+      "scrim": 0.86,
       "hasPhoto": true,
       "weight": "500",
       "text": "or it just feels that way"

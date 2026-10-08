@@ -210,7 +210,7 @@ function lintCopy() {
   const never = ((deck.brandRules && deck.brandRules.never) || []).map((w) => w.toLowerCase());
   deck.slides.forEach((s, i) => {
     const at = `slide ${i + 1}`;
-    const all = [s.kicker, s.text, s.sub, s.cta].filter(Boolean).join(" ");
+    const all = [s.kicker, s.text, s.sub, s.cta].concat((s.annotations || []).map((a) => a.text)).filter(Boolean).join(" ");
     const count = ja ? all.replace(/\s|\*|\/\//g, "").length / 2.5 : words(all).length;
     // ~4 words a second on a phone; photo mode moves on after 3-5 seconds.
     if (count > 18) lint.push(["error", `${at}: ~${Math.round(count)} words - nobody reads that before it advances; split the slide`]);
@@ -219,7 +219,8 @@ function lintCopy() {
     if (marks > 1) lint.push(["warn", `${at}: ${marks} highlights - one per slide, or none of them stands out`]);
     if (s.cta || s.role === "cta") ctas++;
     if (LOUD.indexOf(s.template) >= 0) loud++;
-    if (!board && i > 0 && s.template === deck.slides[i - 1].template) {
+    // Numbered lists and candid diaries deliberately repeat their composition.
+    if (!board && i > 0 && s.template === deck.slides[i - 1].template && !["numbered-moment", "diary-note", "routine-pair"].includes(s.template)) {
       lint.push(["warn", `${at}: same template as the slide before - neighbours should differ`]);
     }
     const low = all.toLowerCase();

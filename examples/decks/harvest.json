@@ -1,0 +1,40 @@
+{
+  "title": "Harvest \u2014 brush and photo collage",
+  "photos": "../photos",
+  "theme": {
+    "preset": "harvest"
+  },
+  "slides": [
+    {
+      "template": "cover-brush",
+      "role": "cover",
+      "photo": "sunset.jpg",
+      "text": "A day // outside",
+      "sub": "TAKE THE SLOW ROUTE",
+      "scrim": 0.62
+    },
+    {
+      "template": "collage-right",
+      "photo": "sunset.jpg",
+      "photos": [
+        "sunset.jpg",
+        "sea.jpg"
+      ],
+      "text": "By the // water",
+      "sub": "SEA AIR // AND A LITTLE TIME",
+      "scrim": 0.62
+    },
+    {
+      "template": "collage-foot",
+      "role": "cta",
+      "photo": "sea.jpg",
+      "photos": [
+        "sea.jpg",
+        "hallway.jpg"
+      ],
+      "text": "Look closer",
+      "sub": "SAVE THESE VIEWS // FOR ANOTHER DAY",
+      "scrim": 0.62
+    }
+  ]
+}

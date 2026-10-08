@@ -1,8 +1,7 @@
 ---
 name: tiktok-photo-carousel
-description: Designs and renders TikTok photo-mode carousels from the user's own photos and video clips - never AI-generated images. Pulls the sharpest frames out of video (HDR tone-mapped), redraws photos in code (topographic contours of their own light, halftone, ASCII, dither, mosaic) and adds code-drawn art (pen marks aimed at the words, seals, badges, grids, light leaks). Ten ready-made style presets and twenty-two layout templates, including four covers built for the profile grid's 1:1 crop, scored hooks, a browser studio with per-slide approval and a phone-frame play mode, then pixel-exact 1080x1920 export with an upload-ready folder, a safe-zone check against TikTok's interface, and a contrast audit of the shipped pixels that fixes its own scrims. Use when the user asks for a TikTok carousel, photo-mode post, slideshow, photo dump, text over photos, slide captions, a travel or tips carousel, or turning photos or clips into slides.
+description: Create TikTok photo-mode carousels from the user's photos and video clips. Includes fifteen style presets, thirty-seven layouts, reference-led styling, frame extraction, code-drawn art, a review studio, 1080x1920 export, safe-zone checks and readability audits. Use for photo carousels, travel or tips slides, photo dumps, and text over the user's photos; does not generate or source replacement photography.
 license: MIT
-compatibility: Node 18+ and Playwright (npm install, then npx playwright install chromium). Python 3.9+ and Pillow. ffmpeg for video frames. Works on Windows, macOS and Linux.
 metadata:
   version: "3.1.1"
 ---
@@ -19,6 +18,8 @@ images with AI, and never use stock.
 Your judgment goes into choosing frames, writing the hook, picking the style
 and ordering the deck. Geometry, contrast and type fitting are measured by
 code - trust the reports over your eye, then check the pictures with your eye.
+
+**Requirements:** Node 18+ and Playwright (npm install, then npx playwright install chromium). Python 3.9+ and Pillow. ffmpeg for video frames. Works on Windows, macOS and Linux.
 
 Run commands from this skill's directory. `python3` on macOS/Linux, `python`
 on Windows. First run:
@@ -78,6 +79,24 @@ action. Caption rules: [references/captions.md](references/captions.md).
 Never invent facts - prices, rankings, counts, dates, measurements. Use what
 the user or their notes provide, or what the photos plainly show.
 
+## Reference-led styling
+
+When the user supplies visual references, read
+[references/reference-styles.md](references/reference-styles.md). Extract their
+photo treatment, typography, labels and composition. Use the `sunlit` preset
+and ribbon layouts for warm travel photography with cream serif titles,
+yellow italic labels and flowing yellow linework. Use `together` for muted
+lifestyle photos, butter-yellow italic titles, numbered activities and a quiet
+parenthetical close. Use `harvest` for cream brush capitals, typewriter paper
+labels and offset photo collages for markets and makers. Use `weekender` for
+candid photo diaries with small white mono captions and two-photo stacks. Use
+`dew` for paired product/routine photos with rounded sans type and movable
+translucent annotations.
+
+An explicitly selected reference is already a style direction: build its
+preview directly; offer alternatives only when useful or requested. Review
+the resulting slides in the studio as usual.
+
 ## Phase 3 - Concept board (gate 1)
 
 Pick three presets that suit the niche and the photos
@@ -100,9 +119,9 @@ settle a design conversation twenty questions will not.
 
 Write `deck.json` with `"theme": { "preset": "<chosen>" }` and a template per
 slide chosen by its job ([references/templates.md](references/templates.md)).
-**Slide 1 is a cover** - `cover`, `cover-word`, `cover-split` or
-`cover-frame`: the first image is the cover, and the profile grid crops it to
-1:1. Vary the cover across a user's posts, or their grid becomes one layout.
+**Slide 1 is a cover** - `cover`, `cover-word`, `cover-split`,
+`cover-frame`, `cover-ribbon`, `cover-italic`, `cover-brush`, `cover-diary` or `cover-routine`: the first image is the cover, and the profile
+grid crops it to 1:1. Vary the cover across a user's posts, or their grid becomes one layout.
 Schema: [references/deck-format.md](references/deck-format.md).
 
 ```bash
@@ -171,7 +190,7 @@ Do not post anything for the user.
 | `scripts/audit.py` | contrast and size audit of the shipped pixels; `--fix` |
 | `scripts/selftest.js` | renders every template, preset and generator and checks them |
 | `html/templates.css` `engine.js` `art.js` `shell.html` | the engine |
-| `presets/*.json` | the ten ready-made looks |
+| `presets/*.json` | the fifteen ready-made looks |
 | `brand/` | brand kits |
 | `scripts/carousel.py` | legacy Pillow renderer - offline, text over photo only |
 

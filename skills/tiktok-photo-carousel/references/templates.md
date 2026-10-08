@@ -1,6 +1,6 @@
 # Templates
 
-Twenty-two composition archetypes. A template decides the **layout** of a slide,
+Thirty-seven composition archetypes. A template decides the **layout** of a slide,
 not its font. Fonts, colour and code-drawn art come from the preset and theme, so every template in a
 deck still looks like one deck.
 
@@ -12,7 +12,7 @@ people by slide 3.
 
 | Slide | Job | Reach for |
 |---|---|---|
-| 1 | Stop the thumb, and survive the grid crop | **`cover`**, **`cover-word`**, **`cover-split`**, **`cover-frame`** |
+| 1 | Stop the thumb, and survive the grid crop | **`cover`**, **`cover-word`**, **`cover-split`**, **`cover-frame`**, **`cover-ribbon`**, **`cover-italic`**, **`cover-brush`**, **`cover-diary`**, **`cover-routine`** |
 | 2..n-1 | Carry one idea each | `editorial-split`, `index-card`, `caption-bar`, `arch-window`, `frosted-card`, `diagonal-split`, `notes-card`, `film-strip` |
 | any | A line worth hearing | `quote-pull` |
 | any | A real pairing | `compare` |
@@ -20,7 +20,7 @@ people by slide 3.
 | n-1 | The payoff | `polaroid-stack`, `full-bleed-hook`, `sticker-chaos` |
 | n | One call to action | `end-card` |
 
-**Slide 1 should normally be `cover`.** On a photo post the first image is the
+**Slide 1 should normally use a `cover*` template.** On a photo post the first image is the
 cover, and the profile grid crops it to 1:1 - every other template puts the
 headline where that crop cuts.
 
@@ -31,7 +31,7 @@ cover -> editorial-split -> caption-bar -> arch-window
 -> frosted-card -> index-card -> polaroid-stack -> end-card
 ```
 
-Vary, but keep two rules: **never two of the same template back to back**, and
+Vary, but keep two rules: **avoid identical compositions back to back unless following a coordinated reference family**, and
 **never more than three "loud" templates** (duotone, sticker, dreamcore) in
 one deck.
 
@@ -254,9 +254,8 @@ of pace, and five small photos read slower than one big one.
 ## Covers
 
 Slide 1 is the cover, and the profile grid crops it to the centre 1080x1080.
-Every cover keeps its title inside that square. Ten presets on one cover
-layout made a grid of posts look like one design in ten fonts - so there are
-four, and a feed of posts should rotate between them.
+Every cover keeps its title inside that square. There are nine cover layouts;
+rotate compositions as well as presets to give a feed variety.
 
 | Cover | Reach for it when | Watch for |
 |---|---|---|
@@ -264,6 +263,11 @@ four, and a feed of posts should rotate between them.
 | `cover-word` | the hook is 2-5 short words and you want a poster | long words share the width and come out smaller; busy photos need a dark scrim |
 | `cover-split` | the photo is busy, or you want the title to own half the frame | the subject has to be in the photo's top half |
 | `cover-frame` | quiet, premium, editorial - hotels, food, architecture | the photo is small; it needs one clear subject |
+| `cover-ribbon` | warm travel opener | leave room for the yellow kicker and edge linework |
+| `cover-italic` | intimate activity or date list | keep the italic title short |
+| `cover-brush` | market or maker story | use a short brush-lettered hook |
+| `cover-diary` | candid photo diary | small mono copy needs a quiet patch of photo |
+| `cover-routine` | a routine introduced with two photos | keep the title at the seam and labels clear of the interface |
 
 All four take `photo`, `text`, `sub?`, `kicker?` and `swipe?`.
 
@@ -306,3 +310,90 @@ in ink. Reads as a magazine cover in the grid.
    TikTok's interface - then run `scripts/audit.py`.
 7. Add it to `scripts/selftest.js`, and put it on a concept board in every
    preset. A template that only reads in one look is not finished.
+
+
+## 23–25. Reference-led ribbon family
+
+Pair with `sunlit` for the supplied Camiguin-inspired look. Other presets can
+supply their own fonts and colours to the same geometry.
+
+| Template | Composition | Fields |
+|---|---|---|
+| `cover-ribbon` | Stacked italic labels above a short title in the grid-safe upper band | `photo`, `kicker`, `text` |
+| `ribbon-destination` | Label above a centred two-line place or destination title | `photo`, `kicker`, `text` |
+| `ribbon-tip` | Short headline with the italic yellow label below | `photo`, `text`, `kicker` |
+
+Use ` // ` in `kicker` for individually sized labels, and in `text` for title
+breaks. `doodles: false` removes the decorative paths and circles. Optional
+`sub` works, but a short headline and label most closely match the reference.
+The layout owns the copy position; `pos` does not move these compositions.
+See [reference-styles.md](reference-styles.md) for provenance, photo selection,
+reference-specific details and the distinction between a label and a subtitle.
+
+
+## 26–28. Quiet editorial family
+
+Pair with `together` for the date-ideas reference. No decorative art is added
+by these templates. Fonts and palette still come from the chosen preset.
+
+| Template | Composition | Fields |
+|---|---|---|
+| `cover-italic` | Large centred title; small footer within the square crop | `photo`, `text`, `sub?` |
+| `numbered-moment` | Small number above the title; explanation near the foot | `photo`, `kicker`, `text`, `sub` |
+| `soft-close` | Small centred sharing sentence | `photo`, `text`, `role: "cta"` |
+
+`numbered-moment` can repeat consecutively for a consistent list. Use explicit
+`kicker` strings (`"01"`, `"02"`) and ` // ` breaks in `text` and `sub`.
+Keep titles short. The preset supplies italics for titles and upright serif
+for the close. See [reference-styles.md](reference-styles.md#together--date-ideas-reference).
+
+
+## 29–31. Brush market family
+
+Pair with `harvest` for cream brush capitals and typewriter paper labels.
+
+| Template | Composition | Fields |
+|---|---|---|
+| `cover-brush` | Upper centred title and label on a full-bleed photo | `photo`, `text`, `sub` |
+| `collage-right` | Left inset photo, right-aligned title across its edge | `photo`, `photos`, `text`, `sub` |
+| `collage-foot` | Right inset photo, lower-left title and label | `photo`, `photos`, `text`, `sub` |
+
+`photo` is the background; `photos[1]` is the inset, falling back to `photo`.
+Use `insetFocus` to adjust the inset independently of `focus`. `sub` uses plain
+text with ` // ` for separately sized paper strips. Read the
+[Harvest reference](reference-styles.md#harvest--bohol-market-reference) for
+crop, typography and photo-pairing guidance.
+
+
+## 32–34. Candid photo diary family
+
+Pair with `weekender`: small white mono captions, optional inline emoji,
+muted photos, no decorative art.
+
+| Template | Composition | Fields |
+|---|---|---|
+| `cover-diary` | Short centred caption within the square profile crop | `photo`, `text` |
+| `diary-note` | Upper title and optional low location line | `photo`, `text`, `sub?` |
+| `diary-stack` | Two edge-to-edge photo halves; title above seam, location below | `photo`, `photos`, `text`, `sub?` |
+
+For `diary-stack`, `photo` is the top image and `photos[1]` the bottom; missing
+second photo repeats the first. `focus` and `secondFocus` adjust crops
+independently. `diary-note` may repeat consecutively. See the
+[Weekender reference](reference-styles.md#weekender--outdoor-date-diary-reference).
+
+
+## 35–37. Annotated routine family
+
+Pair with `dew` for rounded white sans type and small translucent labels.
+
+| Template | Composition | Fields |
+|---|---|---|
+| `cover-routine` | Two photo halves, main title across seam, supporting labels | `photo`, `photos`, `text`, `annotations?` |
+| `routine-pair` | Two photo halves with independently positioned labels | `photo`, `photos`, `annotations` |
+| `routine-note` | Single full-bleed photo and a quiet reminder label | `photo`, `annotations` |
+
+Use `focus` for the top photo and `secondFocus` for the lower one. `text` is
+optional on supporting slides. Labels use canvas-relative `x`, `y`, `w` and
+`surface: "plain"` or `"glass"`. Repeated `routine-pair` entries are intentional.
+See [Dew](reference-styles.md#dew--annotated-skincare-reference) for placement,
+editing, audit behaviour and source interpretation.

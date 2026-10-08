@@ -1,0 +1,160 @@
+{
+  "slides": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg"
+  ],
+  "cover": "cover.jpg",
+  "coverSlide": 1,
+  "issues": [],
+  "boxes": [
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "kicker",
+      "role": "cover",
+      "template": "cover-ribbon",
+      "box": [
+        357,
+        444,
+        723,
+        523
+      ],
+      "color": "rgb(41, 37, 13)",
+      "ownBg": "rgb(255, 222, 0)",
+      "ownBgImage": false,
+      "fontSize": 58,
+      "scrim": 0.62,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "Things I noticed"
+    },
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "kicker",
+      "role": "cover",
+      "template": "cover-ribbon",
+      "box": [
+        369,
+        528,
+        711,
+        607
+      ],
+      "color": "rgb(41, 37, 13)",
+      "ownBg": "rgb(255, 222, 0)",
+      "ownBgImage": false,
+      "fontSize": 58,
+      "scrim": 0.62,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "along the shore"
+    },
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover-ribbon",
+      "box": [
+        248,
+        650,
+        832,
+        814
+      ],
+      "color": "rgb(255, 248, 227)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 152,
+      "scrim": 0.62,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "Slow days."
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "kicker",
+      "role": "build",
+      "template": "ribbon-destination",
+      "box": [
+        374,
+        737,
+        706,
+        816
+      ],
+      "color": "rgb(41, 37, 13)",
+      "ownBg": "rgb(255, 222, 0)",
+      "ownBgImage": false,
+      "fontSize": 58,
+      "scrim": 0.64,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "One more stop"
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "headline",
+      "role": "build",
+      "template": "ribbon-destination",
+      "box": [
+        312,
+        859,
+        768,
+        1187
+      ],
+      "color": "rgb(255, 248, 227)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 152,
+      "scrim": 0.64,
+      "hasPhoto": true,
+      "weight": "700",
+      "text": "Eveninglight."
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "kicker",
+      "role": "cta",
+      "template": "ribbon-tip",
+      "box": [
+        358,
+        1085,
+        722,
+        1164
+      ],
+      "color": "rgb(41, 37, 13)",
+      "ownBg": "rgb(255, 222, 0)",
+      "ownBgImage": false,
+      "fontSize": 58,
+      "scrim": 0.62,
+      "hasPhoto": true,
+      "weight": "400",
+      "text": "for a slower day"
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "headline",
+      "role": "cta",
+      "template": "ribbon-tip",
+      "box": [
+        295,
+        875,
+        785,
+        1039
+      ],
+      "color": "rgb(255, 248, 227)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 152,
+      "scrim": 0.62,
+      "hasPhoto": true,
+      "weight": "600",
+      "text": "Save this"
+    }
+  ],
+  "pageErrors": []
+}

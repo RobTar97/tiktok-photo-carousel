@@ -89,7 +89,7 @@
       "photo": "hallway.jpg",
       "kicker": "osaka",
       "text": "This hallway // never *ends*",
-      "sub": "one of four covers",
+      "sub": "one of nine covers",
       "scrim": 0.86
     },
     {
@@ -98,7 +98,7 @@
       "photo": "sunset.jpg",
       "kicker": "osaka",
       "text": "The harbour at *16:40*",
-      "sub": "one of four covers"
+      "sub": "one of nine covers"
     },
     {
       "role": "cover",
@@ -106,7 +106,7 @@
       "photo": "sea.jpg",
       "kicker": "osaka",
       "text": "A window on the *bay*",
-      "sub": "one of four covers"
+      "sub": "one of nine covers"
     }
   ]
 }

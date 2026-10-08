@@ -1,0 +1,29 @@
+{
+  "name": "together",
+  "label": "Together",
+  "for": "date ideas, shared activities, slow weekends, intimate lifestyle lists",
+  "signature": "Pale butter-yellow italic serif titles on muted photographs, tiny sans-serif numbering, low captions and a quiet parenthetical close. Based on supplied date-ideas references.",
+  "theme": {
+    "googleFonts": ["Cormorant Garamond:ital,wght@0,500;1,600", "Inter:wght@400"],
+    "display": "Cormorant Garamond, Georgia, serif",
+    "text": "Inter, Arial, sans-serif",
+    "hand": "Cormorant Garamond, Georgia, serif",
+    "mono": "Inter, Arial, sans-serif",
+    "displayWeight": 600,
+    "sizeMax": 216,
+    "ink": "#F5F0B8",
+    "muted": "#F5F0B8",
+    "accent": "#F5F0B8",
+    "onAccent": "#292B21",
+    "inkDark": "#292B21",
+    "bg": "#292B21",
+    "block": "#292B21",
+    "paper": "#F5F0B8",
+    "highlight": "plain",
+    "grain": 0.025,
+    "vignette": 0.12
+  },
+  "art": {},
+  "templates": ["cover-italic", "numbered-moment", "soft-close"],
+  "css": ".slide[data-preset='together'] .layer-photo .photo{filter:saturate(.72) sepia(.1) contrast(.94)}.slide[data-preset='together'] .headline{font-style:italic;font-weight:600;--tracking:-.035em;--leading:.94;text-shadow:none}.slide[data-preset='together'] .sub{font-style:normal;text-shadow:none}.slide[data-preset='together'][data-template='soft-close'] .headline{font-style:normal;font-weight:500;--leading:1.08}"
+}

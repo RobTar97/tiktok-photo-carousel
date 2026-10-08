@@ -13,9 +13,9 @@ Styled, reviewed, approved, exported and checked for readability - by an agent s
 
 [Get started](docs/getting-started.md) · [How it works](docs/how-it-works.md) · [Presets](skills/tiktok-photo-carousel/references/presets.md) · [Templates](skills/tiktok-photo-carousel/references/templates.md) · [All docs](docs/README.md)
 
-<img src="examples/renders/presets.png" alt="Ten style presets applied to the same demo photo" width="100%">
+<img src="examples/renders/presets.png" alt="Fifteen style presets applied to the same demo photo" width="100%">
 
-<sub>Ten ready-made presets, one demo photo. <code>contour</code> traces the photo's own light as a topographic map, <code>riso</code> re-screens it as two-ink halftone, <code>terminal</code> rebuilds it in ASCII, <code>photodump</code> tiles it round a sharp window.</sub>
+<sub>Fifteen ready-made presets, one demo photo. <code>contour</code> traces the photo's own light as a topographic map, <code>riso</code> re-screens it as two-ink halftone, <code>terminal</code> rebuilds it in ASCII, <code>photodump</code> tiles it round a sharp window.</sub>
 
 </div>
 
@@ -44,8 +44,8 @@ And it checks its own work. The safe zones come from TikTok's published specs an
 
 ### Ready styles
 
-- **10 presets** - one word sets fonts, palette, texture and art
-- **22 templates** - including **4 covers** built for the profile grid's crop
+- **15 presets** - one word sets fonts, palette, texture and art
+- **37 templates** - including **9 covers** built for the profile grid's crop
 - **Brand kits** layer your fonts and colours over any preset
 
 </td>
@@ -99,9 +99,61 @@ Two gates where **you** decide: the concept board (which look) and the studio (e
 
 ## Templates
 
-<img src="examples/renders/templates.png" alt="All twenty-two templates" width="100%">
+<img src="examples/renders/templates.png" alt="All thirty-seven templates" width="100%">
 
-<sub>All 22 on the repo's generated demo photos. → <a href="skills/tiktok-photo-carousel/references/templates.md">Template catalogue</a></sub>
+<sub>All 37 on the repo's generated demo photos. → <a href="skills/tiktok-photo-carousel/references/templates.md">Template catalogue</a></sub>
+
+### New: Sunlit travel family
+
+<img src="examples/renders/sunlit.png" alt="Three Sunlit layouts on synthetic demo photos: opener, destination and tip" width="100%">
+
+Inspired by supplied travel references: warm full-bleed photos, cream serif
+headlines, yellow italic labels and flowing vector linework. Includes
+`cover-ribbon`, `ribbon-destination` and `ribbon-tip`.
+
+[Reference breakdown](skills/tiktok-photo-carousel/references/reference-styles.md) ·
+[Runnable demo deck](examples/decks/sunlit.json)
+
+### New: Together editorial family
+
+<img src="examples/renders/together.png" alt="Together: italic cover, numbered activities and quiet closing prompt" width="100%">
+
+Muted photos, pale butter-yellow italic titles, tiny activity numbers and low
+captions. Based on the supplied date-ideas references. Includes `cover-italic`,
+`numbered-moment` and `soft-close`.
+
+[Reference breakdown](skills/tiktok-photo-carousel/references/reference-styles.md#together--date-ideas-reference) ·
+[Runnable demo deck](examples/decks/together.json)
+
+### New: Harvest market family
+
+<img src="examples/renders/harvest.png" alt="Harvest: brush-capital cover and two offset photo collages" width="100%">
+
+Cream brush lettering, typewriter labels and warm offset photo collages.
+Includes `cover-brush`, `collage-right` and `collage-foot`.
+
+[Reference breakdown](skills/tiktok-photo-carousel/references/reference-styles.md#harvest--bohol-market-reference) ·
+[Runnable demo deck](examples/decks/harvest.json)
+
+### New: Weekender photo diary
+
+<img src="examples/renders/weekender.png" alt="Weekender: small mono captions over candid-style photos and a two-photo stack" width="100%">
+
+Small white mono captions, muted photography and optional inline emoji.
+Includes `cover-diary`, `diary-note` and `diary-stack`.
+
+[Reference breakdown](skills/tiktok-photo-carousel/references/reference-styles.md#weekender--outdoor-date-diary-reference) ·
+[Runnable demo deck](examples/decks/weekender.json)
+
+### New: Dew annotated routine
+
+<img src="examples/renders/dew.png" alt="Dew: paired photos, rounded white title and positioned translucent labels" width="100%">
+
+Soft photo pairs, a bold title across the seam, and independently editable
+labels. Includes `cover-routine`, `routine-pair` and `routine-note`.
+
+[Reference breakdown](skills/tiktok-photo-carousel/references/reference-styles.md#dew--annotated-skincare-reference) ·
+[Runnable demo deck](examples/decks/dew.json)
 
 ## Documentation
 
@@ -122,7 +174,7 @@ The complete, categorised index is **[docs/README.md](docs/README.md)**.
 skills/tiktok-photo-carousel/   the skill - this folder is what gets installed
   SKILL.md                      the workflow the agent follows
   html/                         engine: templates, rendering, code-drawn art, studio
-  presets/                      the ten looks (JSON - add your own)
+  presets/                      the fifteen looks (JSON - add your own)
   scripts/                      frames, analyze, build, apply-edits, export, audit, selftest
   references/                   reference docs the agent reads on demand
 docs/                           guides for people
@@ -136,4 +188,4 @@ Presets, templates, generators and niche playbooks are all welcome. Every one is
 
 ## License
 
-[MIT](LICENSE). Bundled fonts for the legacy renderer are under the SIL Open Font License 1.1 (`skills/tiktok-photo-carousel/fonts/OFL-*.txt`). All demo images are generated by code, so nothing in `examples/` is copyrighted.
+[MIT](LICENSE). Bundled fonts for the legacy renderer are under the SIL Open Font License 1.1 (`skills/tiktok-photo-carousel/fonts/OFL-*.txt`). Demo photos are generated by code and included under this repository's MIT license; supplied reference screenshots are not redistributed.

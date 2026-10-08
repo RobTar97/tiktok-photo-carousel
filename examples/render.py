@@ -93,11 +93,30 @@ def main():
     run([PY, os.path.join(SKILL, "analyze.py"), "--photos", PHOTOS,
          "--out", os.path.join(DECKS, "analysis.json")])
     print("renders")
-    for name in ("templates-1", "templates-2", "presets"):
+    for name in ("templates-1", "templates-2", "presets", "sunlit", "together", "harvest", "weekender", "dew"):
         render(name)
     print("overviews")
-    compose(slides_in(os.path.join(RENDERS, "templates-1")) + slides_in(os.path.join(RENDERS, "templates-2")),
-            os.path.join(RENDERS, "templates.png"), cols=8)
+    compose(slides_in(os.path.join(RENDERS, "dew")), os.path.join(RENDERS, "dew.png"), cols=4,
+            labels=["cover-routine", "routine-pair", "routine-pair", "routine-note"], w=270, h=480)
+    compose(slides_in(os.path.join(RENDERS, "weekender")), os.path.join(RENDERS, "weekender.png"), cols=4,
+            labels=["cover-diary", "diary-note", "diary-stack", "diary-note"], w=270, h=480)
+    compose(slides_in(os.path.join(RENDERS, "harvest")), os.path.join(RENDERS, "harvest.png"), cols=3,
+            labels=["cover-brush", "collage-right", "collage-foot"], w=360, h=640)
+    compose(slides_in(os.path.join(RENDERS, "together")), os.path.join(RENDERS, "together.png"), cols=4,
+            labels=["cover-italic", "numbered-moment", "numbered-moment", "soft-close"], w=270, h=480)
+    compose(slides_in(os.path.join(RENDERS, "sunlit")), os.path.join(RENDERS, "sunlit.png"), cols=3,
+            labels=["cover-ribbon", "ribbon-destination", "ribbon-tip"], w=360, h=640)
+    # One example per template, including the five reference-led families.
+    template_files, template_labels = [], []
+    for name in ("templates-1", "templates-2", "sunlit", "together", "harvest", "weekender", "dew"):
+        with open(os.path.join(DECKS, name + ".json"), encoding="utf-8") as f:
+            deck = json.load(f)
+        for slide, image in zip(deck["slides"], slides_in(os.path.join(RENDERS, name))):
+            template = slide["template"]
+            if template not in template_labels:
+                template_files.append(image)
+                template_labels.append(template)
+    compose(template_files, os.path.join(RENDERS, "templates.png"), cols=8, labels=template_labels)
     presets = json.load(open(os.path.join(DECKS, "presets.json"), encoding="utf-8"))
     compose(slides_in(os.path.join(RENDERS, "presets")), os.path.join(RENDERS, "presets.png"), cols=5,
             labels=[s.get("preset", "") for s in presets["slides"]], w=270, h=480)

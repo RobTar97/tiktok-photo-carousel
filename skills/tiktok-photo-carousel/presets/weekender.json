@@ -1,0 +1,35 @@
+{
+  "name": "weekender",
+  "label": "Weekender",
+  "for": "candid date ideas, camping, slow outings, everyday photo diaries",
+  "signature": "Small white monospaced captions over muted candid photos; optional inline emoji, low location credits and an edge-to-edge two-frame stack. Based on supplied outdoor date references.",
+  "theme": {
+    "googleFonts": [
+      "Roboto Mono:wght@500;600"
+    ],
+    "display": "Roboto Mono, monospace",
+    "text": "Roboto Mono, monospace",
+    "mono": "Roboto Mono, monospace",
+    "hand": "Roboto Mono, monospace",
+    "displayWeight": 500,
+    "sizeMax": 56,
+    "ink": "#FFFFFF",
+    "muted": "#FFFFFF",
+    "accent": "#FFFFFF",
+    "onAccent": "#202722",
+    "paper": "#F0F0E7",
+    "inkDark": "#202722",
+    "bg": "#202722",
+    "block": "#202722",
+    "grain": 0.025,
+    "vignette": 0.08,
+    "highlight": "plain"
+  },
+  "art": {},
+  "templates": [
+    "cover-diary",
+    "diary-note",
+    "diary-stack"
+  ],
+  "css": ".slide[data-preset='weekender'] .layer-photo img{filter:saturate(.74) sepia(.06) contrast(.96)}.slide[data-preset='weekender'] .headline,.slide[data-preset='weekender'] .sub{font-style:normal;text-transform:none;text-shadow:0 1px 6px rgba(0,0,0,.28);--tracking:-.035em;--leading:1.2}"
+}

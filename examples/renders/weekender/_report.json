@@ -1,0 +1,140 @@
+{
+  "slides": [
+    "01.jpg",
+    "02.jpg",
+    "03.jpg",
+    "04.jpg"
+  ],
+  "cover": "cover.jpg",
+  "coverSlide": 1,
+  "issues": [],
+  "boxes": [
+    {
+      "holes": [],
+      "slide": 1,
+      "el": "headline",
+      "role": "cover",
+      "template": "cover-diary",
+      "box": [
+        334,
+        893,
+        746,
+        1027
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 56,
+      "scrim": 0.68,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "a little timeoutside 💌"
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "headline",
+      "role": "build",
+      "template": "diary-note",
+      "box": [
+        303,
+        400,
+        777,
+        467
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 56,
+      "scrim": 0.68,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "an evening walk"
+    },
+    {
+      "holes": [],
+      "slide": 2,
+      "el": "sub",
+      "role": "build",
+      "template": "diary-note",
+      "box": [
+        377,
+        1500,
+        703,
+        1558
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 48,
+      "scrim": 0.68,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "by the water"
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "headline",
+      "role": "build",
+      "template": "diary-stack",
+      "box": [
+        255,
+        810,
+        825,
+        877
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 56,
+      "scrim": 0.68,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "two views, one day"
+    },
+    {
+      "holes": [],
+      "slide": 3,
+      "el": "sub",
+      "role": "build",
+      "template": "diary-stack",
+      "box": [
+        337,
+        1500,
+        743,
+        1558
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 48,
+      "scrim": 0.68,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "along the shore"
+    },
+    {
+      "holes": [],
+      "slide": 4,
+      "el": "headline",
+      "role": "cta",
+      "template": "diary-note",
+      "box": [
+        334,
+        400,
+        746,
+        534
+      ],
+      "color": "rgb(255, 255, 255)",
+      "ownBg": "rgba(0, 0, 0, 0)",
+      "ownBgImage": false,
+      "fontSize": 56,
+      "scrim": 0.68,
+      "hasPhoto": true,
+      "weight": "500",
+      "text": "save this fora slower day"
+    }
+  ],
+  "pageErrors": []
+}

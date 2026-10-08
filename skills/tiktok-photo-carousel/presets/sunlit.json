@@ -1,0 +1,27 @@
+{
+  "name": "sunlit",
+  "label": "Sunlit",
+  "for": "warm travel diaries, island guides, food closeups, short practical tips",
+  "signature": "Cream editorial serif on warm olive photographs; butter-yellow italic ribbons and thin wandering edge lines, inspired by supplied Camiguin travel references.",
+  "theme": {
+    "googleFonts": ["Cormorant Garamond:ital,wght@0,600;0,700;1,400"],
+    "display": "Cormorant Garamond, Georgia, serif",
+    "text": "Cormorant Garamond, Georgia, serif",
+    "hand": "Cormorant Garamond, Georgia, serif",
+    "displayWeight": 700,
+    "sizeMax": 152,
+    "accent": "#FFDE00",
+    "onAccent": "#29250D",
+    "ink": "#FFF8E3",
+    "muted": "#FFF8E3",
+    "bg": "#24291A",
+    "block": "#24291A",
+    "paper": "#FFF8E3",
+    "highlight": "plain",
+    "grain": 0.035,
+    "vignette": 0.18
+  },
+  "art": {},
+  "templates": ["cover-ribbon", "ribbon-destination", "ribbon-tip"],
+  "css": ".slide[data-preset='sunlit'] .layer-photo .photo{filter:sepia(.24) saturate(.82) contrast(.94) brightness(.94)}.slide[data-preset='sunlit'] .headline{--leading:1.08;--tracking:-.025em;text-shadow:0 2px 14px rgba(25,27,12,.22)}.slide[data-preset='sunlit'] .sub{font-style:italic}.slide[data-preset='sunlit'][data-template='ribbon-tip'] .headline{font-weight:600}"
+}
